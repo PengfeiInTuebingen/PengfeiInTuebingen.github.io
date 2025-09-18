@@ -1,12 +1,3 @@
----
-output:
-  format:
-  docx:
-    toc: true
-    number-sections: true
-    highlight-style: github
----
-
 # Pengfei Liu (刘鹏飞)
 
 <img src="./WechatIMG1216.jpg" alt="Profile Photo" width="140" height="180" style="float: right; margin-left: 40px;"/>
