@@ -58,21 +58,23 @@ Shanghai, China \| September 2017 - June 2020
 
 ## Publications
 
-1.  **Pengfei Liu**, Rory J. Craig, et al. 2025. "Evolution of 3D chromatin architecture of brown algal genomes". (in preparation)
+† These authors contributed equally to this work.
 
-2.  Josué Barrera-Redondo†, Agnieszka P Lipinska†, **Pengfei Liu**, et al. 2025. "Origin and evolutionary trajectories of brown algal sex chromosomes". **Nature Ecology and Evolution** [doi.org/10.1038/s41559-025-02838-w](https://doi.org/10.1038/s41559-025-02838-w)
+1.  **Pengfei Liu**, Rory J. Craig, Elena Avdievich, Fabian B. Haas, Chang Liu, Susana M Coelho. 2025. "Lineage-wide evolution of 3D genome organisation and centromeres in brown algae". **bioRxiv**  [doi.org/10.64898/2025.12.07.692804]( https://www.biorxiv.org/content/10.64898/2025.12.07.692804v1.full)
 
-3.  **Pengfei Liu**, Jeromine Vigneau, Rory J. Craig, et al. 2024. "3D Chromatin Maps of a Brown Alga Reveal U/V Sex Chromosome Spatial Organization". **Nature Communications**, 15, 9590. [doi:10.1038/s41467-024-53453-5](https://doi.org/10.1038/s41467-024-53453-5)
+2.  Jeromine Vigneau†, Jaruwatana Sodai Lotharukpong†, **Pengfei Liu**, Remy Luthringer, Bérangère Lombard, Damarys Loew, Fabian Haas, Michael Borg, Susana M Coelho. 2025. "Rewiring of chromatin regulation underlies the evolution of brown algal multicellularity". **bioRxiv**  [doi.org/10.1101/2025.09.16.676480]( https://doi.org/10.1101/2025.09.16.676480)
 
-4.  **Pengfei Liu**, Yanhui Bi, Qian Zheng, et al. 2023. "Molecular and FISH Analysis of 45S rDNA on BAC Molecule of *Saccharina japonica*". **Aquaculture and Fisheries** 8(2). [doi:10.1016/j.aaf.2021.07.002](https://doi.org/10.1016/j.aaf.2021.07.002)
+3.  Josué Barrera-Redondo†, Agnieszka P Lipinska†, **Pengfei Liu**, Erica Dinatale, Guillaume Cossard, Kenny Bogaert, Masakazu Hoshino, Komlan Avia, Goncalo Leiria, Elena Avdievich, Daniel Liesner, Rémy Luthringer, Olivier Godfroy, Svenja Heesch, Zofia Nehr, Loraine Brillet-Guéguen, Akira F. Peters, Galice Hoarau, Gareth Pearson, Jean-Marc Aury, Patrick Wincker, France Denoeud, J Mark Cock, Fabian B. Haas, and Susana M Coelho. 2025. "Origin and evolutionary trajectories of brown algal sex chromosomes". **Nature Ecology and Evolution** [doi.org/10.1038/s41559-025-02838-w](https://doi.org/10.1038/s41559-025-02838-w)
 
-5.  Yu Du, **Pengfei Liu**, Zhi Li, et al. 2022. "Discerning the Putative U and V Chromosomes of *Saccharina japonica* by Cytogenetic Mapping of Sex-Linked Molecular Markers". **Frontiers in Marine Science** 9. [doi:10.3389/fmars.2022.821603](https://doi.org/10.3389/fmars.2022.821603)
+4.  **Pengfei Liu**, Jeromine Vigneau, Rory J. Craig, Josue Barrera-Redondo, Elena Avdievich, Claudia Martinho, Michael Borg, Fabian B. Haas, Chang Liu, and Susana M Coelho. 2024. "3D Chromatin Maps of a Brown Alga Reveal U/V Sex Chromosome Spatial Organization". **Nature Communications**. [doi:10.1038/s41467-024-53453-5](https://doi.org/10.1038/s41467-024-53453-5)
 
-6.  **Pengfei Liu**, Jungang Gu, Yanhui Bi, et al. 2021. "Construction of a BAC Library of Female Gametophytes of *Saccharina japonica* and Map Cloning and Sequencing of Genes Neighboring a Female-Specific Marker FRML-1488". **Journal of Fisheries of China** 45(5). [doi:10.11964/jfc.20200112143](https://doi.org/10.11964/jfc.20200112143)
+5.  **Pengfei Liu**, Yanhui Bi, Qian Zheng, Li Liu, Yu Du, Yu Liu, Zhigang Zhou. 2023. "Molecular and FISH Analysis of 45S rDNA on BAC Molecule of *Saccharina japonica*". **Aquaculture and Fisheries**. [doi:10.1016/j.aaf.2021.07.002](https://doi.org/10.1016/j.aaf.2021.07.002)
 
-7.  Yu Liu, **Pengfei Liu**, Yanhui Bi, et al. 2021. "Chromosomal Mapping of 5S and 18S-5.8S-25S rRNA Genes in *Saccharina japonica* by Dual-Color FISH". **Journal of Oceanology and Limnology** 39(2). [doi:10.1007/s00343-020-9276-5](https://doi.org/10.1007/s00343-020-9276-5)
+6.  Yu Du, **Pengfei Liu**, Zhi Li, Qian Zheng, Yanhui Bi, Zhigang Zhou. 2022. "Discerning the Putative U and V Chromosomes of *Saccharina japonica* by Cytogenetic Mapping of Sex-Linked Molecular Markers". **Frontiers in Marine Science**. [doi:10.3389/fmars.2022.821603](https://doi.org/10.3389/fmars.2022.821603)
 
-8.  Wushan Dong†, **Pengfei Liu†**, Yu Liu, et al. 2020. "Immunocytochemical Localization of the Kinetochore Protein Nuf2p on Gametophyte Chromosomes of a Saccharina Cultivar". **Frontiers in Marine Science** 7. [doi:10.3389/fmars.2020.539260](https://doi.org/10.3389/fmars.2020.539260)
+7.  Yu Liu, **Pengfei Liu**, Yanhui Bi, Zhigang Zhou. 2021. "Chromosomal Mapping of 5S and 18S-5.8S-25S rRNA Genes in *Saccharina japonica* by Dual-Color FISH". **Journal of Oceanology and Limnology**. [doi:10.1007/s00343-020-9276-5](https://doi.org/10.1007/s00343-020-9276-5)
+
+8.  Wushan Dong†, **Pengfei Liu†**, Yu Liu, Yu Du, Yanhui Bi, Zhigang Zhou. 2020. "Immunocytochemical Localization of the Kinetochore Protein Nuf2p on Gametophyte Chromosomes of a Saccharina Cultivar". **Frontiers in Marine Science**. [doi:10.3389/fmars.2020.539260](https://doi.org/10.3389/fmars.2020.539260)
 
 ------------------------------------------------------------------------
 
