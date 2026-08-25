@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="2026年8月25日黄金、白银与日元每日市场简报">
+  <link rel="canonical" href="https://pengfeiliu.com/markets/2026-08-25/">
+  <title>黄金 · 白银 · 日元每日简报｜2026-08-25</title>
+  <style>
+    :root {
+      --bg: #eef3f1;
+      --surface: #ffffff;
+      --surface-soft: #f6f8f7;
+      --ink: #14201f;
+      --muted: #62706d;
+      --line: #dce5e2;
+      --navy: #102927;
+      --teal: #168c78;
+      --teal-soft: #dff3ed;
+      --gold: #bd8731;
+      --gold-soft: #f8edd7;
+      --red: #bd4a53;
+      --red-soft: #f9e4e6;
+      --amber: #c07c22;
+      --amber-soft: #fff0d5;
+      --blue: #356f9f;
+      --blue-soft: #e6f0f8;
+      --shadow: 0 16px 45px rgba(22, 47, 43, .08);
+      --radius: 22px;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0c1514;
+      --surface: #12201e;
+      --surface-soft: #172724;
+      --ink: #eef6f3;
+      --muted: #9fb0ac;
+      --line: #2a3e3a;
+      --navy: #e4f3ef;
+      --teal: #52c9ae;
+      --teal-soft: #173d35;
+      --gold: #e2b65e;
+      --gold-soft: #3b3020;
+      --red: #ef8c94;
+      --red-soft: #3d2528;
+      --amber: #e9a951;
+      --amber-soft: #3c3020;
+      --blue: #77abd5;
+      --blue-soft: #1b3041;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .2);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--teal) 12%, transparent), transparent 28rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+    button { font: inherit; }
+    .container { width: min(1180px, calc(100% - 36px)); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+      background: color-mix(in srgb, var(--bg) 87%, transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar-inner {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 760;
+      letter-spacing: .02em;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(145deg, #163b37, #168c78);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav a, .icon-btn {
+      border: 0;
+      border-radius: 10px;
+      color: var(--muted);
+      background: transparent;
+      padding: 8px 11px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav a:hover, .icon-btn:hover { background: var(--surface); color: var(--ink); }
+    .icon-btn { width: 40px; height: 40px; padding: 0; font-size: 18px; }
+
+    .hero { padding: 58px 0 24px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(330px, .75fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin: 0 0 22px;
+      font-size: clamp(42px, 6.4vw, 78px);
+      line-height: 1.03;
+      letter-spacing: -.055em;
+      font-weight: 800;
+    }
+
+    .hero-copy {
+      max-width: 790px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+    }
+
+    .hero-copy strong { color: var(--ink); }
+    .meta-row {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+    .dot.amber { background: var(--amber); }
+
+    .event-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 100%;
+      border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
+      border-radius: var(--radius);
+      padding: 26px;
+      color: #fff;
+      background: linear-gradient(145deg, #142d2a 0%, #1a3934 58%, #6e5229 145%);
+      box-shadow: var(--shadow);
+    }
+
+    .event-card::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -90px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      border: 46px solid rgba(255,255,255,.05);
+    }
+
+    .event-label { color: #d8c397; font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .event-card h2 { position: relative; z-index: 1; margin: 12px 0 5px; font-size: 24px; line-height: 1.2; }
+    .event-time { color: rgba(255,255,255,.7); font-size: 14px; }
+    .countdown {
+      position: relative;
+      z-index: 1;
+      margin: 30px 0 18px;
+      font-size: clamp(30px, 4vw, 44px);
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      letter-spacing: -.035em;
+    }
+    .event-note { position: relative; z-index: 1; margin: 0; color: rgba(255,255,255,.76); font-size: 14px; }
+
+    .section { padding: 38px 0; scroll-margin-top: 78px; }
+    .section-head {
+      margin-bottom: 19px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .section-kicker { margin-bottom: 6px; color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+    .section h2 { margin: 0; font-size: clamp(27px, 4vw, 40px); letter-spacing: -.035em; }
+    .section-note { max-width: 470px; margin: 0; color: var(--muted); text-align: right; font-size: 14px; }
+
+    .tape {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .quote-card, .panel, .tech-card, .scenario, .score-panel, .source-panel {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .quote-card {
+      min-height: 142px;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .quote-top { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+    .quote-label { color: var(--muted); font-size: 13px; }
+    .change { font-size: 13px; font-weight: 800; white-space: nowrap; }
+    .positive { color: var(--teal); }
+    .negative { color: var(--red); }
+    .quote-value { margin: 13px 0 6px; font-size: 29px; line-height: 1; font-weight: 790; letter-spacing: -.025em; }
+    .quote-note { color: var(--muted); font-size: 12px; }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .panel { border-radius: var(--radius); padding: 24px; }
+    .panel h3 { margin: 0 0 15px; font-size: 19px; }
+    .signal-list { display: grid; gap: 15px; }
+    .signal-row { display: grid; grid-template-columns: 102px 1fr auto; gap: 12px; align-items: center; }
+    .signal-name { font-weight: 720; }
+    .signal-detail { color: var(--muted); font-size: 14px; }
+    .tag { padding: 5px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .tag.good { color: var(--teal); background: var(--teal-soft); }
+    .tag.watch { color: var(--amber); background: var(--amber-soft); }
+    .tag.risk { color: var(--red); background: var(--red-soft); }
+
+    .score-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .headline-score { border-radius: 17px; padding: 18px; background: var(--surface-soft); }
+    .score-label { color: var(--muted); font-size: 13px; }
+    .score-number { margin: 5px 0; font-size: 44px; line-height: 1; font-weight: 820; letter-spacing: -.05em; }
+    .score-number.gold { color: var(--gold); }
+    .score-number.silver { color: var(--blue); }
+    .score-caption { font-size: 13px; font-weight: 750; }
+
+    .score-meter {
+      position: relative;
+      height: 8px;
+      margin-top: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--red-soft), var(--surface-soft) 50%, var(--teal-soft));
+    }
+
+    .score-meter::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--muted); opacity: .45; }
+    .score-meter::after { content: ""; position: absolute; left: var(--pos); top: 50%; width: 14px; height: 14px; transform: translate(-50%, -50%); border: 3px solid var(--surface); border-radius: 50%; background: var(--teal); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+
+    .tech-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .tech-card { border-radius: var(--radius); padding: 24px; }
+    .tech-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .ticker { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .tech-card h3 { margin: 3px 0 0; font-size: 24px; }
+    .price { margin: 21px 0 3px; font-size: 38px; font-weight: 800; letter-spacing: -.04em; }
+    .price-sub { color: var(--muted); font-size: 13px; }
+
+    .range { margin: 28px 0 20px; }
+    .range-track { position: relative; height: 9px; border-radius: 999px; background: linear-gradient(90deg, var(--red-soft), var(--gold-soft), var(--teal-soft)); }
+    .range-track::after { content: ""; position: absolute; left: var(--position); top: 50%; width: 16px; height: 16px; transform: translate(-50%, -50%); border: 4px solid var(--surface); border-radius: 50%; background: var(--ink); box-shadow: 0 2px 9px rgba(0,0,0,.25); }
+    .range-labels { display: flex; justify-content: space-between; margin-top: 8px; color: var(--muted); font-size: 11px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat { border-radius: 12px; padding: 11px; background: var(--surface-soft); }
+    .stat span { display: block; color: var(--muted); font-size: 11px; }
+    .stat strong { display: block; margin-top: 3px; font-size: 14px; }
+    .trigger { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .trigger strong { color: var(--ink); }
+
+    .scenario-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .scenario { position: relative; overflow: hidden; border-radius: var(--radius); padding: 24px; }
+    .scenario::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--amber); }
+    .scenario.up::before { background: var(--teal); }
+    .scenario.down::before { background: var(--red); }
+    .scenario-label { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .scenario h3 { margin: 7px 0 15px; font-size: 22px; }
+    .scenario ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+    .scenario li + li { margin-top: 8px; }
+
+    .macro-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .55fr); gap: 18px; }
+    .score-panel { border-radius: var(--radius); padding: 24px; }
+    .score-panel h3 { margin: 0 0 20px; font-size: 20px; }
+    .layer-table { display: grid; gap: 15px; }
+    .layer {
+      display: grid;
+      grid-template-columns: minmax(142px, 1fr) minmax(210px, 1.55fr) 66px 66px;
+      gap: 14px;
+      align-items: center;
+    }
+    .layer-name strong { display: block; font-size: 14px; }
+    .layer-name span { color: var(--muted); font-size: 11px; }
+    .contribution { display: grid; gap: 7px; }
+    .bar {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      overflow: hidden;
+    }
+    .bar::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line); z-index: 2; }
+    .fill { position: absolute; top: 0; bottom: 0; border-radius: 999px; }
+    .fill.gold { left: 50%; width: var(--width); background: var(--gold); }
+    .fill.silver { left: 50%; width: var(--width); background: var(--blue); }
+    .fill.negative { left: calc(50% - var(--width)); width: var(--width); background: var(--red); }
+    .layer-value { text-align: right; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .legend { display: flex; gap: 16px; margin-top: 20px; color: var(--muted); font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+    .legend i.silver { background: var(--blue); }
+
+    .insight-stack { display: grid; gap: 18px; }
+    .insight { border-radius: 17px; padding: 19px; background: var(--surface-soft); }
+    .insight-label { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .insight h4 { margin: 7px 0 8px; font-size: 17px; }
+    .insight p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .risk-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .position-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .position-box { border-radius: 14px; padding: 14px; background: var(--surface-soft); }
+    .position-box span { display: block; color: var(--muted); font-size: 12px; }
+    .position-box strong { display: block; margin-top: 4px; font-size: 23px; }
+    .position-meta { margin-top: 16px; color: var(--muted); font-size: 13px; }
+
+    .timeline { display: grid; gap: 14px; }
+    .timeline-item { display: grid; grid-template-columns: 74px 1fr; gap: 13px; }
+    .timeline-date { color: var(--teal); font-size: 12px; font-weight: 820; }
+    .timeline-item strong { display: block; font-size: 14px; }
+    .timeline-item span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+
+    .sources { padding-bottom: 74px; }
+    .source-panel { border-radius: var(--radius); padding: 24px; }
+    .source-panel p { margin: 0; color: var(--muted); font-size: 13px; }
+    .source-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
+    .source-links a { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 12px; }
+    .source-links a:hover { border-color: var(--teal); color: var(--teal); }
+
+    footer { border-top: 1px solid var(--line); padding: 24px 0 36px; color: var(--muted); font-size: 12px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; }
+
+    @media (max-width: 980px) {
+      .nav a { display: none; }
+      .hero-grid, .macro-layout { grid-template-columns: 1fr; }
+      .tape { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tech-grid, .scenario-grid { grid-template-columns: 1fr; }
+      .event-card { min-height: 280px; }
+    }
+
+    @media (max-width: 720px) {
+      .container { width: min(100% - 24px, 1180px); }
+      .hero { padding-top: 36px; }
+      h1 { font-size: 46px; }
+      .signal-grid, .risk-layout, .score-pair { grid-template-columns: 1fr; }
+      .section { padding: 29px 0; }
+      .section-head { align-items: start; flex-direction: column; }
+      .section-note { text-align: left; }
+      .layer { grid-template-columns: 1fr 76px 76px; }
+      .contribution { grid-column: 1 / -1; grid-row: 2; }
+      .position-grid { grid-template-columns: 1fr; }
+      .signal-row { grid-template-columns: 88px 1fr; }
+      .signal-row .tag { grid-column: 2; justify-self: start; }
+      .footer-inner { flex-direction: column; }
+    }
+
+    @media (max-width: 460px) {
+      .tape { grid-template-columns: 1fr; }
+      .meta-row { align-items: stretch; flex-direction: column; }
+      .pill { justify-content: center; }
+      .layer { grid-template-columns: 1fr 58px 58px; }
+    }
+
+    @media print {
+      :root { --bg: #fff; --surface: #fff; --surface-soft: #f5f6f5; --ink: #111; --muted: #555; --line: #ddd; --shadow: none; }
+      .topbar, .countdown { display: none !important; }
+      body { background: #fff; }
+      .hero { padding-top: 18px; }
+      .section { padding: 22px 0; break-inside: avoid; }
+      .event-card, .quote-card, .panel, .tech-card, .scenario, .score-panel, .source-panel { box-shadow: none; break-inside: avoid; }
+      .event-card { color: #111; background: #f5f0e6; }
+      .event-time, .event-note { color: #555; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">MY</span>
+        <span>Metals &amp; Yen Daily</span>
+      </div>
+      <nav class="nav" aria-label="页面导航">
+        <a href="/">主页</a>
+        <a href="#market">行情</a>
+        <a href="#technical">技术</a>
+        <a href="#scenarios">情景</a>
+        <a href="#macro">宏观评分</a>
+        <button class="icon-btn" id="themeToggle" aria-label="切换深浅色">◐</button>
+        <button class="icon-btn" onclick="window.print()" aria-label="打印网页">⌁</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="eyebrow">Daily briefing · Snapshot</div>
+        <div class="hero-grid">
+          <div>
+            <h1>黄金偏强，白银待确认，日元守枢轴。</h1>
+            <p class="hero-copy">
+              金银中期结构仍偏多，但短线进入高波动消化。<strong>黄金 RSI 70.9 已偏热</strong>，白银仍未收复 200 日均线；
+              美元与长债收益率回落形成支持，但美国 10 年实际利率 2.40% 仍是约束。USD/JPY 只有跌破 158，才确认日元进一步走强。
+            </p>
+            <div class="meta-row">
+              <span class="pill"><span class="dot"></span>观察时点 2026-08-25 15:48 CEST</span>
+              <span class="pill"><span class="dot amber"></span>IBKR 10–15 分钟延迟</span>
+              <span class="pill">现货与期货分开计量</span>
+            </div>
+          </div>
+          <aside class="event-card" aria-label="下一关键事件">
+            <div class="event-label">Next macro event</div>
+            <h2>美国 GDP 二估、企业利润与 7 月 PCE</h2>
+            <div class="event-time">2026-08-26 · 14:30 CEST</div>
+            <div class="countdown" id="countdown">计算中…</div>
+            <p class="event-note">这是未来 24–48 小时最重要的跳空风险。若数据推升实际利率与美元，贵金属评分需要同步下调。</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="market">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Market snapshot</div>
+            <h2>行情快照</h2>
+          </div>
+          <p class="section-note">现货金银为约 07:00 CEST 的公开快照；其余为 IBKR 延迟行情或日线。此处不是实时行情终端。</p>
+        </div>
+        <div class="tape">
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">黄金现货 XAU/USD</span><span class="change negative">−0.3%</span></div>
+            <div class="quote-value">4,688.96</div>
+            <div class="quote-note">公开行情 · 约 07:00 CEST</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">白银现货 XAG/USD</span><span class="change positive">+0.8%</span></div>
+            <div class="quote-value">69.51</div>
+            <div class="quote-note">公开行情 · 约 07:00 CEST</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">USD/JPY</span><span class="change positive">+0.09%</span></div>
+            <div class="quote-value">159.26</div>
+            <div class="quote-note">IBKR midpoint · 日线</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">美元指数 DXU6</span><span class="change negative">−0.07%</span></div>
+            <div class="quote-value">98.87</div>
+            <div class="quote-note">IBKR · 延迟约 15 分钟</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">美债 10 年</span><span class="change negative">−4.6bp</span></div>
+            <div class="quote-value">4.658%</div>
+            <div class="quote-note">IBKR TNX · 14:20 CEST</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">美债 30 年</span><span class="change negative">−4.0bp</span></div>
+            <div class="quote-value">5.191%</div>
+            <div class="quote-note">IBKR TYX · 14:20 CEST</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">VIX</span><span class="change negative">−4.5%</span></div>
+            <div class="quote-value">15.13</div>
+            <div class="quote-note">IBKR · 延迟盘中</div>
+          </article>
+          <article class="quote-card">
+            <div class="quote-top"><span class="quote-label">SPX / NDX</span><span class="change positive">+0.35 / +0.77%</span></div>
+            <div class="quote-value">7,679 / 29,247</div>
+            <div class="quote-note">IBKR · 15:30 CEST</div>
+          </article>
+        </div>
+
+        <div class="signal-grid">
+          <article class="panel">
+            <h3>跨资产确认</h3>
+            <div class="signal-list">
+              <div class="signal-row"><span class="signal-name">收益率</span><span class="signal-detail">10Y / 30Y 回落约 4–5bp</span><span class="tag good">支持金价</span></div>
+              <div class="signal-row"><span class="signal-name">风险偏好</span><span class="signal-detail">NDX 跑赢 SPX，VIX 回落</span><span class="tag good">改善</span></div>
+              <div class="signal-row"><span class="signal-name">实际利率</span><span class="signal-detail">10Y 仍在 2.40%</span><span class="tag risk">估值约束</span></div>
+            </div>
+          </article>
+          <article class="panel">
+            <h3>综合评分</h3>
+            <div class="score-pair">
+              <div class="headline-score">
+                <div class="score-label">黄金</div>
+                <div class="score-number gold">+46</div>
+                <div class="score-caption">明确支持</div>
+                <div class="score-meter" style="--pos:73%"></div>
+              </div>
+              <div class="headline-score">
+                <div class="score-label">白银</div>
+                <div class="score-number silver">+24</div>
+                <div class="score-caption">轻度支持</div>
+                <div class="score-meter" style="--pos:62%"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="technical">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Technical structure</div>
+            <h2>技术结构与失效位</h2>
+          </div>
+          <p class="section-note">指标基于 IBKR 一年日线。位置条仅表达当前价在战术支撑与阻力之间的位置，不是价格预测。</p>
+        </div>
+        <div class="tech-grid">
+          <article class="tech-card">
+            <div class="tech-head">
+              <div><div class="ticker">GCZ6 · COMEX</div><h3>黄金</h3></div>
+              <span class="tag watch">趋势偏多 / 过热</span>
+            </div>
+            <div class="price">4,670.7</div>
+            <div class="price-sub">20E 4,444 · 50E 4,375 · 200S 4,635</div>
+            <div class="range">
+              <div class="range-track" style="--position:45.6%"></div>
+              <div class="range-labels"><span>支撑 4,600</span><span>阻力 4,755</span></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><span>RSI 14</span><strong>70.9</strong></div>
+              <div class="stat"><span>MACD / signal</span><strong>117.9 / 84.0</strong></div>
+              <div class="stat"><span>布林上轨</span><strong>4,771</strong></div>
+              <div class="stat"><span>结构支撑</span><strong>4,635 / 4,600</strong></div>
+            </div>
+            <div class="trigger"><strong>确认：</strong>日收高于 4,755 且放量。<br><strong>失效：</strong>日收低于 4,600。</div>
+          </article>
+
+          <article class="tech-card">
+            <div class="tech-head">
+              <div><div class="ticker">SIU6 · COMEX</div><h3>白银</h3></div>
+              <span class="tag watch">反弹 / 未反转</span>
+            </div>
+            <div class="price">67.64</div>
+            <div class="price-sub">20E 64.76 · 50E 64.61 · 200S 72.55</div>
+            <div class="range">
+              <div class="range-track" style="--position:61%"></div>
+              <div class="range-labels"><span>支撑 63.8</span><span>阻力 70.1</span></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><span>RSI 14</span><strong>60.4</strong></div>
+              <div class="stat"><span>MACD / signal</span><strong>1.88 / 1.29</strong></div>
+              <div class="stat"><span>布林上轨</span><strong>70.98</strong></div>
+              <div class="stat"><span>200 日均线</span><strong>72.55</strong></div>
+            </div>
+            <div class="trigger"><strong>确认：</strong>日收高于 70.1，进一步看 72.55。<br><strong>失效：</strong>日收低于 62.45。</div>
+          </article>
+
+          <article class="tech-card">
+            <div class="tech-head">
+              <div><div class="ticker">IDEALPRO</div><h3>USD/JPY</h3></div>
+              <span class="tag good">日元略占优</span>
+            </div>
+            <div class="price">159.26</div>
+            <div class="price-sub">20E 159.52 · 50E 160.11 · 200S 158.36</div>
+            <div class="range">
+              <div class="range-track" style="--position:60%"></div>
+              <div class="range-labels"><span>日元确认 158</span><span>失效 160.1</span></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><span>RSI 14</span><strong>45.8</strong></div>
+              <div class="stat"><span>MACD / signal</span><strong>−0.54 / −0.64</strong></div>
+              <div class="stat"><span>支撑</span><strong>158.98 / 158.36</strong></div>
+              <div class="stat"><span>阻力</span><strong>159.65 / 160.1</strong></div>
+            </div>
+            <div class="trigger"><strong>日元走强确认：</strong>USD/JPY 日收低于 158。<br><strong>失效：</strong>日收高于 160.1。</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="scenarios">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Conditional map</div>
+            <h2>24–48 小时条件情景</h2>
+          </div>
+          <p class="section-note">每个情景都有触发与确认条件；在条件未成立前，不把观点当成交易信号。</p>
+        </div>
+        <div class="scenario-grid">
+          <article class="scenario">
+            <div class="scenario-label">Base case</div>
+            <h3>基准：高位震荡</h3>
+            <ul>
+              <li>DXY 维持 98.5–99.5，10Y 位于 4.60–4.75%。</li>
+              <li>黄金 4,600–4,755，白银 63.8–70.1 消化涨幅。</li>
+              <li>USD/JPY 围绕 159 震荡，等待 PCE。</li>
+            </ul>
+          </article>
+          <article class="scenario up">
+            <div class="scenario-label">Upside</div>
+            <h3>贵金属上行 / 日元强</h3>
+            <ul>
+              <li>触发：10Y &lt; 4.60%，DXY &lt; 98.48。</li>
+              <li>确认：黄金 &gt; 4,755，白银 &gt; 70.1。</li>
+              <li>USD/JPY &lt; 158，日元升值链条成立。</li>
+            </ul>
+          </article>
+          <article class="scenario down">
+            <div class="scenario-label">Downside</div>
+            <h3>贵金属回撤 / 日元弱</h3>
+            <ul>
+              <li>触发：PCE 偏热、10Y &gt; 4.75%、DXY &gt; 99.50。</li>
+              <li>确认：黄金 &lt; 4,600，白银 &lt; 63.8。</li>
+              <li>USD/JPY &gt; 160.1，下一观察 161.5。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="macro">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Six-layer framework</div>
+            <h2>六层宏观评分</h2>
+          </div>
+          <p class="section-note">总分 = Σ（原始分 −1 至 +1 × 权重）×100。图中展示每层对总分的实际贡献。</p>
+        </div>
+        <div class="macro-layout">
+          <article class="score-panel">
+            <h3>各层贡献</h3>
+            <div class="layer-table">
+              <div class="layer">
+                <div class="layer-name"><strong>L1 全球流动性</strong><span>权重 30%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:41.25%"></span></div><div class="bar"><span class="fill silver" style="--width:26.25%"></span></div></div>
+                <div class="layer-value">+16.50</div><div class="layer-value">+10.50</div>
+              </div>
+              <div class="layer">
+                <div class="layer-name"><strong>L2 经济周期</strong><span>权重 25%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:15.63%"></span></div><div class="bar"><span class="fill negative" style="--width:6.25%"></span></div></div>
+                <div class="layer-value">+6.25</div><div class="layer-value negative">−2.50</div>
+              </div>
+              <div class="layer">
+                <div class="layer-name"><strong>L3 通胀</strong><span>权重 20%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:27.5%"></span></div><div class="bar"><span class="fill silver" style="--width:22.5%"></span></div></div>
+                <div class="layer-value">+11.00</div><div class="layer-value">+9.00</div>
+              </div>
+              <div class="layer">
+                <div class="layer-name"><strong>L4 跨资产</strong><span>权重 15%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:22.5%"></span></div><div class="bar"><span class="fill silver" style="--width:13.13%"></span></div></div>
+                <div class="layer-value">+9.00</div><div class="layer-value">+5.25</div>
+              </div>
+              <div class="layer">
+                <div class="layer-name"><strong>L5 仓位情绪</strong><span>权重 7%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:3.5%"></span></div><div class="bar"><span class="fill silver" style="--width:2.63%"></span></div></div>
+                <div class="layer-value">+1.40</div><div class="layer-value">+1.05</div>
+              </div>
+              <div class="layer">
+                <div class="layer-name"><strong>L6 政策 / 地缘</strong><span>权重 3%</span></div>
+                <div class="contribution"><div class="bar"><span class="fill gold" style="--width:4.13%"></span></div><div class="bar"><span class="fill silver" style="--width:2.63%"></span></div></div>
+                <div class="layer-value">+1.65</div><div class="layer-value">+1.05</div>
+              </div>
+            </div>
+            <div class="legend"><span><i></i>黄金贡献</span><span><i class="silver"></i>白银贡献</span></div>
+          </article>
+
+          <aside class="score-panel">
+            <h3>为什么黄金优于白银</h3>
+            <div class="insight-stack">
+              <div class="insight">
+                <div class="insight-label">LIQUIDITY</div>
+                <h4>美元走弱，信用未承压</h4>
+                <p>Fed 资产同比仍扩张，ON RRP 接近耗尽，HY OAS 2.70%、VIX 15.13。</p>
+              </div>
+              <div class="insight">
+                <div class="insight-label">DIVERGENCE</div>
+                <h4>工业周期拖累白银</h4>
+                <p>Q2 GDP 初值 +1.5%，增长放缓压制工业需求；白银仍低于 200 日均线。</p>
+              </div>
+              <div class="insight">
+                <div class="insight-label">INFLATION</div>
+                <h4>对冲需求仍在</h4>
+                <p>6 月 PCE 同比 3.7%；但 10 年实际利率 2.40%，意味着利多并非无条件。</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risk">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Positioning & events</div>
+            <h2>仓位与事件风险</h2>
+          </div>
+          <p class="section-note">事件前后可能出现跳空与滑点；静态止损并不等于保证成交。</p>
+        </div>
+        <div class="risk-layout">
+          <article class="panel">
+            <h3>白银 CFTC 管理资金</h3>
+            <div class="position-grid">
+              <div class="position-box"><span>多头</span><strong>19,533</strong></div>
+              <div class="position-box"><span>空头</span><strong>7,838</strong></div>
+              <div class="position-box"><span>净多</span><strong class="positive">11,695</strong></div>
+            </div>
+            <div class="position-meta">周变动 +537 张 · 持仓日 8月18日 · 8月21日发布 · 下次计划发布 8月28日。结论：净多但不拥挤。</div>
+          </article>
+          <article class="panel">
+            <h3>未来一周时间线</h3>
+            <div class="timeline">
+              <div class="timeline-item"><div class="timeline-date">8/26 14:30</div><div><strong>美国 GDP、企业利润、7月 PCE</strong><span>本期最重要的利率与美元触发器</span></div></div>
+              <div class="timeline-item"><div class="timeline-date">8/26 盘后</div><div><strong>英伟达业绩</strong><span>影响 NDX、风险偏好与白银的工业需求叙事</span></div></div>
+              <div class="timeline-item"><div class="timeline-date">8/28</div><div><strong>Fed 主席 Kevin Warsh 讲话</strong><span>关注通胀、金融条件与长端收益率表述</span></div></div>
+              <div class="timeline-item"><div class="timeline-date">8/28</div><div><strong>CFTC COT 更新</strong><span>验证白银管理资金是否继续增持</span></div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sources" id="sources">
+      <div class="container">
+        <div class="source-panel">
+          <h3>数据口径与来源</h3>
+          <p>IBKR 是市场与技术数据的优先来源，但本次 XAU/XAG 伦敦现货不可用，因此现货卡片使用约 07:00 CEST 的公开快照，并与 COMEX 期货技术序列严格分开。宏观数据按最后发布日期使用，不把滞后数据标成实时值。网页保存的是 2026-08-25 15:48 CEST 的分析快照。</p>
+          <div class="source-links">
+            <a href="https://www.bea.gov/news/schedule/full" target="_blank" rel="noreferrer">BEA 发布日程</a>
+            <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm" target="_blank" rel="noreferrer">Fed 7月声明</a>
+            <a href="https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k260731a.pdf" target="_blank" rel="noreferrer">BoJ 7月声明</a>
+            <a href="https://fred.stlouisfed.org/series/WALCL" target="_blank" rel="noreferrer">Fed 资产负债表</a>
+            <a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noreferrer">10年实际利率</a>
+            <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noreferrer">CFTC COT</a>
+            <a href="https://finance.yahoo.com/markets/commodities/articles/gold-pulls-back-three-month-093355050.html" target="_blank" rel="noreferrer">现货公开快照</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>Metals &amp; Yen Daily · 2026-08-25</span>
+      <span>结构化市场研究，不构成投资建议或收益保证。</span>
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const themeButton = document.getElementById("themeToggle");
+    const savedTheme = localStorage.getItem("brief-theme");
+    if (savedTheme === "dark" || savedTheme === "light") root.dataset.theme = savedTheme;
+    themeButton.addEventListener("click", () => {
+      const next = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      localStorage.setItem("brief-theme", next);
+    });
+
+    const countdown = document.getElementById("countdown");
+    const eventTime = new Date("2026-08-26T14:30:00+02:00").getTime();
+    function updateCountdown() {
+      const delta = eventTime - Date.now();
+      if (delta <= 0) {
+        countdown.textContent = "事件时间已到";
+        return;
+      }
+      const hours = Math.floor(delta / 3600000);
+      const minutes = Math.floor((delta % 3600000) / 60000);
+      const seconds = Math.floor((delta % 60000) / 1000);
+      countdown.textContent = `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
