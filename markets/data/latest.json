@@ -1,34 +1,8 @@
 {
   "calendar": {
-    "checked_at": "2026-08-26T11:29:07Z",
+    "checked_at": "2026-08-26T13:17:45Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "ecd7c040faee",
-        "impact": "High",
-        "official": true,
-        "original_title": "GDP (Second Estimate) and Corporate Profits, 2nd Quarter 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-08-26T12:30:00Z",
-        "title": "美国 GDP 第二次估值"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "19b9aa6b3903",
-        "impact": "High",
-        "official": true,
-        "original_title": "Personal Income and Outlays, July 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-08-26T12:30:00Z",
-        "title": "美国个人收入与支出（含 PCE）"
-      },
       {
         "country": "USD",
         "forecast": "0.2%",
@@ -314,20 +288,46 @@
         "source_url": "https://www.bea.gov/news/schedule",
         "timestamp": "2026-11-04T13:30:00Z",
         "title": "美国国际贸易"
+      },
+      {
+        "country": "USD",
+        "forecast": "",
+        "id": "ea6438ce821d",
+        "impact": "High",
+        "official": true,
+        "original_title": "GDP (Second Estimate) and Corporate Profits, 3rd Quarter 2026",
+        "previous": "",
+        "source": "U.S. BEA",
+        "source_url": "https://www.bea.gov/news/schedule",
+        "timestamp": "2026-11-25T13:30:00Z",
+        "title": "美国 GDP 第二次估值"
+      },
+      {
+        "country": "USD",
+        "forecast": "",
+        "id": "53fa07815483",
+        "impact": "High",
+        "official": true,
+        "original_title": "Personal Income and Outlays, October 2026",
+        "previous": "",
+        "source": "U.S. BEA",
+        "source_url": "https://www.bea.gov/news/schedule",
+        "timestamp": "2026-11-25T13:30:00Z",
+        "title": "美国个人收入与支出（含 PCE）"
       }
     ],
     "next_event": {
       "country": "USD",
-      "forecast": "",
-      "id": "ecd7c040faee",
+      "forecast": "0.2%",
+      "id": "f623769db85d",
       "impact": "High",
-      "official": true,
-      "original_title": "GDP (Second Estimate) and Corporate Profits, 2nd Quarter 2026",
-      "previous": "",
-      "source": "U.S. BEA",
-      "source_url": "https://www.bea.gov/news/schedule",
+      "official": false,
+      "original_title": "Core PCE Price Index m/m",
+      "previous": "0.1%",
+      "source": "Forex Factory public calendar feed",
+      "source_url": "https://www.forexfactory.com/calendar",
       "timestamp": "2026-08-26T12:30:00Z",
-      "title": "美国 GDP 第二次估值"
+      "title": "美国核心 PCE"
     },
     "source_statuses": [
       {
@@ -336,7 +336,7 @@
         "status": "ok"
       },
       {
-        "events": 15,
+        "events": 13,
         "source": "BEA",
         "status": "ok"
       },
@@ -463,15 +463,15 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-08-26T12:04:13Z",
+    "as_of": "2026-08-26T13:17:43Z",
     "assets": {
       "gold": {
         "drivers": [
           {
-            "direction": "支持",
-            "fact": "黄金 UTC 日内 +0.12%",
+            "direction": "压制",
+            "fact": "黄金 UTC 日内 -0.34%",
             "name": "黄金日内动量",
-            "raw": 1.0,
+            "raw": -1.0,
             "weight": 0.25
           },
           {
@@ -503,18 +503,18 @@
             "weight": 0.15
           }
         ],
-        "interpretation": "当前规则得分 +45，对黄金明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 -5，对黄金中性等待。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": 45,
-        "stance": "明显支持"
+        "score": -5,
+        "stance": "中性等待"
       },
       "silver": {
         "drivers": [
           {
-            "direction": "支持",
-            "fact": "白银 UTC 日内 +0.36%",
+            "direction": "压制",
+            "fact": "白银 UTC 日内 -0.59%",
             "name": "白银日内动量",
-            "raw": 1.0,
+            "raw": -1.0,
             "weight": 0.25
           },
           {
@@ -553,9 +553,9 @@
             "weight": 0.15
           }
         ],
-        "interpretation": "当前规则得分 +85，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +35，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 85,
+        "score": 35,
         "stance": "明显支持"
       },
       "yen": {
@@ -596,12 +596,12 @@
       }
     },
     "date": "2026-08-26",
-    "headline": "黄金明显支持；白银明显支持；日元温和压制。",
+    "headline": "黄金中性等待；白银明显支持；日元温和压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；缺失因子不参与加权，不用 AI 补写。",
-    "next_event_text": "下一事件：08-26 14:30 美国 GDP 第二次估值",
+    "next_event_text": "下一事件：08-26 14:30 美国核心 PCE",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金明显支持；白银明显支持；日元温和压制。下一事件：08-26 14:30 美国 GDP 第二次估值。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金中性等待；白银明显支持；日元温和压制。下一事件：08-26 14:30 美国核心 PCE。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "CORE_PCE_YOY": {
@@ -623,7 +623,7 @@
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
-      "value": 67.2035
+      "value": 67.54
     },
     "M2_YOY": {
       "date": "2026-08-03",
@@ -679,28 +679,28 @@
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.401
+      "value": -0.9541
     },
     "XAG_SESSION": {
       "date": "2026-08-26",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.3644
+      "value": -0.5932
     },
     "XAU_15M": {
       "date": "2026-08-26",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.184
+      "value": -0.4581
     },
     "XAU_SESSION": {
       "date": "2026-08-26",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.1168
+      "value": -0.3418
     },
     "YIELD_10Y2Y": {
       "date": "2026-08-24",
@@ -710,7 +710,7 @@
       "value": 0.46
     }
   },
-  "generated_at": "2026-08-26T12:04:33Z",
+  "generated_at": "2026-08-26T13:17:43Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -765,15 +765,15 @@
   },
   "pipeline": {
     "ai_tokens_used": 0,
-    "cached_count": 26,
-    "calendar_checked_at": "2026-08-26T11:28:39Z",
+    "cached_count": 25,
+    "calendar_checked_at": "2026-08-26T13:17:43Z",
     "cftc_checked_at": "2026-08-26T11:28:39Z",
     "error_count": 0,
     "errors": [],
     "fallback_count": 0,
     "macro_checked_at": "2026-08-26T11:28:39Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-08-26T12:15:00Z",
+    "next_scheduled_at": "2026-08-26T13:30:00Z",
     "run_interval_minutes": 15,
     "source_count": 28,
     "statuses": [
@@ -898,12 +898,12 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-26T12:04:13Z",
+        "date": "2026-08-26T13:17:43Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-08-26T12:04:12Z",
+        "date": "2026-08-26T13:17:42Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
@@ -913,13 +913,13 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-26T11:29:07Z",
+        "date": "2026-08-26T13:17:45Z",
         "source": "Economic calendar",
-        "status": "cached"
+        "status": "ok"
       }
     ],
     "success_count": 28,
-    "updated_count": 2
+    "updated_count": 3
   },
   "schema_version": 1,
   "series": {
@@ -5936,21 +5936,25 @@
         [
           "2026-08-26T12:04:12Z",
           68.861
+        ],
+        [
+          "2026-08-26T13:17:42Z",
+          68.204002
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-08-26T12:04:12Z",
-      "previous": 68.585999,
-      "previous_date": "2026-08-26T11:38:42Z",
+      "observed_at": "2026-08-26T13:17:42Z",
+      "previous": 68.861,
+      "previous_date": "2026-08-26T12:04:12Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xag",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 68.861,
+      "value": 68.204002,
       "venue": "OTC composite"
     },
     "SPOT_XAUUSD": {
@@ -5972,21 +5976,25 @@
         [
           "2026-08-26T12:04:13Z",
           4627.700195
+        ],
+        [
+          "2026-08-26T13:17:43Z",
+          4606.5
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-08-26T12:04:13Z",
-      "previous": 4619.200195,
-      "previous_date": "2026-08-26T11:38:43Z",
+      "observed_at": "2026-08-26T13:17:43Z",
+      "previous": 4627.700195,
+      "previous_date": "2026-08-26T12:04:13Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xau",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 4627.700195,
+      "value": 4606.5,
       "venue": "OTC composite"
     },
     "T10YIE": {
@@ -8228,5 +8236,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "e478deba2610ea4e"
+  "snapshot_id": "e864eb675a02155c"
 }
