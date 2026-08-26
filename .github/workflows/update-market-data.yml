@@ -52,7 +52,7 @@ jobs:
         run: |
           git config user.name "market-data-bot"
           git config user.email "market-data-bot@users.noreply.github.com"
-          git add markets/data/latest.json markets/data/history.json
+          git add markets/data/latest.json markets/data/history.json markets/data/a_share.json
           git commit -m "data: refresh market dashboard"
           git push origin gh-pages
 
@@ -61,5 +61,6 @@ jobs:
           echo "## Market data update" >> "$GITHUB_STEP_SUMMARY"
           echo "- Target cadence: **every 15 minutes** (GitHub Actions best effort)" >> "$GITHUB_STEP_SUMMARY"
           echo "- AI tokens used: **0**" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Data bundle: \`markets/data/latest.json\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Data bundle: \`markets/data/latest.json\` + \`markets/data/a_share.json\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- A-share source: Eastmoney public quote/sector-flow endpoints (last valid values are retained on transient failures)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Changed: **${{ steps.changes.outputs.changed }}**" >> "$GITHUB_STEP_SUMMARY"

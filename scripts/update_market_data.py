@@ -33,6 +33,7 @@ ROOT = Path(os.environ.get("MARKET_SITE_ROOT", Path(__file__).resolve().parents[
 DATA_DIR = ROOT / "markets" / "data"
 LATEST_PATH = DATA_DIR / "latest.json"
 HISTORY_PATH = DATA_DIR / "history.json"
+A_SHARE_PATH = DATA_DIR / "a_share.json"
 USER_AGENT = "PengfeiMarketDashboard/1.0 (+https://pengfeiintuebingen.github.io/markets/)"
 
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
@@ -52,6 +53,35 @@ CME_WAREHOUSE_URLS = {
 }
 COINGLASS_API_BASE = "https://open-api-v4.coinglass.com/api"
 BINANCE_FUTURES_BASE = "https://fapi.binance.com"
+EASTMONEY_QUOTE_BASES = (
+    "https://push2.eastmoney.com/webguest/api/qt",
+    "https://82.push2.eastmoney.com/webguest/api/qt",
+    "https://73.push2.eastmoney.com/webguest/api/qt",
+    "https://push2.eastmoney.com/api/qt",
+    "https://82.push2.eastmoney.com/api/qt",
+    "https://73.push2.eastmoney.com/api/qt",
+)
+EASTMONEY_HISTORY_BASES = (
+    "https://push2his.eastmoney.com/api/qt",
+    "https://82.push2his.eastmoney.com/api/qt",
+    "https://73.push2his.eastmoney.com/api/qt",
+    # The webguest edge is less complete (often one day only), but is useful
+    # as a last transport fallback when the historical edge is rate-limited.
+    "https://push2.eastmoney.com/webguest/api/qt",
+    "https://82.push2.eastmoney.com/webguest/api/qt",
+    "https://73.push2.eastmoney.com/webguest/api/qt",
+)
+EASTMONEY_UT = "bd1d9ddb04089700cf9c27f6f7426281"
+A_SHARE_INDEXES = (
+    {"name": "上证指数", "secid": "1.000001", "code": "000001"},
+    {"name": "科创50", "secid": "1.000688", "code": "000688"},
+    {"name": "深证成指", "secid": "0.399001", "code": "399001"},
+    {"name": "创业板指", "secid": "0.399006", "code": "399006"},
+)
+A_SHARE_SECTORS = (
+    "铜", "工业金属", "证券", "印制电路板", "酿酒", "电力设备", "通信设备",
+    "半导体材料", "半导体", "银行", "有色金属/贵金属",
+)
 
 # Last verified official CME snapshot retained when CME's anti-scraping edge
 # blocks automated downloads.  A successful future report replaces these rows;
@@ -141,7 +171,7 @@ def write_json(path: Path, payload: Any) -> None:
     temporary.replace(path)
 
 
-def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = None) -> str:
+def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = None, timeout: float = 45) -> str:
     last_error: Exception | None = None
     request_headers = {
         "User-Agent": USER_AGENT,
@@ -154,7 +184,7 @@ def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = N
             headers=request_headers,
         )
         try:
-            with urllib.request.urlopen(request, timeout=45) as response:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
                 raw = response.read()
                 encoding = response.headers.get_content_charset() or "utf-8"
                 return raw.decode(encoding, errors="replace")
@@ -165,11 +195,11 @@ def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = N
     if last_error and "CERTIFICATE_VERIFY_FAILED" in str(last_error):
         try:
             completed = subprocess.run(
-                ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "-A", request_headers.get("User-Agent", USER_AGENT), "--max-time", "60", url],
+                ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "-A", request_headers.get("User-Agent", USER_AGENT), "--max-time", str(max(5, int(timeout + 15))), url],
                 check=True,
                 capture_output=True,
                 text=True,
-                timeout=70,
+                timeout=timeout + 20,
             )
             return completed.stdout
         except (subprocess.SubprocessError, OSError) as curl_error:
@@ -177,9 +207,9 @@ def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = N
     raise RuntimeError(f"download failed: {url}: {last_error}")
 
 
-def request_json(url: str, headers: dict[str, str] | None = None) -> Any:
+def request_json(url: str, headers: dict[str, str] | None = None, attempts: int = 3, timeout: float = 45) -> Any:
     try:
-        return json.loads(request_text(url, headers=headers))
+        return json.loads(request_text(url, attempts=attempts, headers=headers, timeout=timeout))
     except json.JSONDecodeError as error:
         raise ValueError(f"invalid JSON from {url}: {error}") from error
 
@@ -552,6 +582,314 @@ def fetch_crypto_positioning() -> dict[str, Any]:
             fallback["coinglass_error"] = str(error)[:240]
             return fallback
     return fetch_binance_positioning()
+
+
+def eastmoney_get(path: str, params: dict[str, Any], *, historical: bool = False) -> dict[str, Any]:
+    hosts = EASTMONEY_HISTORY_BASES if historical else EASTMONEY_QUOTE_BASES
+    query = urllib.parse.urlencode(params)
+    last_error: Exception | None = None
+    for host in hosts:
+        url = f"{host}/{path.lstrip('/')}?{query}"
+        try:
+            try:
+                payload = request_json(url, headers={"Referer": "https://data.eastmoney.com/"}, attempts=1, timeout=12)
+            except Exception:
+                # Eastmoney's edge intermittently closes urllib connections; curl
+                # with a browser UA is a transport fallback, not a second source.
+                completed = subprocess.run(
+                    ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "-A", "Mozilla/5.0", "--max-time", "15", url],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=20,
+                )
+                payload = json.loads(completed.stdout)
+            if not isinstance(payload, dict) or payload.get("rc") not in (0, "0") or not isinstance(payload.get("data"), dict):
+                raise ValueError(f"Eastmoney response unavailable: {str(payload)[:180]}")
+            return payload
+        except Exception as error:
+            last_error = error
+    raise RuntimeError(f"Eastmoney request failed: {path}: {last_error}")
+
+
+def parse_eastmoney_flow_klines(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = payload.get("data", {}).get("klines", [])
+    parsed = []
+    for raw in rows if isinstance(rows, list) else []:
+        parts = str(raw).split(",")
+        if len(parts) < 13:
+            continue
+        main_net = number(parts[1])
+        close = number(parts[11])
+        change_pct = number(parts[12])
+        if not parts[0] or main_net is None:
+            continue
+        parsed.append({
+            "date": parts[0],
+            "main_net_flow_billion_cny": round_value(main_net / 100_000_000, 3),
+            "close": round_value(close, 3),
+            "change_pct": round_value(change_pct, 3),
+        })
+    return parsed
+
+
+def a_share_continuity(today: float | None, five_day: float | None, today_ratio: float | None, five_day_ratio: float | None) -> tuple[str, str]:
+    if None in (today, five_day, today_ratio, five_day_ratio):
+        return "UNKNOWN", "数据缺失或板块成分聚合异常"
+    if today > 0 and five_day > 0 and today_ratio > 0 and five_day_ratio > 0:
+        return "CONTINUOUS_GREEN", "连续流入"
+    if today > 0 and five_day <= 0:
+        return "ONE_DAY_SPIKE", "单日流入，5日未确认"
+    if today <= 0 and five_day < 0:
+        if five_day_ratio <= -0.20 or five_day <= -100:
+            return "RED_STRONG", "持续流出，强度偏高"
+        return "RED", "连续流出"
+    if today > 0 and five_day < 0:
+        return "REBOUND_ONLY", "反抽性质"
+    return "MIXED", "方向分裂，等待确认"
+
+
+def fetch_eastmoney_sector_rows() -> tuple[dict[str, dict[str, Any]], list[str]]:
+    base_params = {
+        # Pull the complete concept list in one request when the endpoint
+        # accepts pz=500. Some edges cap the page at 100; the pagination
+        # below detects that response and continues without dropping rows.
+        "pn": 1, "pz": 500, "po": 1, "np": 1, "ut": EASTMONEY_UT, "fltt": 2, "invt": 2,
+        "fid": "f62", "fs": "m:90+t:2", "fields": "f12,f14,f2,f3,f6,f20,f62,f184",
+    }
+    first = eastmoney_get("clist/get", base_params)
+    data = first.get("data", {})
+    rows = list(data.get("diff", [])) if isinstance(data.get("diff"), list) else []
+    total = int(number(data.get("total")) or len(rows))
+    page_size = max(len(rows), 100)
+    pages = min(10, max(1, math.ceil(total / page_size)))
+    errors = []
+    for page in range(2, pages + 1):
+        params = dict(base_params)
+        params["pn"] = page
+        try:
+            page_data = eastmoney_get("clist/get", params).get("data", {})
+            if isinstance(page_data.get("diff"), list):
+                rows.extend(page_data["diff"])
+        except Exception as error:
+            errors.append(f"sector page {page}: {str(error)[:120]}")
+    return {str(row.get("f14")): row for row in rows if isinstance(row, dict) and row.get("f14")}, errors
+
+
+def fetch_a_share_snapshot(previous: dict[str, Any] | None = None) -> tuple[dict[str, Any], list[str]]:
+    previous = previous or {}
+    checked_at = utc_now()
+    errors: list[str] = []
+    try:
+        sector_rows, sector_errors = fetch_eastmoney_sector_rows()
+        errors.extend(sector_errors)
+    except Exception as error:
+        sector_rows, sector_errors = {}, []
+        errors.append(f"sector quotes: {str(error)[:120]}")
+    sectors = []
+    old_sectors = {str(item.get("name")): item for item in previous.get("sectors", []) if isinstance(item, dict)}
+    current_sector_count = 0
+    history_live_count = 0
+    cached_sector_count = 0
+    for name in A_SHARE_SECTORS:
+        row = sector_rows.get(name)
+        old = old_sectors.get(name, {})
+        today = five_day = market_cap = today_ratio = five_day_ratio = None
+        history: list[dict[str, Any]] = []
+        history_fresh = False
+        if row:
+            current_sector_count += 1
+            market_cap_value = number(row.get("f20"))
+            market_cap = market_cap_value / 1_000_000_000_000 if market_cap_value is not None else number(old.get("market_cap_trillion_cny"))
+            try:
+                flow_payload = eastmoney_get("stock/fflow/daykline/get", {
+                    "lmt": 5, "klt": 101, "secid": f"90.{row.get('f12')}",
+                    "fields1": "f1,f2,f3,f7", "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
+                }, historical=True)
+                history = parse_eastmoney_flow_klines(flow_payload)
+            except Exception as error:
+                errors.append(f"{name} history: {str(error)[:120]}")
+            # A one-day webguest response is enough to refresh today's flow,
+            # but never masquerades as a five-day continuity signal.
+            if history:
+                today = history[-1]["main_net_flow_billion_cny"]
+                if len(history) >= 5:
+                    five_day = round_value(sum(item["main_net_flow_billion_cny"] for item in history[-5:]), 3)
+                    history_fresh = True
+                    history_live_count += 1
+                elif old.get("five_day_billion_cny") is not None:
+                    five_day = number(old.get("five_day_billion_cny"))
+                    history = history + list(old.get("history") or [])
+            else:
+                current = number(row.get("f62"))
+                today = current / 100_000_000 if current is not None else number(old.get("today_billion_cny"))
+                five_day = number(old.get("five_day_billion_cny"))
+                history = list(old.get("history") or [])
+            if market_cap:
+                today_ratio = today / (market_cap * 100) if today is not None else number(old.get("today_to_cap_pct"))
+                five_day_ratio = five_day / (market_cap * 100) if five_day is not None else number(old.get("five_day_to_cap_pct"))
+        else:
+            errors.append(f"{name}: sector not found")
+            cached_sector_count += 1 if old else 0
+            today = number(old.get("today_billion_cny"))
+            five_day = number(old.get("five_day_billion_cny"))
+            market_cap = number(old.get("market_cap_trillion_cny"))
+            today_ratio = number(old.get("today_to_cap_pct"))
+            five_day_ratio = number(old.get("five_day_to_cap_pct"))
+            history = list(old.get("history") or [])
+        if history_fresh:
+            continuity, label = a_share_continuity(today, five_day, today_ratio, five_day_ratio)
+            flow_data_status = "LIVE"
+        elif today is not None or five_day is not None:
+            continuity, label = "UNKNOWN", "5日历史未完整返回，连续性不判定"
+            flow_data_status = "PARTIAL" if row else "CACHED"
+        else:
+            continuity, label = "UNKNOWN", "数据缺失或板块成分聚合异常"
+            flow_data_status = "UNKNOWN"
+        sectors.append({
+            "name": name,
+            "code": row.get("f12") if row else old.get("code"),
+            "today_billion_cny": round_value(today, 3),
+            "five_day_billion_cny": round_value(five_day, 3),
+            "market_cap_trillion_cny": round_value(market_cap, 3),
+            "today_to_cap_pct": round_value(today_ratio, 3),
+            "five_day_to_cap_pct": round_value(five_day_ratio, 3),
+            "continuity": continuity,
+            "label": label,
+            "flow_data_status": flow_data_status,
+            "history": history[-5:],
+        })
+
+    index_params = {
+        "fltt": 2, "secids": ",".join(item["secid"] for item in A_SHARE_INDEXES),
+        "fields": "f2,f3,f4,f5,f6,f12,f13,f14",
+    }
+    try:
+        index_data = eastmoney_get("ulist.np/get", index_params).get("data", {})
+    except Exception as error:
+        errors.append(f"index quotes: {str(error)[:120]}")
+        index_data = {}
+    raw_index_rows = index_data.get("diff", []) if isinstance(index_data, dict) else []
+    if isinstance(raw_index_rows, dict):
+        raw_index_rows = list(raw_index_rows.values())
+    index_rows = {str(item.get("f12")): item for item in raw_index_rows if isinstance(item, dict)}
+    old_index_rows = {str(item.get("code")): item for item in previous.get("index_flows", []) if isinstance(item, dict)}
+    index_flows = []
+    for index in A_SHARE_INDEXES:
+        row = index_rows.get(index["code"], {})
+        old = old_index_rows.get(index["code"], {})
+        main_net = None
+        try:
+            flow = eastmoney_get("stock/fflow/daykline/get", {
+                "lmt": 5, "klt": 101, "secid": index["secid"],
+                "fields1": "f1,f2,f3,f7", "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
+            }, historical=True)
+            rows = parse_eastmoney_flow_klines(flow)
+            if rows:
+                main_net = rows[-1]["main_net_flow_billion_cny"]
+        except Exception as error:
+            errors.append(f"{index['name']} flow: {str(error)[:120]}")
+        raw_turnover = number(row.get("f6")) if row else None
+        if raw_turnover is None:
+            raw_turnover = (number(old.get("turnover_billion_cny")) or 0) * 100_000_000
+        index_flows.append({
+            "name": index["name"], "code": index["code"], "secid": index["secid"],
+            "main_net_flow_billion_cny": round_value(main_net, 3),
+            "price": round_value(number(row.get("f2")) if row else number(old.get("price")), 3),
+            "change_pct": round_value(number(row.get("f3")) if row else number(old.get("change_pct")), 3),
+            "turnover_billion_cny": round_value(raw_turnover / 100_000_000, 3),
+        })
+
+    sse = next((item for item in index_flows if item["code"] == "000001"), {})
+    sz = next((item for item in index_flows if item["code"] == "399001"), {})
+    turnover = sum(item.get("turnover_billion_cny") or 0 for item in (sse, sz))
+    if not turnover:
+        turnover = (number(previous.get("market", {}).get("turnover_trillion_cny")) or 0) * 10_000
+    available_flows = [item["main_net_flow_billion_cny"] for item in index_flows if item.get("main_net_flow_billion_cny") is not None]
+    market_label = "指数主力流向净流入，结构仍需结合行业连续性" if available_flows and sum(available_flows) > 0 else "指数主力流向偏弱或部分缺失"
+    return {
+        "schema_version": 1,
+        "data_type": "a_share_snapshot",
+        "snapshot_date": datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat(),
+        "checked_at": checked_at,
+        "timezone": "Asia/Shanghai",
+        "update_interval_minutes": RUN_INTERVAL_MINUTES,
+        "data_status": "LIVE" if current_sector_count >= 8 and history_live_count >= 8 else ("PARTIAL" if current_sector_count or cached_sector_count else "UNKNOWN"),
+        "observation_finality": "INTRADAY",
+        "evaluation_status": "PARTIAL",
+        "source": "东方财富公开行情与资金流接口",
+        "source_url": "https://data.eastmoney.com/zjlx/",
+        "source_note": f"自动抓取指数行情、成交额与行业资金流；板块当前行情 {current_sector_count}/{len(A_SHARE_SECTORS)}，完整5日历史 {history_live_count}/{len(A_SHARE_SECTORS)}。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+        "market": {"turnover_trillion_cny": round_value(turnover / 10_000, 3), "main_net_flow_billion_cny": round_value(sum(available_flows), 3) if len(available_flows) == len(A_SHARE_INDEXES) else None, "structure_label": market_label},
+        "index_flows": index_flows,
+        "sectors": sectors,
+        "conclusions": build_a_share_conclusions(sectors),
+        "watchlist": build_a_share_watchlist(sectors, previous),
+        "framework": ["宏观货币环境", "大盘（指数）位置", "行业资金连续性与市值比例", "行业内生态位", "个股价格/量价/RVOL", "风险政策与人工确认"],
+        "rules_applied": ["UNKNOWN 不等于 0，不生成自动买入绿灯", "连续流入必须同时看 1日、5日和市值比例", "资金流是置信度修正项，不能覆盖价格证伪和风险硬线", "波浪/结构只提出情景，不直接触发交易动作"],
+        "next_data_needed": ["A股个股日内 OHLCV", "同一时点累计成交额与20日可比 RVOL", "上涨家数/上涨成交额占比", "板块主动流向来源、算法版本和大小单分档", "个股代码、复权口径和版本化确认/证伪位"],
+        "freshness": {"current_sector_count": current_sector_count, "history_live_count": history_live_count, "cached_sector_count": cached_sector_count, "error_count": len(errors)},
+        "errors": errors,
+    }, errors
+
+
+def build_a_share_conclusions(sectors: list[dict[str, Any]]) -> list[dict[str, str]]:
+    lookup = {item["name"]: item for item in sectors}
+    copper = lookup.get("铜", {})
+    metals = lookup.get("工业金属", {})
+    semi = lookup.get("半导体", {})
+    materials = lookup.get("半导体材料", {})
+    if copper.get("continuity") == "CONTINUOUS_GREEN":
+        first = f"铜今日/市值 {a_share_number(copper.get('today_to_cap_pct'))}%、5日/市值 {a_share_number(copper.get('five_day_to_cap_pct'))}%，5日累计 {a_share_signed(copper.get('five_day_billion_cny'))} 亿。"
+    elif copper.get("five_day_billion_cny") is not None:
+        first = f"铜当前记录值为 {a_share_signed(copper.get('five_day_billion_cny'))} 亿（5日/市值 {a_share_number(copper.get('five_day_to_cap_pct'))}%），但历史未完整返回，连续性保持 UNKNOWN。"
+    else:
+        first = "铜板块数据暂缺，不能确认资源主线连续性。"
+    if semi.get("continuity") in {"RED", "RED_STRONG"}:
+        second = f"半导体 5日净额 {a_share_signed(semi.get('five_day_billion_cny'))} 亿；半导体材料 5日/市值 {a_share_number(materials.get('five_day_to_cap_pct'))}%。"
+    elif semi.get("five_day_billion_cny") is not None:
+        second = f"半导体记录值为 {a_share_signed(semi.get('five_day_billion_cny'))} 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。"
+    else:
+        second = "半导体板块历史流向暂缺，撤退判断保持 UNKNOWN。"
+    tone = "positive" if copper.get("continuity") == "CONTINUOUS_GREEN" and metals.get("continuity") == "CONTINUOUS_GREEN" else "neutral"
+    return [
+        {"title": "资源流入连续性", "body": first + "工业金属若同向，才构成趋势级而非一日异动。", "tone": tone},
+        {"title": "科技资金状态", "body": second + "资金流只修正结构可信度，不能替代个股价格与广度确认。", "tone": "negative" if semi.get("continuity") in {"RED", "RED_STRONG"} else "neutral"},
+        {"title": "当前执行权限", "body": "板块绿灯不等于个股买点；个股代码、复权口径、OHLCV 和正式证伪位齐备后，才可进入人工评估。", "tone": "neutral"},
+    ]
+
+
+def a_share_number(value: float | None) -> str:
+    return f"{value:.2f}" if value is not None else "—"
+
+
+def a_share_signed(value: float | None) -> str:
+    return f"{value:+.1f}" if value is not None else "—"
+
+
+def build_a_share_watchlist(sectors: list[dict[str, Any]], previous: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    previous = previous or {}
+    by_name = {item["name"]: item for item in sectors}
+    mapping = {"太极实业": "半导体", "云锗": None, "紫金": "工业金属", "兴业": "工业金属", "中铝": "工业金属"}
+    result = []
+    for name, sector_name in mapping.items():
+        old = next((item for item in previous.get("watchlist", []) if item.get("name") == name), {})
+        sector = by_name.get(sector_name or "", {})
+        status = sector.get("continuity") if sector_name else "UNKNOWN"
+        if status in {"RED", "RED_STRONG"}:
+            actionability = "FREEZE_BUY"
+        elif status == "CONTINUOUS_GREEN":
+            status, actionability = "PROVISIONAL_GREEN", "MANUAL_REVIEW"
+        else:
+            status, actionability = "UNKNOWN", "NON_ACTIONABLE"
+        if name == "太极实业":
+            reason = f"所属半导体板块5日净额 {a_share_signed(sector.get('five_day_billion_cny'))} 亿；接回资金绿灯不满足，不能仅凭价格反弹接回。"
+        elif name == "云锗":
+            reason = "确切证券与对应板块未登记，铜的强弱只能作间接背景；等待个股放量收复 105+ 的可核验条件。"
+        else:
+            reason = f"所属工业金属板块状态为 {status}；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。"
+        result.append({"name": name, "symbol": old.get("symbol"), "sector": sector_name or old.get("sector", "小金属"), "status": status, "actionability": actionability, "reason": reason, "missing": old.get("missing") or "确切证券代码、复权口径、个股 OHLCV/RVOL、确认与证伪位"})
+    return result
 
 
 def clean_html(value: str) -> str:
@@ -1482,6 +1820,20 @@ def main() -> int:
         errors.append({"source": "Crypto positioning", "series": "BTC/ETH", "error": str(error)[:240]})
         statuses.append({"source": "Crypto OI / volume / funding", "status": "fallback" if crypto.get("assets") else "failed", "date": crypto.get("checked_at")})
 
+    previous_a_share = load_json(A_SHARE_PATH, {})
+    try:
+        a_share, a_share_errors = fetch_a_share_snapshot(previous_a_share)
+        errors.extend({"source": "Eastmoney A-share", "series": "sector/index", "error": item} for item in a_share_errors)
+        a_share_status = "ok" if a_share.get("data_status") == "LIVE" else "fallback"
+        statuses.append({"source": "A股指数/板块资金流", "status": a_share_status, "date": a_share.get("checked_at")})
+    except Exception as error:
+        a_share = previous_a_share
+        a_share_status = "fallback" if a_share else "failed"
+        errors.append({"source": "Eastmoney A-share", "series": "index/sector", "error": str(error)[:240]})
+        statuses.append({"source": "A股指数/板块资金流", "status": a_share_status, "date": a_share.get("checked_at")})
+    if a_share:
+        write_json(A_SHARE_PATH, a_share)
+
     flow_positioning = {
         "updated_at": run_at,
         "cme_inventory": cme_inventory,
@@ -1511,6 +1863,7 @@ def main() -> int:
             "calendar_checked_at": calendar_checked_at,
             "inventory_checked_at": inventory_checked_at,
             "crypto_checked_at": crypto_checked_at,
+            "a_share_checked_at": a_share.get("checked_at"),
             "source_count": len(statuses),
             "success_count": sum(item["status"] in available_statuses for item in statuses),
             "updated_count": sum(item["status"] == "ok" for item in statuses),
@@ -1525,6 +1878,7 @@ def main() -> int:
         "cftc": cftc,
         "calendar": calendar,
         "flow_positioning": flow_positioning,
+        "a_share": a_share,
     }
     payload["layers"] = build_layers(series, derived, cftc)
     payload["daily_conclusion"] = build_daily_conclusion(series, derived, cftc, calendar)
