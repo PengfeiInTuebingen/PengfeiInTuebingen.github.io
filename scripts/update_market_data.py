@@ -96,6 +96,8 @@ FRED_SERIES = {
     "SP500": ("标普 500", "指数", "资产"),
     "NASDAQCOM": ("纳斯达克综合", "指数", "资产"),
     "DTWEXBGS": ("广义美元指数", "指数", "资产"),
+    "DCOILBRENTEU": ("Brent 原油", "美元/桶", "能源"),
+    "DCOILWTICO": ("WTI 原油", "美元/桶", "能源"),
     "A191RL1Q225SBEA": ("美国实际 GDP 环比年化", "%", "周期"),
     "PAYEMS": ("美国非农就业", "千人", "周期"),
     "UNRATE": ("美国失业率", "%", "周期"),
@@ -320,6 +322,7 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     pair = f"{symbol}USDT"
     ticker = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/ticker/24hr?symbol={pair}")
     oi_rows = request_json(f"{BINANCE_FUTURES_BASE}/futures/data/openInterestHist?symbol={pair}&period=15m&limit=97")
+    kline_rows = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/klines?symbol={pair}&interval=15m&limit=97")
     premium = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/premiumIndex?symbol={pair}")
     if not isinstance(oi_rows, list) or not oi_rows:
         raise ValueError(f"Binance {pair} open interest history is empty")
@@ -331,6 +334,15 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
             history.append([timestamp, round_value(value, 2)])
     if not history:
         raise ValueError(f"Binance {pair} open interest values are empty")
+    volume_history = []
+    if isinstance(kline_rows, list):
+        for row in kline_rows:
+            if not isinstance(row, list) or len(row) < 8:
+                continue
+            stamp = _milliseconds_iso(row[0])
+            quote_volume = number(row[7])
+            if stamp and quote_volume is not None:
+                volume_history.append([stamp, round_value(quote_volume, 2)])
     current_oi = history[-1][1]
     first_oi = history[0][1]
     funding = number(premium.get("lastFundingRate"))
@@ -350,6 +362,7 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
         "next_funding_at": _milliseconds_iso(premium.get("nextFundingTime")),
         "observed_at": history[-1][0],
         "oi_history": history[-97:],
+        "volume_history": volume_history[-97:],
         "source": "Binance USDⓈ-M public API",
         "source_url": "https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api",
         "note": "单一交易所公开代理值；不等于全市场持仓量、成交量或资金费率聚合。",
@@ -449,6 +462,7 @@ def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
         "next_funding_at": proxy.get("next_funding_at"),
         "observed_at": latest[0],
         "oi_history": oi_history,
+        "volume_history": proxy.get("volume_history", []),
         "source": "CoinGlass API v4",
         "source_url": "https://docs.coinglass.com/reference/getting-started-with-your-api",
         "note": "持仓量与资金费率为 CoinGlass 多交易所聚合；价格与成交量为 Binance USDⓈ-M 公开代理。",
@@ -1047,6 +1061,8 @@ def build_derived(series: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]
         "CORE_PCE_YOY": derived_metric("美国核心 PCE 同比", yoy(series.get("PCEPILFE")), "%", latest_date("PCEPILFE"), "FRED"),
         "SP500_DAILY": derived_metric("标普 500 日变动", percent_change(series.get("SP500")), "%", latest_date("SP500"), "FRED"),
         "NASDAQ_DAILY": derived_metric("纳斯达克日变动", percent_change(series.get("NASDAQCOM")), "%", latest_date("NASDAQCOM"), "FRED"),
+        "BRENT_DAILY": derived_metric("Brent 原油日变动", percent_change(series.get("DCOILBRENTEU")), "%", latest_date("DCOILBRENTEU"), "FRED"),
+        "WTI_DAILY": derived_metric("WTI 原油日变动", percent_change(series.get("DCOILWTICO")), "%", latest_date("DCOILWTICO"), "FRED"),
         "USDJPY_DAILY": derived_metric("USD/JPY 日变动", percent_change(series.get("FX_USDJPY")), "%", latest_date("FX_USDJPY"), "ECB"),
         "XAU_15M": derived_metric("黄金较上次快照", percent_change(series.get("SPOT_XAUUSD")), "%", latest_date("SPOT_XAUUSD"), "Gold-API"),
         "XAG_15M": derived_metric("白银较上次快照", percent_change(series.get("SPOT_XAGUSD")), "%", latest_date("SPOT_XAGUSD"), "Gold-API"),
@@ -1200,21 +1216,28 @@ def build_daily_conclusion(
     usdjpy_change = metric("USDJPY_DAILY")
     ten_year_delta = delta("DGS10")
     vix_level = value("VIXCLS")
+    brent_change = metric("BRENT_DAILY")
+    wti_change = metric("WTI_DAILY")
+    oil_changes = [item for item in (brent_change, wti_change) if item is not None]
+    oil_change = sum(oil_changes) / len(oil_changes) if oil_changes else None
+    oil_fact = f"Brent {signed_text(brent_change, 2, '%')}；WTI {signed_text(wti_change, 2, '%')}"
 
     gold_factors = [
-        conclusion_factor("黄金日内动量", xau_session, weight=.25, deadband=.08, positive_when_rising=True, fact=f"黄金 UTC 日内 {signed_text(xau_session, 2, '%')}"),
-        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.25, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
-        conclusion_factor("广义美元", dollar_change, weight=.20, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
+        conclusion_factor("黄金日内动量", xau_session, weight=.23, deadband=.08, positive_when_rising=True, fact=f"黄金 UTC 日内 {signed_text(xau_session, 2, '%')}"),
+        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.24, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
+        conclusion_factor("广义美元", dollar_change, weight=.18, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
         conclusion_factor("黄金 CFTC", cftc_ratio_value("黄金"), weight=.15, deadband=5, positive_when_rising=True, fact=f"黄金净持仓/OI {signed_text(cftc_ratio_value('黄金'), 2, '%')}"),
-        conclusion_factor("避险波动", None if vix_level is None else vix_level - 20, weight=.15, deadband=3, positive_when_rising=True, fact=f"VIX {vix_level:.2f}" if vix_level is not None else "VIX 待更新"),
+        conclusion_factor("避险波动", None if vix_level is None else vix_level - 20, weight=.12, deadband=3, positive_when_rising=True, fact=f"VIX {vix_level:.2f}" if vix_level is not None else "VIX 待更新"),
+        conclusion_factor("能源/通胀背景", oil_change, weight=.08, deadband=.50, positive_when_rising=True, fact=oil_fact),
     ]
     silver_factors = [
-        conclusion_factor("白银日内动量", xag_session, weight=.25, deadband=.10, positive_when_rising=True, fact=f"白银 UTC 日内 {signed_text(xag_session, 2, '%')}"),
-        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.15, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
-        conclusion_factor("广义美元", dollar_change, weight=.15, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
-        conclusion_factor("纳斯达克风险偏好", nasdaq_change, weight=.15, deadband=.20, positive_when_rising=True, fact=f"纳斯达克较前值 {signed_text(nasdaq_change, 2, '%')}"),
-        conclusion_factor("铜 CFTC", cftc_ratio_value("铜"), weight=.15, deadband=5, positive_when_rising=True, fact=f"铜净持仓/OI {signed_text(cftc_ratio_value('铜'), 2, '%')}"),
-        conclusion_factor("白银 CFTC", cftc_ratio_value("白银"), weight=.15, deadband=5, positive_when_rising=True, fact=f"白银净持仓/OI {signed_text(cftc_ratio_value('白银'), 2, '%')}"),
+        conclusion_factor("白银日内动量", xag_session, weight=.23, deadband=.10, positive_when_rising=True, fact=f"白银 UTC 日内 {signed_text(xag_session, 2, '%')}"),
+        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.14, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
+        conclusion_factor("广义美元", dollar_change, weight=.14, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
+        conclusion_factor("纳斯达克风险偏好", nasdaq_change, weight=.14, deadband=.20, positive_when_rising=True, fact=f"纳斯达克较前值 {signed_text(nasdaq_change, 2, '%')}"),
+        conclusion_factor("铜 CFTC", cftc_ratio_value("铜"), weight=.13, deadband=5, positive_when_rising=True, fact=f"铜净持仓/OI {signed_text(cftc_ratio_value('铜'), 2, '%')}"),
+        conclusion_factor("白银 CFTC", cftc_ratio_value("白银"), weight=.14, deadband=5, positive_when_rising=True, fact=f"白银净持仓/OI {signed_text(cftc_ratio_value('白银'), 2, '%')}"),
+        conclusion_factor("能源/通胀背景", oil_change, weight=.08, deadband=.50, positive_when_rising=True, fact=oil_fact),
     ]
     yen_factors = [
         conclusion_factor("USD/JPY 方向", usdjpy_change, weight=.35, deadband=.08, positive_when_rising=False, fact=f"USD/JPY 较前值 {signed_text(usdjpy_change, 2, '%')}"),
@@ -1265,7 +1288,7 @@ def build_daily_conclusion(
         "assets": assets,
         "next_event_text": event_text,
         "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；CME 库存和加密衍生品指标作为风险背景展示，不直接改变金银规则分数；缺失因子不参与加权，不用 AI 补写。",
+        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存和加密衍生品指标作为风险背景展示；缺失因子不参与加权，不用 AI 补写。",
     }
 
 

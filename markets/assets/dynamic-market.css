@@ -120,6 +120,34 @@
   gap: 12px;
 }
 
+.dm-trends {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(22, 47, 43, .06);
+}
+
+.dm-trend-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.dm-trend-card { min-width: 0; overflow: hidden; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-soft); }
+.dm-trend-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.dm-trend-head span { color: var(--teal); font-size: .59rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.dm-trend-head h4 { margin: 3px 0 0; font-size: .86rem; }
+.dm-trend-value { text-align: right; font-size: .85rem; font-weight: 850; font-variant-numeric: tabular-nums; }
+.dm-trend-value small { display: block; margin-top: 3px; color: var(--muted); font-size: .61rem; font-weight: 650; }
+.dm-trend-svg { display: block; width: 100%; height: 208px; margin-top: 8px; overflow: visible; }
+.dm-trend-gridline { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+.dm-trend-baseline { stroke: color-mix(in srgb, var(--muted) 40%, var(--line)); stroke-width: 1; }
+.dm-trend-area { fill: color-mix(in srgb, var(--dm-color) 12%, transparent); }
+.dm-trend-line { fill: none; stroke: var(--dm-color); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.dm-trend-bar { opacity: .72; }
+.dm-trend-bar.positive { fill: var(--teal); }
+.dm-trend-bar.negative { fill: var(--red); }
+.dm-trend-axis { fill: var(--muted); font-size: 10px; }
+.dm-trend-volume-label { color: var(--muted); font-size: .6rem; line-height: 1.35; }
+.dm-trend-empty { display: grid; place-items: center; min-height: 208px; color: var(--muted); font-size: .7rem; text-align: center; }
+
 .dm-card {
   position: relative;
   min-width: 0;
@@ -533,6 +561,7 @@
   .dm-refresh { grid-column: 1 / -1; width: 100%; }
   .dm-conclusion-grid { grid-template-columns: 1fr; }
   .dm-flow-grid { grid-template-columns: 1fr; }
+  .dm-trend-grid { grid-template-columns: 1fr; }
   .dm-event { grid-template-columns: 82px 36px minmax(0, 1fr); }
   .dm-impact { grid-column: 3; justify-self: start; }
   .dm-subhead { align-items: flex-start; }
@@ -544,6 +573,7 @@
   .dm-conclusion,
   .dm-calendar,
   .dm-flow { padding: 14px; }
+  .dm-trends { padding: 14px; }
   .dm-event { grid-template-columns: 1fr auto; gap: 5px 8px; }
   .dm-event > time { grid-column: 1; }
   .dm-country { grid-column: 2; grid-row: 1; }

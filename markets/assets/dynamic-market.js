@@ -64,6 +64,74 @@
     return `<svg class="dm-sparkline" style="--dm-color:${color}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><path class="area" d="${area}"></path><polyline class="line" points="${line}"></polyline></svg>`;
   };
 
+  const dayKey = (value) => {
+    const date = new Date(String(value).includes("T") ? value : `${value}T00:00:00Z`);
+    return Number.isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat("en-CA", {timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit"}).format(date);
+  };
+
+  const normalizePoints = (history) => (history || []).map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => item.stamp && Number.isFinite(item.value));
+
+  const trendPoints = (history, mode) => {
+    const points = normalizePoints(history);
+    if (mode === "today" && points.length) {
+      const latestDay = dayKey(points.at(-1).stamp);
+      const sameDay = points.filter((point) => dayKey(point.stamp) === latestDay);
+      if (sameDay.length >= 2) return sameDay;
+    }
+    return points.slice(-32);
+  };
+
+  const trendSvg = (history, volumeHistory, color, mode, label) => {
+    const points = trendPoints(history, mode);
+    if (points.length < 2) return `<div class="dm-trend-empty">${mode === "today" ? "今日凌晨以来样本不足，下一轮更新后显示完整轨迹。" : "历史样本不足。"}</div>`;
+    const width = 680;
+    const height = 248;
+    const plotTop = 12;
+    const plotBottom = 146;
+    const barsBase = 218;
+    const values = points.map((point) => point.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min || Math.max(Math.abs(max) * .01, 1);
+    const x = (index) => (index / (points.length - 1)) * width;
+    const y = (value) => plotBottom - ((value - min) / range) * (plotBottom - plotTop);
+    const coordinates = points.map((point, index) => [x(index).toFixed(1), y(point.value).toFixed(1)]);
+    const line = coordinates.map((point) => point.join(",")).join(" ");
+    const area = `M ${coordinates[0][0]} ${plotBottom} L ${coordinates.map((point) => point.join(" ")).join(" L ")} L ${coordinates.at(-1)[0]} ${plotBottom} Z`;
+    const volumePoints = trendPoints(volumeHistory, mode);
+    const hasVolume = volumePoints.length >= 2;
+    const barsValues = hasVolume ? volumePoints.map((point) => point.value) : points.map((point, index) => index ? point.value - points[index - 1].value : 0);
+    const maxBar = Math.max(...barsValues.map((value) => Math.abs(value)), 1e-9);
+    const barWidth = Math.max(3, width / Math.max(points.length, 2) * .58);
+    const bars = barsValues.map((value, index) => {
+      const heightBar = Math.max(2, Math.abs(value) / maxBar * 48);
+      const positive = hasVolume ? true : value >= 0;
+      const barX = hasVolume ? x(index < volumePoints.length ? index : volumePoints.length - 1) : x(index);
+      return `<rect class="dm-trend-bar ${positive ? "positive" : "negative"}" x="${Math.max(0, barX - barWidth / 2).toFixed(1)}" y="${(positive ? barsBase - heightBar : barsBase).toFixed(1)}" width="${barWidth.toFixed(1)}" height="${heightBar.toFixed(1)}" rx="2"></rect>`;
+    }).join("");
+    const firstLabel = mode === "today" ? "00:00" : formatDate(points[0].stamp);
+    const lastLabel = mode === "today" ? "最新" : formatDate(points.at(-1).stamp);
+    return `<svg class="dm-trend-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)}走势与${hasVolume ? "成交量" : "相邻观测变动"}">
+      <line class="dm-trend-gridline" x1="0" y1="${plotTop}" x2="${width}" y2="${plotTop}"></line><line class="dm-trend-gridline" x1="0" y1="${plotBottom}" x2="${width}" y2="${plotBottom}"></line><line class="dm-trend-baseline" x1="0" y1="${barsBase}" x2="${width}" y2="${barsBase}"></line>
+      <path class="dm-trend-area" style="--dm-color:${color}" d="${area}"></path><polyline class="dm-trend-line" style="--dm-color:${color}" points="${line}"></polyline>${bars}
+      <text class="dm-trend-axis" x="0" y="242">${escapeHtml(firstLabel)}</text><text class="dm-trend-axis" x="${width}" y="242" text-anchor="end">${escapeHtml(lastLabel)}</text>
+    </svg><div class="dm-trend-volume-label">${hasVolume ? "下方：成交量" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）"}</div>`;
+  };
+
+  const renderDailyTrends = (data) => {
+    const cryptoAssets = data.flow_positioning?.crypto?.assets || {};
+    const specs = [
+      {label: "黄金现货 · 今日", color: "#bd861f", history: getSeries(data, "SPOT_XAUUSD")?.history, mode: "today", value: getSeries(data, "SPOT_XAUUSD")?.value, change: getDerived(data, "XAU_SESSION")?.value, unit: "USD/oz"},
+      {label: "白银现货 · 今日", color: "#718096", history: getSeries(data, "SPOT_XAGUSD")?.history, mode: "today", value: getSeries(data, "SPOT_XAGUSD")?.value, change: getDerived(data, "XAG_SESSION")?.value, unit: "USD/oz"},
+      {label: "Brent 原油 · 近 30 个交易日", color: "#8d5e33", history: getSeries(data, "DCOILBRENTEU")?.history, mode: "rolling", value: getSeries(data, "DCOILBRENTEU")?.value, change: getDerived(data, "BRENT_DAILY")?.value, unit: "USD/bbl"},
+      {label: "WTI 原油 · 近 30 个交易日", color: "#5f6d4c", history: getSeries(data, "DCOILWTICO")?.history, mode: "rolling", value: getSeries(data, "DCOILWTICO")?.value, change: getDerived(data, "WTI_DAILY")?.value, unit: "USD/bbl"},
+      ...["BTC", "ETH"].map((symbol) => ({label: `${symbol} 永续 OI · 今日`, color: symbol === "BTC" ? "#0f8b78" : "#6274c5", history: cryptoAssets[symbol]?.oi_history, volumeHistory: cryptoAssets[symbol]?.volume_history, mode: "today", value: cryptoAssets[symbol]?.open_interest_usd, change: cryptoAssets[symbol]?.open_interest_change_24h_pct, unit: "USD OI"})),
+    ].filter((item) => item.history?.length);
+    if (!specs.length) return "";
+    const cards = specs.map((item) => `<article class="dm-trend-card"><div class="dm-trend-head"><div><span>Daily window · Europe/Berlin</span><h4>${escapeHtml(item.label)}</h4></div><div class="dm-trend-value">${item.unit === "USD OI" ? formatUsd(item.value) : finite(item.value) ? `$${formatCompact(item.value, 2)}` : "待更新"}<small>${signed(item.change, 2, "%")}</small></div></div>${trendSvg(item.history, item.volumeHistory, item.color, item.mode, item.label)}</article>`).join("");
+    return `<section class="dm-trends" id="dynamic-trends"><div class="dm-subhead"><div><span>Intraday chart · midnight reset</span><h3>日内完整走势与成交量/变动柱</h3></div><time>金银/加密从柏林时间 00:00 起；原油为近 30 个交易日</time></div><div class="dm-trend-grid">${cards}</div><p class="dm-flow-note">图表按每次数据包的实际观测时间绘制。金银与原油公开源未提供统一的逐笔成交量，因此下方红绿柱仅作相邻观测变动代理；BTC/ETH 若返回 Binance K 线，则显示真实 USDT 成交量。</p></section>`;
+  };
+
   const getSeries = (data, key) => data.series?.[key] || null;
   const getDerived = (data, key) => data.derived?.[key] || null;
 
@@ -80,6 +148,8 @@
     {label: "核心 PCE 同比", key: "PCEPILFE", derived: "CORE_PCE_YOY", color: "#c64752", value: (s, d) => `${formatCompact(getDerived(d, "CORE_PCE_YOY")?.value, 2)}%`, change: () => "政策核心通胀"},
     {label: "USD/JPY", key: "FX_USDJPY", color: "#b97c1f", value: (s) => formatCompact(s.value, 2), change: (d) => signed(getDerived(d, "USDJPY_DAILY")?.value, 2, "%")},
     {label: "标普 500", key: "SP500", color: "#168c78", value: (s) => formatCompact(s.value, 2), change: (d) => signed(getDerived(d, "SP500_DAILY")?.value, 2, "%")},
+    {label: "Brent 原油", key: "DCOILBRENTEU", color: "#8d5e33", value: (s) => `$${formatCompact(s.value, 2)}`, change: (d) => signed(getDerived(d, "BRENT_DAILY")?.value, 2, "%")},
+    {label: "WTI 原油", key: "DCOILWTICO", color: "#5f6d4c", value: (s) => `$${formatCompact(s.value, 2)}`, change: (d) => signed(getDerived(d, "WTI_DAILY")?.value, 2, "%")},
   ];
 
   const loadingMarkup = () => `
@@ -242,6 +312,7 @@
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
       ${errorNote}<div class="dm-grid">${cardMarkup}</div>
+      ${renderDailyTrends(data)}
       <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
