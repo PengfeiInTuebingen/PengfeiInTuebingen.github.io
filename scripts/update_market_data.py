@@ -318,6 +318,12 @@ def _milliseconds_iso(value: Any) -> str | None:
         return None
 
 
+def _berlin_midnight_bounds_ms() -> tuple[int, int]:
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(midnight.astimezone(timezone.utc).timestamp() * 1000), int(now.astimezone(timezone.utc).timestamp() * 1000)
+
+
 def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     pair = f"{symbol}USDT"
     ticker = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/ticker/24hr?symbol={pair}")
@@ -335,6 +341,7 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     if not history:
         raise ValueError(f"Binance {pair} open interest values are empty")
     volume_history = []
+    ohlcv_history = []
     if isinstance(kline_rows, list):
         for row in kline_rows:
             if not isinstance(row, list) or len(row) < 8:
@@ -343,6 +350,15 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
             quote_volume = number(row[7])
             if stamp and quote_volume is not None:
                 volume_history.append([stamp, round_value(quote_volume, 2)])
+            if stamp and len(row) >= 6 and None not in (number(row[1]), number(row[2]), number(row[3]), number(row[4])):
+                ohlcv_history.append({
+                    "time": stamp,
+                    "open": round_value(number(row[1]), 6),
+                    "high": round_value(number(row[2]), 6),
+                    "low": round_value(number(row[3]), 6),
+                    "close": round_value(number(row[4]), 6),
+                    "volume_usd": round_value(quote_volume, 2) if quote_volume is not None else None,
+                })
     current_oi = history[-1][1]
     first_oi = history[0][1]
     funding = number(premium.get("lastFundingRate"))
@@ -363,6 +379,7 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
         "observed_at": history[-1][0],
         "oi_history": history[-97:],
         "volume_history": volume_history[-97:],
+        "ohlcv_history": ohlcv_history[-97:],
         "source": "Binance USDⓈ-M public API",
         "source_url": "https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api",
         "note": "单一交易所公开代理值；不等于全市场持仓量、成交量或资金费率聚合。",
@@ -442,6 +459,20 @@ def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
     funding_value = _coinglass_close(funding[-1], ("close", "funding_rate", "fundingRate", "value")) if funding else None
     latest = oi_history[-1]
     first = oi_history[0]
+    start_ms, end_ms = _berlin_midnight_bounds_ms()
+    price_rows = _coinglass_rows(coinglass_json("futures/price/history", {"exchange": "Binance", "symbol": f"{symbol}USDT", "interval": "15m", "limit": 200, "start_time": start_ms, "end_time": end_ms}, api_key))
+    ohlcv_history = []
+    for item in price_rows:
+        stamp = _coinglass_time(item)
+        opened = _coinglass_close(item, ("open",))
+        high = _coinglass_close(item, ("high",))
+        low = _coinglass_close(item, ("low",))
+        closed = _coinglass_close(item, ("close",))
+        volume = _coinglass_close(item, ("volume_usd", "volumeUsd", "volume"))
+        if stamp and None not in (opened, high, low, closed):
+            ohlcv_history.append({"time": stamp, "open": opened, "high": high, "low": low, "close": closed, "volume_usd": volume})
+    if len(ohlcv_history) < 2:
+        raise ValueError(f"CoinGlass {symbol} price OHLC history is empty or too short")
     # Price and volume are deliberately sourced from Binance public API and
     # labeled as such; CoinGlass Hobbyist does not expose the all-in-one market
     # endpoint needed for those fields.
@@ -463,6 +494,7 @@ def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
         "observed_at": latest[0],
         "oi_history": oi_history,
         "volume_history": proxy.get("volume_history", []),
+        "ohlcv_history": ohlcv_history[-200:],
         "source": "CoinGlass API v4",
         "source_url": "https://docs.coinglass.com/reference/getting-started-with-your-api",
         "note": "持仓量与资金费率为 CoinGlass 多交易所聚合；价格与成交量为 Binance USDⓈ-M 公开代理。",

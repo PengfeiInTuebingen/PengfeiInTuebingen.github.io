@@ -81,15 +81,31 @@
     return points.slice(-32);
   };
 
-  const trendSvg = (history, volumeHistory, color, mode, label) => {
-    const points = trendPoints(history, mode);
+  const normalizeCandles = (history) => (history || []).map((item) => ({
+    stamp: item.time || item.stamp,
+    open: Number(item.open), high: Number(item.high), low: Number(item.low), close: Number(item.close), volume: Number(item.volume_usd ?? item.volume),
+  })).filter((item) => item.stamp && [item.open, item.high, item.low, item.close].every(Number.isFinite));
+
+  const candleWindow = (history, mode) => {
+    const points = normalizeCandles(history);
+    if (mode === "today" && points.length) {
+      const latestDay = dayKey(points.at(-1).stamp);
+      return points.filter((point) => dayKey(point.stamp) === latestDay);
+    }
+    return points.slice(-32);
+  };
+
+  const trendSvg = (history, volumeHistory, ohlcvHistory, color, mode, label) => {
+    const candles = candleWindow(ohlcvHistory, mode);
+    const useCandles = candles.length >= 2;
+    const points = useCandles ? candles.map((item) => ({stamp: item.stamp, value: item.close})) : trendPoints(history, mode);
     if (points.length < 2) return `<div class="dm-trend-empty">${mode === "today" ? "今日凌晨以来样本不足，下一轮更新后显示完整轨迹。" : "历史样本不足。"}</div>`;
     const width = 680;
     const height = 248;
     const plotTop = 12;
     const plotBottom = 146;
     const barsBase = 218;
-    const values = points.map((point) => point.value);
+    const values = useCandles ? candles.flatMap((point) => [point.low, point.high]) : points.map((point) => point.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
     const range = max - min || Math.max(Math.abs(max) * .01, 1);
@@ -98,24 +114,36 @@
     const coordinates = points.map((point, index) => [x(index).toFixed(1), y(point.value).toFixed(1)]);
     const line = coordinates.map((point) => point.join(",")).join(" ");
     const area = `M ${coordinates[0][0]} ${plotBottom} L ${coordinates.map((point) => point.join(" ")).join(" L ")} L ${coordinates.at(-1)[0]} ${plotBottom} Z`;
-    const volumePoints = trendPoints(volumeHistory, mode);
-    const hasVolume = volumePoints.length >= 2;
-    const barsValues = hasVolume ? volumePoints.map((point) => point.value) : points.map((point, index) => index ? point.value - points[index - 1].value : 0);
+    const candleVolumes = candles.map((point) => point.volume);
+    const hasVolume = useCandles && candleVolumes.filter(Number.isFinite).length >= 2;
+    const barsValues = hasVolume
+      ? candleVolumes.map((value) => Number.isFinite(value) ? value : 0)
+      : points.map((point, index) => index ? point.value - points[index - 1].value : 0);
     const maxBar = Math.max(...barsValues.map((value) => Math.abs(value)), 1e-9);
     const barWidth = Math.max(3, width / Math.max(points.length, 2) * .58);
     const bars = barsValues.map((value, index) => {
       const heightBar = Math.max(2, Math.abs(value) / maxBar * 48);
-      const positive = hasVolume ? true : value >= 0;
-      const barX = hasVolume ? x(index < volumePoints.length ? index : volumePoints.length - 1) : x(index);
+      const positive = hasVolume ? candles[index].close >= candles[index].open : value >= 0;
+      const barX = x(index);
       return `<rect class="dm-trend-bar ${positive ? "positive" : "negative"}" x="${Math.max(0, barX - barWidth / 2).toFixed(1)}" y="${(positive ? barsBase - heightBar : barsBase).toFixed(1)}" width="${barWidth.toFixed(1)}" height="${heightBar.toFixed(1)}" rx="2"></rect>`;
     }).join("");
+    const candleMarkup = useCandles ? candles.map((candle, index) => {
+      const candleX = x(index);
+      const wickTop = y(candle.high);
+      const wickBottom = y(candle.low);
+      const bodyTop = y(Math.max(candle.open, candle.close));
+      const bodyBottom = y(Math.min(candle.open, candle.close));
+      const bodyHeight = Math.max(1.5, bodyBottom - bodyTop);
+      const direction = candle.close >= candle.open ? "positive" : "negative";
+      return `<line class="dm-candle-wick ${direction}" x1="${candleX.toFixed(1)}" y1="${wickTop.toFixed(1)}" x2="${candleX.toFixed(1)}" y2="${wickBottom.toFixed(1)}"></line><rect class="dm-candle-body ${direction}" x="${(candleX - barWidth / 2).toFixed(1)}" y="${bodyTop.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bodyHeight.toFixed(1)}" rx="1"></rect>`;
+    }).join("") : "";
     const firstLabel = mode === "today" ? "00:00" : formatDate(points[0].stamp);
     const lastLabel = mode === "today" ? "最新" : formatDate(points.at(-1).stamp);
-    return `<svg class="dm-trend-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)}走势与${hasVolume ? "成交量" : "相邻观测变动"}">
+    return `<svg class="dm-trend-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)}${useCandles ? "K线与成交量" : "走势与相邻观测变动"}">
       <line class="dm-trend-gridline" x1="0" y1="${plotTop}" x2="${width}" y2="${plotTop}"></line><line class="dm-trend-gridline" x1="0" y1="${plotBottom}" x2="${width}" y2="${plotBottom}"></line><line class="dm-trend-baseline" x1="0" y1="${barsBase}" x2="${width}" y2="${barsBase}"></line>
-      <path class="dm-trend-area" style="--dm-color:${color}" d="${area}"></path><polyline class="dm-trend-line" style="--dm-color:${color}" points="${line}"></polyline>${bars}
+      ${useCandles ? candleMarkup : `<path class="dm-trend-area" style="--dm-color:${color}" d="${area}"></path><polyline class="dm-trend-line" style="--dm-color:${color}" points="${line}"></polyline>`}${bars}
       <text class="dm-trend-axis" x="0" y="242">${escapeHtml(firstLabel)}</text><text class="dm-trend-axis" x="${width}" y="242" text-anchor="end">${escapeHtml(lastLabel)}</text>
-    </svg><div class="dm-trend-volume-label">${hasVolume ? "下方：成交量" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）"}</div>`;
+    </svg><div class="dm-trend-volume-label">${hasVolume ? "下方：成交量；红绿柱颜色跟随 K 线涨跌" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）"}</div>`;
   };
 
   const renderDailyTrends = (data) => {
@@ -125,11 +153,11 @@
       {label: "白银现货 · 今日", color: "#718096", history: getSeries(data, "SPOT_XAGUSD")?.history, mode: "today", value: getSeries(data, "SPOT_XAGUSD")?.value, change: getDerived(data, "XAG_SESSION")?.value, unit: "USD/oz"},
       {label: "Brent 原油 · 近 30 个交易日", color: "#8d5e33", history: getSeries(data, "DCOILBRENTEU")?.history, mode: "rolling", value: getSeries(data, "DCOILBRENTEU")?.value, change: getDerived(data, "BRENT_DAILY")?.value, unit: "USD/bbl"},
       {label: "WTI 原油 · 近 30 个交易日", color: "#5f6d4c", history: getSeries(data, "DCOILWTICO")?.history, mode: "rolling", value: getSeries(data, "DCOILWTICO")?.value, change: getDerived(data, "WTI_DAILY")?.value, unit: "USD/bbl"},
-      ...["BTC", "ETH"].map((symbol) => ({label: `${symbol} 永续 OI · 今日`, color: symbol === "BTC" ? "#0f8b78" : "#6274c5", history: cryptoAssets[symbol]?.oi_history, volumeHistory: cryptoAssets[symbol]?.volume_history, mode: "today", value: cryptoAssets[symbol]?.open_interest_usd, change: cryptoAssets[symbol]?.open_interest_change_24h_pct, unit: "USD OI"})),
+      ...["BTC", "ETH"].map((symbol) => ({label: `${symbol} 永续价格 K线 · 今日`, color: symbol === "BTC" ? "#0f8b78" : "#6274c5", history: cryptoAssets[symbol]?.oi_history, volumeHistory: cryptoAssets[symbol]?.volume_history, ohlcvHistory: cryptoAssets[symbol]?.ohlcv_history, mode: "today", value: cryptoAssets[symbol]?.price_usd, change: cryptoAssets[symbol]?.price_change_24h_pct, unit: "USD"})),
     ].filter((item) => item.history?.length);
     if (!specs.length) return "";
-    const cards = specs.map((item) => `<article class="dm-trend-card"><div class="dm-trend-head"><div><span>Daily window · Europe/Berlin</span><h4>${escapeHtml(item.label)}</h4></div><div class="dm-trend-value">${item.unit === "USD OI" ? formatUsd(item.value) : finite(item.value) ? `$${formatCompact(item.value, 2)}` : "待更新"}<small>${signed(item.change, 2, "%")}</small></div></div>${trendSvg(item.history, item.volumeHistory, item.color, item.mode, item.label)}</article>`).join("");
-    return `<section class="dm-trends" id="dynamic-trends"><div class="dm-subhead"><div><span>Intraday chart · midnight reset</span><h3>日内完整走势与成交量/变动柱</h3></div><time>金银/加密从柏林时间 00:00 起；原油为近 30 个交易日</time></div><div class="dm-trend-grid">${cards}</div><p class="dm-flow-note">图表按每次数据包的实际观测时间绘制。金银与原油公开源未提供统一的逐笔成交量，因此下方红绿柱仅作相邻观测变动代理；BTC/ETH 若返回 Binance K 线，则显示真实 USDT 成交量。</p></section>`;
+    const cards = specs.map((item) => `<article class="dm-trend-card"><div class="dm-trend-head"><div><span>Daily window · Europe/Berlin</span><h4>${escapeHtml(item.label)}</h4></div><div class="dm-trend-value">${item.unit === "USD OI" ? formatUsd(item.value) : finite(item.value) ? `$${formatCompact(item.value, 2)}` : "待更新"}<small>${signed(item.change, 2, "%")}</small></div></div>${trendSvg(item.history, item.volumeHistory, item.ohlcvHistory, item.color, item.mode, item.label)}</article>`).join("");
+    return `<section class="dm-trends" id="dynamic-trends"><div class="dm-subhead"><div><span>Intraday chart · midnight reset</span><h3>日内 K 线与成交量/变动柱</h3></div><time>金银/加密从柏林时间 00:00 起；原油为近 30 个交易日</time></div><div class="dm-trend-grid">${cards}</div><p class="dm-flow-note">图表按每次数据包的实际观测时间绘制。BTC/ETH 使用 OHLC K 线；金银与原油公开源未提供统一逐笔成交量，因此保留价格线与变动代理，不把代理值标成真实成交量。</p></section>`;
   };
 
   const getSeries = (data, key) => data.series?.[key] || null;
@@ -295,7 +323,6 @@
         <div class="dm-card-head"><span class="dm-card-label">${escapeHtml(card.label)}</span><span class="dm-source">${escapeHtml(series.source)}</span></div>
         <div class="dm-card-value">${card.value(series, data)}</div>
         <div class="dm-card-change ${changeClass}">${rawChange}</div>
-        ${sparkline(series.history, card.color)}
         <div class="dm-card-foot"><span>${formatDate(series.observed_at || series.date)}</span><span>${escapeHtml(series.id)}</span></div>
       </article>`;
     }).join("");
