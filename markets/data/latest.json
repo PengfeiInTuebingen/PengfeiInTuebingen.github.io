@@ -463,15 +463,15 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-08-26T11:38:43Z",
+    "as_of": "2026-08-26T12:04:13Z",
     "assets": {
       "gold": {
         "drivers": [
           {
-            "direction": "中性",
-            "fact": "黄金 UTC 日内 -0.07%",
+            "direction": "支持",
+            "fact": "黄金 UTC 日内 +0.12%",
             "name": "黄金日内动量",
-            "raw": 0.0,
+            "raw": 1.0,
             "weight": 0.25
           },
           {
@@ -503,18 +503,18 @@
             "weight": 0.15
           }
         ],
-        "interpretation": "当前规则得分 +20，对黄金温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +45，对黄金明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": 20,
-        "stance": "温和支持"
+        "score": 45,
+        "stance": "明显支持"
       },
       "silver": {
         "drivers": [
           {
-            "direction": "中性",
-            "fact": "白银 UTC 日内 -0.04%",
+            "direction": "支持",
+            "fact": "白银 UTC 日内 +0.36%",
             "name": "白银日内动量",
-            "raw": 0.0,
+            "raw": 1.0,
             "weight": 0.25
           },
           {
@@ -553,9 +553,9 @@
             "weight": 0.15
           }
         ],
-        "interpretation": "当前规则得分 +60，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +85，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 60,
+        "score": 85,
         "stance": "明显支持"
       },
       "yen": {
@@ -596,12 +596,12 @@
       }
     },
     "date": "2026-08-26",
-    "headline": "黄金温和支持；白银明显支持；日元温和压制。",
+    "headline": "黄金明显支持；白银明显支持；日元温和压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：08-26 14:30 美国 GDP 第二次估值",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金温和支持；白银明显支持；日元温和压制。下一事件：08-26 14:30 美国 GDP 第二次估值。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金明显支持；白银明显支持；日元温和压制。下一事件：08-26 14:30 美国 GDP 第二次估值。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "CORE_PCE_YOY": {
@@ -623,7 +623,7 @@
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
-      "value": 67.349
+      "value": 67.2035
     },
     "M2_YOY": {
       "date": "2026-08-03",
@@ -679,28 +679,28 @@
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.0102
+      "value": 0.401
     },
     "XAG_SESSION": {
       "date": "2026-08-26",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.0364
+      "value": 0.3644
     },
     "XAU_15M": {
       "date": "2026-08-26",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.0584
+      "value": 0.184
     },
     "XAU_SESSION": {
       "date": "2026-08-26",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.0671
+      "value": 0.1168
     },
     "YIELD_10Y2Y": {
       "date": "2026-08-24",
@@ -710,7 +710,7 @@
       "value": 0.46
     }
   },
-  "generated_at": "2026-08-26T11:39:01Z",
+  "generated_at": "2026-08-26T12:04:33Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -773,7 +773,7 @@
     "fallback_count": 0,
     "macro_checked_at": "2026-08-26T11:28:39Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-08-26T11:45:00Z",
+    "next_scheduled_at": "2026-08-26T12:15:00Z",
     "run_interval_minutes": 15,
     "source_count": 28,
     "statuses": [
@@ -898,12 +898,12 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-26T11:38:43Z",
+        "date": "2026-08-26T12:04:13Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-08-26T11:38:42Z",
+        "date": "2026-08-26T12:04:12Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
@@ -5932,21 +5932,25 @@
         [
           "2026-08-26T11:38:42Z",
           68.585999
+        ],
+        [
+          "2026-08-26T12:04:12Z",
+          68.861
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-08-26T11:38:42Z",
-      "previous": 68.593002,
-      "previous_date": "2026-08-26T11:29:12Z",
+      "observed_at": "2026-08-26T12:04:12Z",
+      "previous": 68.585999,
+      "previous_date": "2026-08-26T11:38:42Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xag",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 68.585999,
+      "value": 68.861,
       "venue": "OTC composite"
     },
     "SPOT_XAUUSD": {
@@ -5964,21 +5968,25 @@
         [
           "2026-08-26T11:38:43Z",
           4619.200195
+        ],
+        [
+          "2026-08-26T12:04:13Z",
+          4627.700195
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-08-26T11:38:43Z",
-      "previous": 4621.899902,
-      "previous_date": "2026-08-26T11:29:13Z",
+      "observed_at": "2026-08-26T12:04:13Z",
+      "previous": 4619.200195,
+      "previous_date": "2026-08-26T11:38:43Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xau",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 4619.200195,
+      "value": 4627.700195,
       "venue": "OTC composite"
     },
     "T10YIE": {
@@ -8220,5 +8228,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "a94f832ddfcb9ea0"
+  "snapshot_id": "e478deba2610ea4e"
 }
