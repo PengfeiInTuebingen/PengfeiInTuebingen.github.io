@@ -1,0 +1,60 @@
+name: Update market data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 6,18 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "20 8 * * 6"
+      timezone: "Europe/Berlin"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download and validate public market data
+        run: python scripts/update_market_data.py
+
+      - name: Detect data changes
+        id: changes
+        run: |
+          if git diff --quiet -- markets/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit refreshed JSON
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "market-data-bot"
+          git config user.email "market-data-bot@users.noreply.github.com"
+          git add markets/data/latest.json markets/data/history.json
+          git commit -m "data: refresh market dashboard"
+          git push origin gh-pages
+
+      - name: Write run summary
+        run: |
+          echo "## Market data update" >> "$GITHUB_STEP_SUMMARY"
+          echo "- AI tokens used: **0**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Data bundle: \`markets/data/latest.json\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Changed: **${{ steps.changes.outputs.changed }}**" >> "$GITHUB_STEP_SUMMARY"

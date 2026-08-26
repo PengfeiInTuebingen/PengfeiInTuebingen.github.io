@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="2026年8月25日黄金、白银与日元每日市场简报">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://pengfeiintuebingen.github.io/markets/2026-08-25/">
   <title>黄金 · 白银 · 日元每日简报｜2026-08-25</title>
   <link rel="stylesheet" href="../assets/decision-pyramid.css">
+  <link rel="stylesheet" href="../assets/dynamic-market.css">
   <style>
     :root {
       --bg: #eef3f1;
@@ -449,6 +451,7 @@
       <nav class="nav" aria-label="页面导航">
         <a href="/">主页</a>
         <a href="#market">行情</a>
+        <a href="#dynamic-data">动态数据</a>
         <a href="#indicators">指标塔</a>
         <a href="#cftc-cross-asset">CFTC</a>
         <a href="#data-library">数据库</a>
@@ -571,6 +574,7 @@
       </div>
     </section>
 
+    <div id="dynamic-market-dashboard"></div>
     <div id="decision-pyramid-extension"></div>
 
     <section class="section" id="technical">
@@ -817,6 +821,7 @@
   </footer>
 
   <script src="../assets/decision-pyramid.js"></script>
+  <script src="../assets/dynamic-market.js" data-data-url="../data/latest.json"></script>
   <script>
     const root = document.documentElement;
     const themeButton = document.getElementById("themeToggle");
