@@ -452,6 +452,7 @@
         <a href="/">主页</a>
         <a href="#market">行情</a>
         <a href="#dynamic-data">动态数据</a>
+        <a href="#dynamic-calendar">财经日历</a>
         <a href="#indicators">指标塔</a>
         <a href="#cftc-cross-asset">CFTC</a>
         <a href="#data-library">数据库</a>
@@ -467,7 +468,7 @@
   <main>
     <section class="hero">
       <div class="container">
-        <div class="eyebrow">Daily briefing · Snapshot</div>
+        <div class="eyebrow">Daily briefing · Dynamic</div>
         <div class="hero-grid">
           <div>
             <h1>黄金偏强，白银待确认，日元守枢轴。</h1>
@@ -798,7 +799,7 @@
       <div class="container">
         <div class="source-panel">
           <h3>数据口径与来源</h3>
-          <p>IBKR 是市场与技术数据的优先来源，但本次 XAU/XAG 伦敦现货不可用，因此现货卡片使用约 07:00 CEST 的公开快照，并与 COMEX 期货技术序列严格分开。宏观数据按最后发布日期使用，不把滞后数据标成实时值。网页保存的是 2026-08-25 15:48 CEST 的分析快照。</p>
+          <p>基础技术图表保留 2026-08-25 的研究快照；动态中枢每 15 分钟检查公开金银指示中间价，并按各数据源自身发布频率更新 FRED、ECB、CFTC 与财经日历。现货参考价不是券商可成交报价，宏观数据也按最后发布日期显示，不把滞后数据标成实时值。</p>
           <div class="source-links">
             <a href="https://www.bea.gov/news/schedule/full" target="_blank" rel="noreferrer">BEA 发布日程</a>
             <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm" target="_blank" rel="noreferrer">Fed 7月声明</a>
@@ -834,7 +835,7 @@
     });
 
     const countdown = document.getElementById("countdown");
-    const eventTime = new Date("2026-08-26T14:30:00+02:00").getTime();
+    let eventTime = new Date("2026-08-26T14:30:00+02:00").getTime();
     function updateCountdown() {
       const delta = eventTime - Date.now();
       if (delta <= 0) {
@@ -846,6 +847,11 @@
       const seconds = Math.floor((delta % 60000) / 1000);
       countdown.textContent = `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
     }
+    window.setNextEventTime = (value) => {
+      const parsed = new Date(value).getTime();
+      if (Number.isFinite(parsed)) eventTime = parsed;
+      updateCountdown();
+    };
     updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>

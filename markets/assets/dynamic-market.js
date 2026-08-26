@@ -21,8 +21,12 @@
 
   const formatDate = (value) => {
     if (!value) return "未知时点";
-    const date = new Date(`${value}T00:00:00Z`);
-    return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("zh-CN", {month: "short", day: "numeric", timeZone: "UTC"}).format(date);
+    const date = new Date(value.includes("T") ? value : `${value}T00:00:00Z`);
+    if (Number.isNaN(date.getTime())) return value;
+    const options = value.includes("T")
+      ? {month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Berlin"}
+      : {month: "short", day: "numeric", timeZone: "UTC"};
+    return new Intl.DateTimeFormat("zh-CN", options).format(date);
   };
 
   const formatGenerated = (value) => {
@@ -64,6 +68,8 @@
   const getDerived = (data, key) => data.derived?.[key] || null;
 
   const cards = [
+    {label: "黄金现货 XAU/USD", key: "SPOT_XAUUSD", color: "#bd861f", value: (s) => `$${formatCompact(s.value, 2)}`, change: (d) => `${signed(getDerived(d, "XAU_15M")?.value, 2, "%")} / 15m`},
+    {label: "白银现货 XAG/USD", key: "SPOT_XAGUSD", color: "#718096", value: (s) => `$${formatCompact(s.value, 3)}`, change: (d) => `${signed(getDerived(d, "XAG_15M")?.value, 2, "%")} / 15m`},
     {label: "美联储总资产", key: "WALCL", color: "#276aa1", value: (s) => `${formatCompact(s.value / 1_000_000, 3)}T`, change: (d) => signed(getDerived(d, "WALCL_WEEKLY_B")?.value, 1, "B / 周")},
     {label: "美债 10Y", key: "DGS10", color: "#7565cf", value: (s) => `${formatCompact(s.value, 3)}%`, change: (d, s) => signed((s.value - s.previous) * 100, 1, "bp")},
     {label: "10Y 实际利率", key: "DFII10", color: "#c64752", value: (s) => `${formatCompact(s.value, 2)}%`, change: (d, s) => signed((s.value - s.previous) * 100, 1, "bp")},
@@ -80,14 +86,57 @@
     <section class="dm-section" id="dynamic-data">
       <div class="container">
         <div class="section-head"><div><div class="section-kicker">Dynamic data · Zero-token pipeline</div><h2>低成本动态数据脉冲</h2></div><p class="section-note">正在读取官方数据快照…</p></div>
-        <div class="dm-grid dm-loading-grid">${Array.from({length: 10}, () => `<div class="dm-card"><div class="dm-skeleton label"></div><div class="dm-skeleton value"></div><div class="dm-skeleton chart"></div></div>`).join("")}</div>
+        <div class="dm-grid dm-loading-grid">${Array.from({length: 12}, () => `<div class="dm-card"><div class="dm-skeleton label"></div><div class="dm-skeleton value"></div><div class="dm-skeleton chart"></div></div>`).join("")}</div>
       </div>
     </section>`;
 
   const statusTone = (data) => {
     if (data.pipeline?.success_count === 0) return "error";
-    if (data.pipeline?.error_count > 0 || ageHours(data.generated_at) > 36) return "stale";
+    if (data.pipeline?.error_count > 0 || ageHours(data.generated_at) > 1) return "stale";
     return "";
+  };
+
+  const scoreClass = (score) => Number(score) >= 10 ? "support" : Number(score) <= -10 ? "pressure" : "neutral";
+
+  const renderConclusion = (data) => {
+    const conclusion = data.daily_conclusion;
+    if (!conclusion?.assets) return "";
+    const assets = Object.values(conclusion.assets).map((asset) => {
+      const drivers = (asset.drivers || []).slice(0, 4).map((driver) =>
+        `<li><span class="dm-driver-direction ${driver.direction === "支持" ? "support" : driver.direction === "压制" ? "pressure" : "neutral"}">${escapeHtml(driver.direction)}</span><span>${escapeHtml(driver.fact)}</span></li>`
+      ).join("");
+      return `<article class="dm-conclusion-card ${scoreClass(asset.score)}">
+        <div class="dm-conclusion-card-head"><div><span>${escapeHtml(asset.label)}</span><strong>${escapeHtml(asset.stance)}</strong></div><b>${Number(asset.score) > 0 ? "+" : ""}${Number(asset.score)}</b></div>
+        <ul class="dm-driver-list">${drivers}</ul>
+        <p>${escapeHtml(asset.interpretation)}</p>
+      </article>`;
+    }).join("");
+    return `<section class="dm-conclusion">
+      <div class="dm-subhead"><div><span>Daily conclusion · transparent rules</span><h3>每日规则结论</h3></div><time>${formatGenerated(conclusion.as_of)}</time></div>
+      <div class="dm-conclusion-lead"><strong>${escapeHtml(conclusion.headline)}</strong><p>${escapeHtml(conclusion.summary)}</p></div>
+      <div class="dm-conclusion-grid">${assets}</div>
+      <div class="dm-method-note"><strong>判定边界：</strong>${escapeHtml(conclusion.risk_note)}<br><span>${escapeHtml(conclusion.method_note)}</span></div>
+    </section>`;
+  };
+
+  const renderCalendar = (data) => {
+    const calendar = data.calendar;
+    const events = (calendar?.events || []).slice(0, 10);
+    if (!events.length) return "";
+    const rows = events.map((event) => {
+      const detail = [event.forecast ? `预期 ${event.forecast}` : "", event.previous ? `前值 ${event.previous}` : ""].filter(Boolean).join(" · ");
+      return `<article class="dm-event">
+        <time>${formatDate(event.timestamp)}</time>
+        <span class="dm-country">${escapeHtml(event.country)}</span>
+        <div class="dm-event-copy"><strong>${escapeHtml(event.title)}</strong><span>${detail ? escapeHtml(detail) + " · " : ""}<a href="${escapeHtml(event.source_url)}" target="_blank" rel="noopener">${escapeHtml(event.source)}</a>${event.official ? " · 官方" : ""}</span></div>
+        <span class="dm-impact ${event.impact?.toLowerCase()}">${escapeHtml(event.impact)}</span>
+      </article>`;
+    }).join("");
+    return `<section class="dm-calendar" id="dynamic-calendar">
+      <div class="dm-subhead"><div><span>Economic calendar · Europe/Berlin</span><h3>自动财经日历</h3></div><time>检查于 ${formatGenerated(calendar.checked_at)}</time></div>
+      <div class="dm-event-list">${rows}</div>
+      <p class="dm-calendar-note">${escapeHtml(calendar.coverage_note || "")}</p>
+    </section>`;
   };
 
   const render = (data) => {
@@ -105,22 +154,23 @@
         <div class="dm-card-value">${card.value(series, data)}</div>
         <div class="dm-card-change ${changeClass}">${rawChange}</div>
         ${sparkline(series.history, card.color)}
-        <div class="dm-card-foot"><span>${formatDate(series.date)}</span><span>${escapeHtml(series.id)}</span></div>
+        <div class="dm-card-foot"><span>${formatDate(series.observed_at || series.date)}</span><span>${escapeHtml(series.id)}</span></div>
       </article>`;
     }).join("");
     const errorNote = pipeline.error_count > 0
       ? `<div class="dm-notice warning"><span>△</span><div><strong>${pipeline.error_count} 个来源使用降级处理。</strong> 页面保留最近一次有效值，不以空值覆盖；详细错误记录在数据 JSON 中。</div></div>`
-      : `<div class="dm-notice"><span>ⓘ</span><div><strong>本模块不调用 AI，单次更新消耗 0 token。</strong> 黄金和白银现货仍保留报告快照；宏观、利率、风险、USD/JPY 与 CFTC 已自动化。</div></div>`;
+      : `<div class="dm-notice"><span>ⓘ</span><div><strong>每 15 分钟刷新金银现货与快数据，AI token 为 0。</strong> 金银为公开聚合指示中间价，不是券商可成交报价；慢速宏观数据按自身发布频率缓存。</div></div>`;
     mount.innerHTML = `<section class="dm-section" id="dynamic-data"><div class="container">
-      <div class="section-head"><div><div class="section-kicker">Dynamic data · Zero-token pipeline</div><h2>低成本动态数据脉冲</h2></div><p class="section-note">网页从 GitHub 数据快照读取；官方源更新后由定时任务重建，不需要 AI 重写整页。</p></div>
+      <div class="section-head"><div><div class="section-kicker">15-minute data · Zero-token pipeline</div><h2>低成本动态市场中枢</h2></div><p class="section-note">每 15 分钟检查快数据；规则引擎同步更新结论与事件风险，不需要 AI 重写整页。</p></div>
       <div class="dm-status-panel">
-        <div class="dm-status-main"><span class="dm-status-light ${tone}"></span><div><strong>${statusText}</strong><span>生成于 ${formatGenerated(data.generated_at)} · 快照 ${escapeHtml(data.snapshot_id || "—")}</span></div></div>
-        <div class="dm-status-stat"><span>成功数据源</span><strong>${pipeline.success_count || 0} / ${pipeline.source_count || 0}</strong></div>
+        <div class="dm-status-main"><span class="dm-status-light ${tone}"></span><div><strong>${statusText}</strong><span>生成于 ${formatGenerated(data.generated_at)} · 下次计划 ${formatGenerated(pipeline.next_scheduled_at)}</span></div></div>
+        <div class="dm-status-stat"><span>可用数据源</span><strong>${pipeline.success_count || 0} / ${pipeline.source_count || 0}</strong></div>
         <div class="dm-status-stat"><span>CFTC 自动映射</span><strong>${data.cftc?.dynamic_count || 0} / ${data.cftc?.target_count || 10}</strong></div>
         <div class="dm-status-stat"><span>AI token</span><strong>${pipeline.ai_tokens_used || 0}</strong></div>
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
       ${errorNote}<div class="dm-grid">${cardMarkup}</div>
+      <div class="dm-intelligence-grid">${renderConclusion(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
   };
@@ -141,12 +191,16 @@
   };
 
   const patchQuotes = (data) => {
+    const xau = getSeries(data, "SPOT_XAUUSD");
+    const xag = getSeries(data, "SPOT_XAGUSD");
     const usdjpy = getSeries(data, "FX_USDJPY");
     const dgs10 = getSeries(data, "DGS10");
     const dgs30 = getSeries(data, "DGS30");
     const vix = getSeries(data, "VIXCLS");
     const spx = getSeries(data, "SP500");
     const ndx = getSeries(data, "NASDAQCOM");
+    if (xau) setQuote("黄金现货", xau.value, `${signed(getDerived(data, "XAU_15M")?.value, 2, "%")} / 15m`, getDerived(data, "XAU_15M")?.value, `${xau.source} 指示中间价 · ${formatGenerated(xau.observed_at)}`);
+    if (xag) setQuote("白银现货", xag.value, `${signed(getDerived(data, "XAG_15M")?.value, 2, "%")} / 15m`, getDerived(data, "XAG_15M")?.value, `${xag.source} 指示中间价 · ${formatGenerated(xag.observed_at)}`);
     if (usdjpy) setQuote("USD/JPY", usdjpy.value, signed(getDerived(data, "USDJPY_DAILY")?.value, 2, "%"), getDerived(data, "USDJPY_DAILY")?.value, `ECB 参考汇率 · ${usdjpy.date}`);
     if (dgs10) setQuote("美债 10 年", `${formatCompact(dgs10.value, 3)}%`, signed((dgs10.value - dgs10.previous) * 100, 1, "bp"), dgs10.value - dgs10.previous, `FRED DGS10 · ${dgs10.date}`);
     if (dgs30) setQuote("美债 30 年", `${formatCompact(dgs30.value, 3)}%`, signed((dgs30.value - dgs30.previous) * 100, 1, "bp"), dgs30.value - dgs30.previous, `FRED DGS30 · ${dgs30.date}`);
@@ -236,8 +290,34 @@
     patchLayers(data);
     patchCftc(data);
     patchLibrary(data);
+    const conclusion = data.daily_conclusion;
+    const briefDate = conclusion?.date || data.generated_at?.slice(0, 10) || "动态更新";
+    document.title = `黄金 · 白银 · 日元每日简报｜${briefDate}`;
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.content = `${briefDate} 黄金、白银与日元动态市场简报；金银参考价与规则结论每15分钟检查。`;
+    const eyebrow = document.querySelector(".hero .eyebrow");
+    if (eyebrow) eyebrow.textContent = "Daily briefing · Dynamic";
+    const heroTitle = document.querySelector(".hero h1");
+    const heroCopy = document.querySelector(".hero-copy");
+    if (heroTitle && conclusion?.headline) heroTitle.textContent = conclusion.headline;
+    if (heroCopy && conclusion?.summary) heroCopy.textContent = conclusion.summary;
+    const firstPill = document.querySelector(".hero .meta-row .pill");
+    if (firstPill) firstPill.innerHTML = `<span class="dot"></span>动态数据 ${formatGenerated(data.generated_at)}`;
+    const nextEvent = data.calendar?.next_event;
+    if (nextEvent) {
+      const eventCard = document.querySelector(".hero .event-card");
+      const eventTitle = eventCard?.querySelector("h2");
+      const eventTime = eventCard?.querySelector(".event-time");
+      const eventNote = eventCard?.querySelector(".event-note");
+      if (eventTitle) eventTitle.textContent = nextEvent.title;
+      if (eventTime) eventTime.textContent = `${formatGenerated(nextEvent.timestamp)} · ${nextEvent.country} · ${nextEvent.impact}`;
+      if (eventNote) eventNote.textContent = `自动日历下一事件；${nextEvent.forecast ? `预期 ${nextEvent.forecast}，` : ""}${nextEvent.previous ? `前值 ${nextEvent.previous}。` : "公布前后注意跳空与点差扩大。"}`;
+      window.setNextEventTime?.(nextEvent.timestamp);
+    }
+    const footerDate = document.querySelector("footer .footer-inner span:first-child");
+    if (footerDate) footerDate.textContent = `Metals & Yen Daily · ${briefDate} · 15-minute data`;
     const meta = document.querySelector(".hero .meta-row");
-    if (meta && !meta.querySelector("[data-dynamic-meta]")) meta.insertAdjacentHTML("beforeend", `<span class="pill" data-dynamic-meta><span class="dot"></span>动态数据 ${formatGenerated(data.generated_at)} · 0 token</span>`);
+    if (meta && !meta.querySelector("[data-dynamic-meta]")) meta.insertAdjacentHTML("beforeend", `<span class="pill" data-dynamic-meta><span class="dot"></span>15分钟数据 ${formatGenerated(data.generated_at)} · 0 token</span>`);
     window.marketDashboardData = data;
   };
 

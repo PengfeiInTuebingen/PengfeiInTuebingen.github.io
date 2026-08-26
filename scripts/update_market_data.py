@@ -15,15 +15,18 @@ import io
 import json
 import math
 import os
+import re
 import subprocess
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from html import unescape
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 
 ROOT = Path(os.environ.get("MARKET_SITE_ROOT", Path(__file__).resolve().parents[1]))
@@ -36,6 +39,17 @@ FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 ECB_URL = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
 CFTC_DISAGG_URL = "https://www.cftc.gov/dea/newcot/c_disagg.txt"
 CFTC_TFF_URL = "https://www.cftc.gov/dea/newcot/FinComWk.txt"
+GOLD_API_URL = "https://api.gold-api.com/price"
+XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
+CALENDAR_FEED_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+BEA_CALENDAR_URL = "https://www.bea.gov/news/schedule"
+FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+ECB_CALENDAR_URL = "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+
+RUN_INTERVAL_MINUTES = 15
+MACRO_REFRESH_HOURS = 6
+CFTC_REFRESH_HOURS = 12
+CALENDAR_REFRESH_HOURS = 1
 
 FRED_SERIES = {
     "WALCL": ("美联储总资产", "百万美元", "流动性"),
@@ -68,6 +82,21 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def parse_timestamp(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def cadence_due(last_checked: str | None, hours: float) -> bool:
+    parsed = parse_timestamp(last_checked)
+    return parsed is None or datetime.now(timezone.utc) - parsed >= timedelta(hours=hours)
+
+
 def load_json(path: Path, default: Any) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -87,7 +116,10 @@ def request_text(url: str, attempts: int = 3) -> str:
     for attempt in range(attempts):
         request = urllib.request.Request(
             url,
-            headers={"User-Agent": USER_AGENT, "Accept": "text/csv,text/plain,application/xml,*/*"},
+            headers={
+                "User-Agent": USER_AGENT,
+                "Accept": "application/json,text/html,text/csv,text/plain,application/xml,*/*",
+            },
         )
         try:
             with urllib.request.urlopen(request, timeout=45) as response:
@@ -111,6 +143,18 @@ def request_text(url: str, attempts: int = 3) -> str:
         except (subprocess.SubprocessError, OSError) as curl_error:
             last_error = curl_error
     raise RuntimeError(f"download failed: {url}: {last_error}")
+
+
+def request_json(url: str) -> Any:
+    try:
+        return json.loads(request_text(url))
+    except json.JSONDecodeError as error:
+        raise ValueError(f"invalid JSON from {url}: {error}") from error
+
+
+def clean_html(value: str) -> str:
+    plain = re.sub(r"<[^>]+>", " ", value)
+    return re.sub(r"\s+", " ", unescape(plain)).strip()
 
 
 def number(value: Any) -> float | None:
@@ -231,6 +275,75 @@ def fetch_ecb_usdjpy() -> dict[str, Any]:
     }
 
 
+def append_intraday_history(previous: dict[str, Any] | None, observed_at: str, value: float) -> list[list[Any]]:
+    points: dict[str, float] = {}
+    for point in (previous or {}).get("history", []):
+        if len(point) >= 2 and parse_timestamp(str(point[0])) and number(point[1]) is not None:
+            points[str(point[0])] = float(point[1])
+    points[observed_at] = value
+    ordered = sorted(points.items(), key=lambda item: parse_timestamp(item[0]) or datetime.min.replace(tzinfo=timezone.utc))
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    recent = [[stamp, round_value(price, 6)] for stamp, price in ordered if (parse_timestamp(stamp) or cutoff) >= cutoff]
+    return recent[-700:]
+
+
+def fetch_metal_spot(symbol: str, previous: dict[str, Any] | None) -> dict[str, Any]:
+    symbol = symbol.upper()
+    if symbol not in {"XAU", "XAG"}:
+        raise ValueError(f"unsupported metal symbol {symbol}")
+    source = "Gold-API.com"
+    source_url = f"https://gold-api.com/{symbol.lower()}"
+    quote_basis = "公开聚合现货指示中间价（非可成交报价）"
+    stale = False
+    try:
+        raw = request_json(f"{GOLD_API_URL}/{symbol}")
+        price = number(raw.get("price"))
+        observed_at = raw.get("updatedAt")
+    except Exception as primary_error:
+        fallback = request_json(XAUS_FALLBACK_URL)
+        price = number(fallback.get("spot_usd_oz") if symbol == "XAU" else fallback.get("silver_usd_oz"))
+        observed_at = fallback.get("price_as_of") or fallback.get("updated_at")
+        stale = bool(fallback.get("stale"))
+        source = "XAUS.com fallback"
+        source_url = "https://xaus.com/api/"
+        quote_basis = "公开聚合现货指示中间价（回退源，非可成交报价）"
+        if price is None:
+            raise RuntimeError(f"{symbol} primary failed ({primary_error}); fallback returned no price")
+    if price is None or observed_at is None:
+        raise ValueError(f"{symbol}: missing price or observation timestamp")
+    lower, upper = (100.0, 50_000.0) if symbol == "XAU" else (1.0, 1_000.0)
+    if not lower <= price <= upper:
+        raise ValueError(f"{symbol}: implausible price {price}")
+    observed = parse_timestamp(str(observed_at))
+    if observed is None:
+        raise ValueError(f"{symbol}: invalid observation timestamp {observed_at}")
+    observed_at = observed.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    previous_value = number((previous or {}).get("value"))
+    if previous_value is None:
+        previous_value = price
+    history = append_intraday_history(previous, observed_at, price)
+    label = "黄金现货 XAU/USD" if symbol == "XAU" else "白银现货 XAG/USD"
+    return {
+        "id": f"SPOT_{symbol}USD",
+        "label": label,
+        "value": round_value(price, 6),
+        "previous": round_value(previous_value, 6),
+        "date": observed_at[:10],
+        "previous_date": (previous or {}).get("observed_at") or observed_at,
+        "observed_at": observed_at,
+        "unit": "USD/金衡盎司",
+        "category": "贵金属",
+        "instrument": f"{symbol}/USD spot",
+        "venue": "OTC composite",
+        "quote_basis": quote_basis,
+        "tradable": False,
+        "stale": stale,
+        "source": source,
+        "source_url": source_url,
+        "history": history,
+    }
+
+
 def cftc_ratio(row: list[str], kind: str) -> tuple[float, float, int]:
     if kind == "managed_money":
         oi, long_pos, short_pos = number(row[7]), number(row[13]), number(row[14])
@@ -306,8 +419,260 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     }, missing
 
 
+def translate_event(title: str, country: str) -> str:
+    lowered = title.lower()
+    translations = [
+        ("core pce", "美国核心 PCE"),
+        ("personal income and outlays", "美国个人收入与支出（含 PCE）"),
+        ("prelim gdp", "美国 GDP 修正值"),
+        ("gdp (second estimate)", "美国 GDP 第二次估值"),
+        ("gdp (third estimate)", "美国 GDP 第三次估值"),
+        ("gdp (advance estimate)", "美国 GDP 初值"),
+        ("gdp price index", "美国 GDP 价格指数"),
+        ("employment situation", "美国非农就业报告"),
+        ("non-farm", "美国非农就业"),
+        ("unemployment claims", "美国初请失业金"),
+        ("consumer price index", "美国 CPI"),
+        ("tokyo core cpi", "日本东京核心 CPI"),
+        ("cpi m/m", "CPI 环比"),
+        ("cpi y/y", "CPI 同比"),
+        ("producer price index", "美国 PPI"),
+        ("jolts", "美国 JOLTS 职位空缺"),
+        ("fomc", "美联储 FOMC 事件"),
+        ("fed chairman", "美联储主席讲话"),
+        ("jackson hole", "杰克逊霍尔央行年会"),
+        ("boj", "日本央行事件"),
+        ("china", "中国"),
+        ("international trade", "美国国际贸易"),
+        ("monetary policy meeting accounts", "ECB 货币政策会议纪要"),
+    ]
+    for needle, translated in translations:
+        if needle in lowered:
+            return translated
+    prefixes = {"USD": "美国", "JPY": "日本", "CNY": "中国", "EUR": "欧元区", "All": "全球"}
+    return f"{prefixes.get(country, country)} · {title}"
+
+
+def make_calendar_event(
+    *,
+    title: str,
+    country: str,
+    timestamp: datetime,
+    impact: str,
+    source: str,
+    source_url: str,
+    forecast: str = "",
+    previous: str = "",
+    official: bool = False,
+) -> dict[str, Any]:
+    stamp = timestamp.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    identity = hashlib.sha1(f"{stamp}|{country}|{title}|{source}".encode()).hexdigest()[:12]
+    return {
+        "id": identity,
+        "title": translate_event(title, country),
+        "original_title": clean_html(title),
+        "country": country,
+        "timestamp": stamp,
+        "impact": impact,
+        "forecast": forecast,
+        "previous": previous,
+        "source": source,
+        "source_url": source_url,
+        "official": official,
+    }
+
+
+def fetch_calendar_feed(now: datetime) -> list[dict[str, Any]]:
+    raw = request_json(CALENDAR_FEED_URL)
+    if not isinstance(raw, list):
+        raise ValueError("calendar feed did not return a list")
+    events = []
+    countries = {"USD", "JPY", "CNY", "EUR", "All"}
+    for item in raw:
+        timestamp = parse_timestamp(item.get("date"))
+        impact = str(item.get("impact") or "Low").title()
+        country = str(item.get("country") or "")
+        if timestamp is None or country not in countries or impact not in {"High", "Medium"}:
+            continue
+        if not now - timedelta(hours=2) <= timestamp <= now + timedelta(days=8):
+            continue
+        events.append(make_calendar_event(
+            title=str(item.get("title") or "Scheduled event"),
+            country=country,
+            timestamp=timestamp,
+            impact=impact,
+            source="Forex Factory public calendar feed",
+            source_url="https://www.forexfactory.com/calendar",
+            forecast=str(item.get("forecast") or ""),
+            previous=str(item.get("previous") or ""),
+        ))
+    return events
+
+
+def fetch_bea_calendar(now: datetime) -> list[dict[str, Any]]:
+    text = request_text(BEA_CALENDAR_URL)
+    rows = re.findall(r'<tr class="scheduled-releases-type-press">(.*?)</tr>', text, flags=re.S | re.I)
+    events = []
+    for row in rows:
+        date_match = re.search(r'<div class="release-date">([^<]+)</div>', row, flags=re.I)
+        time_match = re.search(r'<small class="text-muted">([^<]+)</small>', row, flags=re.I)
+        title_match = re.search(r'<td class="release-title[^"]*"[^>]*>(.*?)</td>', row, flags=re.S | re.I)
+        if not (date_match and time_match and title_match):
+            continue
+        title = clean_html(title_match.group(1))
+        if not any(keyword in title.lower() for keyword in ("gdp", "personal income and outlays", "international trade")):
+            continue
+        try:
+            local = datetime.strptime(
+                f"{now.year} {clean_html(date_match.group(1))} {clean_html(time_match.group(1))}",
+                "%Y %B %d %I:%M %p",
+            ).replace(tzinfo=ZoneInfo("America/New_York"))
+        except ValueError:
+            continue
+        if local < now - timedelta(hours=2) or local > now + timedelta(days=180):
+            continue
+        impact = "High" if any(keyword in title.lower() for keyword in ("gdp", "personal income and outlays")) else "Medium"
+        events.append(make_calendar_event(
+            title=title,
+            country="USD",
+            timestamp=local,
+            impact=impact,
+            source="U.S. BEA",
+            source_url=BEA_CALENDAR_URL,
+            official=True,
+        ))
+    return events
+
+
+def fetch_fomc_calendar(now: datetime) -> list[dict[str, Any]]:
+    text = request_text(FOMC_CALENDAR_URL)
+    start = text.find(f">{now.year} FOMC Meetings<")
+    if start < 0:
+        raise ValueError(f"FOMC calendar missing {now.year} section")
+    end = text.find(f">{now.year - 1} FOMC Meetings<", start)
+    block = text[start:end if end > start else None]
+    meetings = re.findall(
+        r'fomc-meeting__month[^>]*><strong>([^<]+)</strong>.*?fomc-meeting__date[^>]*>([^<]+)</div>',
+        block,
+        flags=re.S | re.I,
+    )
+    events = []
+    for month_text, date_text in meetings:
+        month_name = clean_html(month_text).split("/")[-1]
+        day_numbers = re.findall(r"\d+", clean_html(date_text))
+        if not day_numbers:
+            continue
+        try:
+            local = datetime(
+                now.year,
+                datetime.strptime(month_name, "%B").month,
+                int(day_numbers[-1]),
+                14,
+                0,
+                tzinfo=ZoneInfo("America/New_York"),
+            )
+        except ValueError:
+            continue
+        if local < now - timedelta(hours=2) or local > now + timedelta(days=180):
+            continue
+        events.append(make_calendar_event(
+            title="FOMC interest-rate decision and statement",
+            country="USD",
+            timestamp=local,
+            impact="High",
+            source="Federal Reserve",
+            source_url=FOMC_CALENDAR_URL,
+            official=True,
+        ))
+    return events
+
+
+def fetch_ecb_calendar(now: datetime) -> list[dict[str, Any]]:
+    text = request_text(ECB_CALENDAR_URL)
+    entries = re.findall(r"<dt>\s*(\d{2}/\d{2}/\d{4})\s*</dt>\s*<dd>\s*(.*?)<br", text, flags=re.S | re.I)
+    events = []
+    for date_text, description in entries:
+        title = clean_html(description)
+        if "monetary policy meeting" not in title.lower() or "(day 2)" not in title.lower():
+            continue
+        try:
+            local = datetime.strptime(date_text, "%d/%m/%Y").replace(
+                hour=14,
+                minute=15,
+                tzinfo=ZoneInfo("Europe/Berlin"),
+            )
+        except ValueError:
+            continue
+        if local < now - timedelta(hours=2) or local > now + timedelta(days=180):
+            continue
+        events.append(make_calendar_event(
+            title="ECB monetary-policy decision",
+            country="EUR",
+            timestamp=local,
+            impact="High",
+            source="European Central Bank",
+            source_url=ECB_CALENDAR_URL,
+            official=True,
+        ))
+    return events
+
+
+def fetch_economic_calendar() -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    now = datetime.now(timezone.utc)
+    events: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+    sources = [
+        ("Broad weekly feed", fetch_calendar_feed),
+        ("BEA", fetch_bea_calendar),
+        ("Federal Reserve", fetch_fomc_calendar),
+        ("ECB", fetch_ecb_calendar),
+    ]
+    source_statuses = []
+    for source, fetcher in sources:
+        try:
+            collected = fetcher(now)
+            events.extend(collected)
+            source_statuses.append({"source": source, "status": "ok", "events": len(collected)})
+        except Exception as error:
+            errors.append({"source": source, "series": "economic_calendar", "error": str(error)[:240]})
+            source_statuses.append({"source": source, "status": "failed", "events": 0})
+    if not events:
+        raise RuntimeError("all economic calendar sources failed")
+    unique: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for event in sorted(events, key=lambda item: (not item["official"], item["timestamp"])):
+        key = (event["timestamp"][:16], event["country"], event["title"])
+        if key not in unique or event["official"]:
+            unique[key] = event
+    upcoming = sorted(unique.values(), key=lambda item: item["timestamp"])
+    return {
+        "checked_at": utc_now(),
+        "timezone": "Europe/Berlin",
+        "events": upcoming[:24],
+        "next_event": upcoming[0] if upcoming else None,
+        "source_statuses": source_statuses,
+        "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
+    }, errors
+
+
 def derived_metric(label: str, value: float | None, unit: str, date: str | None, source: str) -> dict[str, Any]:
     return {"label": label, "value": round_value(value, 4), "unit": unit, "date": date, "source": source}
+
+
+def intraday_session_change(series: dict[str, Any] | None) -> float | None:
+    if not series or not series.get("history"):
+        return None
+    observed = parse_timestamp(series.get("observed_at"))
+    if observed is None:
+        return None
+    same_day = [
+        number(point[1])
+        for point in series["history"]
+        if len(point) >= 2 and parse_timestamp(str(point[0])) and parse_timestamp(str(point[0])).date() == observed.date()
+    ]
+    values = [value for value in same_day if value is not None]
+    if not values or values[0] == 0:
+        return None
+    return round_value((series["value"] / values[0] - 1) * 100, 4)
 
 
 def build_derived(series: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -315,6 +680,7 @@ def build_derived(series: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]
     value = lambda key: series.get(key, {}).get("value")
     dgs10, dgs2 = value("DGS10"), value("DGS2")
     walcl_change = change(series.get("WALCL"))
+    gold, silver = value("SPOT_XAUUSD"), value("SPOT_XAGUSD")
     return {
         "YIELD_10Y2Y": derived_metric("10Y−2Y 利差", None if None in (dgs10, dgs2) else dgs10 - dgs2, "百分点", latest_date("DGS10"), "FRED"),
         "WALCL_WEEKLY_B": derived_metric("美联储资产负债表周变动", None if walcl_change is None else walcl_change / 1000, "十亿美元", latest_date("WALCL"), "FRED"),
@@ -326,6 +692,17 @@ def build_derived(series: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]
         "SP500_DAILY": derived_metric("标普 500 日变动", percent_change(series.get("SP500")), "%", latest_date("SP500"), "FRED"),
         "NASDAQ_DAILY": derived_metric("纳斯达克日变动", percent_change(series.get("NASDAQCOM")), "%", latest_date("NASDAQCOM"), "FRED"),
         "USDJPY_DAILY": derived_metric("USD/JPY 日变动", percent_change(series.get("FX_USDJPY")), "%", latest_date("FX_USDJPY"), "ECB"),
+        "XAU_15M": derived_metric("黄金较上次快照", percent_change(series.get("SPOT_XAUUSD")), "%", latest_date("SPOT_XAUUSD"), "Gold-API"),
+        "XAG_15M": derived_metric("白银较上次快照", percent_change(series.get("SPOT_XAGUSD")), "%", latest_date("SPOT_XAGUSD"), "Gold-API"),
+        "XAU_SESSION": derived_metric("黄金 UTC 日内变动", intraday_session_change(series.get("SPOT_XAUUSD")), "%", latest_date("SPOT_XAUUSD"), "Gold-API"),
+        "XAG_SESSION": derived_metric("白银 UTC 日内变动", intraday_session_change(series.get("SPOT_XAGUSD")), "%", latest_date("SPOT_XAGUSD"), "Gold-API"),
+        "GOLD_SILVER_RATIO": derived_metric(
+            "金银比",
+            None if None in (gold, silver) or silver == 0 else gold / silver,
+            "倍",
+            latest_date("SPOT_XAUUSD"),
+            "Gold-API",
+        ),
     }
 
 
@@ -388,6 +765,154 @@ def build_layers(series: dict[str, dict[str, Any]], derived: dict[str, dict[str,
     }
 
 
+def directional_signal(value: float | None, deadband: float, positive_when_rising: bool = True) -> float | None:
+    if value is None:
+        return None
+    if abs(value) <= deadband:
+        return 0.0
+    raw = 1.0 if value > 0 else -1.0
+    return raw if positive_when_rising else -raw
+
+
+def conclusion_factor(
+    name: str,
+    value: float | None,
+    *,
+    weight: float,
+    deadband: float,
+    positive_when_rising: bool,
+    fact: str,
+) -> dict[str, Any]:
+    return {
+        "name": name,
+        "raw": directional_signal(value, deadband, positive_when_rising),
+        "weight": weight,
+        "fact": fact,
+    }
+
+
+def weighted_conclusion(factors: list[dict[str, Any]]) -> tuple[int, str, list[dict[str, Any]]]:
+    available = [factor for factor in factors if factor["raw"] is not None]
+    total_weight = sum(factor["weight"] for factor in available)
+    score = 0 if not total_weight else round(100 * sum(factor["raw"] * factor["weight"] for factor in available) / total_weight)
+    if score >= 35:
+        stance = "明显支持"
+    elif score >= 10:
+        stance = "温和支持"
+    elif score > -10:
+        stance = "中性等待"
+    elif score > -35:
+        stance = "温和压制"
+    else:
+        stance = "明显压制"
+    drivers = []
+    for factor in available:
+        direction = "支持" if factor["raw"] > 0 else "压制" if factor["raw"] < 0 else "中性"
+        drivers.append({
+            "name": factor["name"],
+            "direction": direction,
+            "raw": factor["raw"],
+            "weight": factor["weight"],
+            "fact": factor["fact"],
+        })
+    return score, stance, drivers
+
+
+def signed_text(value: float | None, digits: int = 2, suffix: str = "") -> str:
+    if value is None:
+        return "待更新"
+    return f"{value:+.{digits}f}{suffix}"
+
+
+def build_daily_conclusion(
+    series: dict[str, dict[str, Any]],
+    derived: dict[str, dict[str, Any]],
+    cftc: dict[str, Any],
+    calendar: dict[str, Any],
+) -> dict[str, Any]:
+    metric = lambda key: number(derived.get(key, {}).get("value"))
+    value = lambda key: number(series.get(key, {}).get("value"))
+    delta = lambda key: change(series.get(key))
+    positions = {item["name"]: item for item in cftc.get("positions", [])}
+    cftc_ratio_value = lambda name: number(positions.get(name, {}).get("ratio"))
+
+    xau_session = metric("XAU_SESSION")
+    xag_session = metric("XAG_SESSION")
+    real_yield_delta = delta("DFII10")
+    dollar_change = percent_change(series.get("DTWEXBGS"))
+    nasdaq_change = metric("NASDAQ_DAILY")
+    usdjpy_change = metric("USDJPY_DAILY")
+    ten_year_delta = delta("DGS10")
+    vix_level = value("VIXCLS")
+
+    gold_factors = [
+        conclusion_factor("黄金日内动量", xau_session, weight=.25, deadband=.08, positive_when_rising=True, fact=f"黄金 UTC 日内 {signed_text(xau_session, 2, '%')}"),
+        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.25, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
+        conclusion_factor("广义美元", dollar_change, weight=.20, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
+        conclusion_factor("黄金 CFTC", cftc_ratio_value("黄金"), weight=.15, deadband=5, positive_when_rising=True, fact=f"黄金净持仓/OI {signed_text(cftc_ratio_value('黄金'), 2, '%')}"),
+        conclusion_factor("避险波动", None if vix_level is None else vix_level - 20, weight=.15, deadband=3, positive_when_rising=True, fact=f"VIX {vix_level:.2f}" if vix_level is not None else "VIX 待更新"),
+    ]
+    silver_factors = [
+        conclusion_factor("白银日内动量", xag_session, weight=.25, deadband=.10, positive_when_rising=True, fact=f"白银 UTC 日内 {signed_text(xag_session, 2, '%')}"),
+        conclusion_factor("10Y 实际利率", real_yield_delta, weight=.15, deadband=.02, positive_when_rising=False, fact=f"10Y 实际利率较前值 {signed_text(None if real_yield_delta is None else real_yield_delta * 100, 1, 'bp')}"),
+        conclusion_factor("广义美元", dollar_change, weight=.15, deadband=.05, positive_when_rising=False, fact=f"广义美元较前值 {signed_text(dollar_change, 2, '%')}"),
+        conclusion_factor("纳斯达克风险偏好", nasdaq_change, weight=.15, deadband=.20, positive_when_rising=True, fact=f"纳斯达克较前值 {signed_text(nasdaq_change, 2, '%')}"),
+        conclusion_factor("铜 CFTC", cftc_ratio_value("铜"), weight=.15, deadband=5, positive_when_rising=True, fact=f"铜净持仓/OI {signed_text(cftc_ratio_value('铜'), 2, '%')}"),
+        conclusion_factor("白银 CFTC", cftc_ratio_value("白银"), weight=.15, deadband=5, positive_when_rising=True, fact=f"白银净持仓/OI {signed_text(cftc_ratio_value('白银'), 2, '%')}"),
+    ]
+    yen_factors = [
+        conclusion_factor("USD/JPY 方向", usdjpy_change, weight=.35, deadband=.08, positive_when_rising=False, fact=f"USD/JPY 较前值 {signed_text(usdjpy_change, 2, '%')}"),
+        conclusion_factor("美债 10Y", ten_year_delta, weight=.25, deadband=.02, positive_when_rising=False, fact=f"美债 10Y 较前值 {signed_text(None if ten_year_delta is None else ten_year_delta * 100, 1, 'bp')}"),
+        conclusion_factor("风险规避", None if vix_level is None else vix_level - 20, weight=.15, deadband=3, positive_when_rising=True, fact=f"VIX {vix_level:.2f}" if vix_level is not None else "VIX 待更新"),
+        conclusion_factor("日元 CFTC", cftc_ratio_value("日元"), weight=.25, deadband=5, positive_when_rising=True, fact=f"日元净持仓/OI {signed_text(cftc_ratio_value('日元'), 2, '%')}"),
+    ]
+
+    assets = {}
+    for key, label, factors in (
+        ("gold", "黄金", gold_factors),
+        ("silver", "白银", silver_factors),
+        ("yen", "日元", yen_factors),
+    ):
+        score, stance, drivers = weighted_conclusion(factors)
+        assets[key] = {
+            "label": label,
+            "score": score,
+            "stance": stance,
+            "drivers": drivers,
+            "interpretation": (
+                f"当前规则得分 {score:+d}，对{label}{stance}。"
+                "只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。"
+            ),
+        }
+
+    next_event = calendar.get("next_event")
+    event_text = "近期无已载入的高影响事件"
+    if next_event:
+        event_time = parse_timestamp(next_event.get("timestamp"))
+        if event_time:
+            berlin = event_time.astimezone(ZoneInfo("Europe/Berlin"))
+            event_text = f"下一事件：{berlin:%m-%d %H:%M} {next_event['title']}"
+    observed_times = [
+        parse_timestamp(series.get(key, {}).get("observed_at"))
+        for key in ("SPOT_XAUUSD", "SPOT_XAGUSD")
+    ]
+    observed_times = [stamp for stamp in observed_times if stamp]
+    as_of = max(observed_times).isoformat().replace("+00:00", "Z") if observed_times else utc_now()
+    headline = "；".join(f"{item['label']}{item['stance']}" for item in assets.values()) + "。"
+    return {
+        "date": datetime.now(ZoneInfo("Europe/Berlin")).date().isoformat(),
+        "as_of": as_of,
+        "method": "transparent-rules-v1",
+        "ai_tokens_used": 0,
+        "headline": headline,
+        "summary": f"{headline}{event_text}。这是指标规则的条件判断，不是收益保证或自动交易指令。",
+        "assets": assets,
+        "next_event_text": event_text,
+        "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
+        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；缺失因子不参与加权，不用 AI 补写。",
+    }
+
+
 def signature(payload: dict[str, Any]) -> str:
     compact = {
         "series": {key: [item.get("date"), item.get("value")] for key, item in payload.get("series", {}).items()},
@@ -399,50 +924,126 @@ def signature(payload: dict[str, Any]) -> str:
 def main() -> int:
     previous = load_json(LATEST_PATH, {})
     previous_series = previous.get("series", {})
+    previous_pipeline = previous.get("pipeline", {})
     series: dict[str, dict[str, Any]] = {}
     errors: list[dict[str, Any]] = []
     statuses: list[dict[str, Any]] = []
+    run_at = utc_now()
 
-    for series_id in FRED_SERIES:
+    macro_due = cadence_due(previous_pipeline.get("macro_checked_at"), MACRO_REFRESH_HOURS) or any(
+        series_id not in previous_series for series_id in (*FRED_SERIES.keys(), "FX_USDJPY")
+    )
+    if macro_due:
+        macro_checked_at = run_at
+        for series_id in FRED_SERIES:
+            try:
+                series[series_id] = fetch_fred_series(series_id)
+                statuses.append({"source": f"FRED {series_id}", "status": "ok", "date": series[series_id]["date"]})
+            except Exception as error:  # source isolation is intentional
+                if series_id in previous_series:
+                    series[series_id] = previous_series[series_id]
+                errors.append({"source": "FRED", "series": series_id, "error": str(error)[:240]})
+                statuses.append({"source": f"FRED {series_id}", "status": "fallback" if series_id in series else "failed"})
         try:
-            series[series_id] = fetch_fred_series(series_id)
-            statuses.append({"source": f"FRED {series_id}", "status": "ok", "date": series[series_id]["date"]})
-        except Exception as error:  # source isolation is intentional
+            series["FX_USDJPY"] = fetch_ecb_usdjpy()
+            statuses.append({"source": "ECB FX", "status": "ok", "date": series["FX_USDJPY"]["date"]})
+        except Exception as error:
+            if "FX_USDJPY" in previous_series:
+                series["FX_USDJPY"] = previous_series["FX_USDJPY"]
+            errors.append({"source": "ECB", "series": "FX_USDJPY", "error": str(error)[:240]})
+            statuses.append({"source": "ECB FX", "status": "fallback" if "FX_USDJPY" in series else "failed"})
+    else:
+        macro_checked_at = previous_pipeline.get("macro_checked_at")
+        for series_id in FRED_SERIES:
             if series_id in previous_series:
                 series[series_id] = previous_series[series_id]
-            errors.append({"source": "FRED", "series": series_id, "error": str(error)[:240]})
-            statuses.append({"source": f"FRED {series_id}", "status": "fallback" if series_id in series else "failed"})
-
-    try:
-        series["FX_USDJPY"] = fetch_ecb_usdjpy()
-        statuses.append({"source": "ECB FX", "status": "ok", "date": series["FX_USDJPY"]["date"]})
-    except Exception as error:
+            statuses.append({
+                "source": f"FRED {series_id}",
+                "status": "cached" if series_id in series else "failed",
+                "date": series.get(series_id, {}).get("date"),
+            })
         if "FX_USDJPY" in previous_series:
             series["FX_USDJPY"] = previous_series["FX_USDJPY"]
-        errors.append({"source": "ECB", "series": "FX_USDJPY", "error": str(error)[:240]})
-        statuses.append({"source": "ECB FX", "status": "fallback" if "FX_USDJPY" in series else "failed"})
+        statuses.append({
+            "source": "ECB FX",
+            "status": "cached" if "FX_USDJPY" in series else "failed",
+            "date": series.get("FX_USDJPY", {}).get("date"),
+        })
 
-    try:
-        cftc, cftc_missing = fetch_cftc()
-        errors.extend(cftc_missing)
-        statuses.append({"source": "CFTC", "status": "ok", "date": cftc.get("report_date")})
-    except Exception as error:
+    for symbol in ("XAU", "XAG"):
+        series_id = f"SPOT_{symbol}USD"
+        try:
+            series[series_id] = fetch_metal_spot(symbol, previous_series.get(series_id))
+            statuses.append({
+                "source": f"{symbol}/USD spot",
+                "status": "ok",
+                "date": series[series_id].get("observed_at"),
+            })
+        except Exception as error:
+            if series_id in previous_series:
+                series[series_id] = previous_series[series_id]
+            errors.append({"source": "Gold spot API", "series": series_id, "error": str(error)[:240]})
+            statuses.append({"source": f"{symbol}/USD spot", "status": "fallback" if series_id in series else "failed"})
+
+    cftc_due = cadence_due(previous_pipeline.get("cftc_checked_at"), CFTC_REFRESH_HOURS) or not previous.get("cftc", {}).get("positions")
+    if cftc_due:
+        try:
+            cftc, cftc_missing = fetch_cftc()
+            errors.extend(cftc_missing)
+            cftc_checked_at = run_at
+            statuses.append({"source": "CFTC", "status": "ok", "date": cftc.get("report_date")})
+        except Exception as error:
+            cftc = previous.get("cftc", {"positions": [], "dynamic_count": 0, "target_count": 10})
+            cftc_checked_at = previous_pipeline.get("cftc_checked_at")
+            errors.append({"source": "CFTC", "series": "COT", "error": str(error)[:240]})
+            statuses.append({"source": "CFTC", "status": "fallback" if cftc.get("positions") else "failed"})
+    else:
         cftc = previous.get("cftc", {"positions": [], "dynamic_count": 0, "target_count": 10})
-        errors.append({"source": "CFTC", "series": "COT", "error": str(error)[:240]})
-        statuses.append({"source": "CFTC", "status": "fallback" if cftc.get("positions") else "failed"})
+        cftc_checked_at = previous_pipeline.get("cftc_checked_at")
+        statuses.append({"source": "CFTC", "status": "cached", "date": cftc.get("report_date")})
+
+    previous_calendar = previous.get("calendar", {})
+    calendar_due = cadence_due(previous_pipeline.get("calendar_checked_at"), CALENDAR_REFRESH_HOURS) or not previous_calendar.get("events")
+    if calendar_due:
+        try:
+            calendar, calendar_errors = fetch_economic_calendar()
+            errors.extend(calendar_errors)
+            calendar_checked_at = run_at
+            statuses.append({"source": "Economic calendar", "status": "ok", "date": calendar.get("checked_at")})
+        except Exception as error:
+            calendar = previous_calendar
+            calendar_checked_at = previous_pipeline.get("calendar_checked_at")
+            errors.append({"source": "Economic calendar", "series": "events", "error": str(error)[:240]})
+            statuses.append({"source": "Economic calendar", "status": "fallback" if calendar.get("events") else "failed"})
+    else:
+        calendar = previous_calendar
+        calendar_checked_at = previous_pipeline.get("calendar_checked_at")
+        statuses.append({"source": "Economic calendar", "status": "cached", "date": calendar.get("checked_at")})
 
     if not series and not cftc.get("positions"):
         raise RuntimeError("No source succeeded and no previous snapshot is available")
 
     derived = build_derived(series)
+    available_statuses = {"ok", "cached", "fallback"}
+    run_time = parse_timestamp(run_at) or datetime.now(timezone.utc)
+    next_update = run_time.replace(minute=0, second=0) + timedelta(
+        minutes=((run_time.minute // RUN_INTERVAL_MINUTES) + 1) * RUN_INTERVAL_MINUTES
+    )
     payload = {
         "schema_version": 1,
-        "generated_at": utc_now(),
+        "generated_at": run_at,
         "pipeline": {
-            "mode": "low-cost-dynamic",
+            "mode": "15-minute-zero-token",
             "ai_tokens_used": 0,
+            "run_interval_minutes": RUN_INTERVAL_MINUTES,
+            "next_scheduled_at": next_update.isoformat().replace("+00:00", "Z"),
+            "macro_checked_at": macro_checked_at,
+            "cftc_checked_at": cftc_checked_at,
+            "calendar_checked_at": calendar_checked_at,
             "source_count": len(statuses),
-            "success_count": sum(item["status"] == "ok" for item in statuses),
+            "success_count": sum(item["status"] in available_statuses for item in statuses),
+            "updated_count": sum(item["status"] == "ok" for item in statuses),
+            "cached_count": sum(item["status"] == "cached" for item in statuses),
             "fallback_count": sum(item["status"] == "fallback" for item in statuses),
             "error_count": len(errors),
             "statuses": statuses,
@@ -451,8 +1052,10 @@ def main() -> int:
         "series": series,
         "derived": derived,
         "cftc": cftc,
+        "calendar": calendar,
     }
     payload["layers"] = build_layers(series, derived, cftc)
+    payload["daily_conclusion"] = build_daily_conclusion(series, derived, cftc, calendar)
     payload["snapshot_id"] = signature(payload)
     write_json(LATEST_PATH, payload)
 
@@ -476,8 +1079,12 @@ def main() -> int:
         "generated_at": payload["generated_at"],
         "snapshot_id": payload["snapshot_id"],
         "series": len(series),
+        "metal_quotes": sum(key in series for key in ("SPOT_XAUUSD", "SPOT_XAGUSD")),
+        "calendar_events": len(calendar.get("events", [])),
         "cftc_positions": cftc.get("dynamic_count", 0),
         "success": payload["pipeline"]["success_count"],
+        "updated": payload["pipeline"]["updated_count"],
+        "cached": payload["pipeline"]["cached_count"],
         "fallback": payload["pipeline"]["fallback_count"],
         "errors": payload["pipeline"]["error_count"],
     }, ensure_ascii=False))
