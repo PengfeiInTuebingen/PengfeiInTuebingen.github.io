@@ -5,6 +5,8 @@
 
   const rawEndpoint = "https://raw.githubusercontent.com/PengfeiInTuebingen/PengfeiInTuebingen.github.io/gh-pages/markets/data/latest.json";
   const relativeEndpoint = loaderScript?.dataset.dataUrl || "./data/latest.json";
+  const aShareRawEndpoint = "https://raw.githubusercontent.com/PengfeiInTuebingen/PengfeiInTuebingen.github.io/gh-pages/markets/data/a_share.json";
+  const aShareRelativeEndpoint = loaderScript?.dataset.aShareUrl || "./data/a_share.json";
   const production = location.hostname === "pengfeiintuebingen.github.io";
   let currentData = null;
 
@@ -289,6 +291,49 @@
     </section>`;
   };
 
+  const aShareStatus = {
+    CONTINUOUS_GREEN: ["连续流入", "positive"],
+    PROVISIONAL_GREEN: ["观察绿灯", "provisional"],
+    ONE_DAY_SPIKE: ["单日异动", "warning"],
+    REBOUND_ONLY: ["反抽", "warning"],
+    RED: ["连续流出", "negative"],
+    RED_STRONG: ["持续撤退", "negative"],
+    UNKNOWN: ["UNKNOWN", "unknown"],
+  };
+
+  const aShareMoney = (value) => finite(value) ? `${Number(value) > 0 ? "+" : ""}${formatCompact(value, 1)}亿` : "—";
+  const aSharePct = (value) => finite(value) ? `${Number(value) > 0 ? "+" : ""}${formatCompact(value, 2)}%` : "—";
+  const aShareFlowTone = (value) => finite(value) ? (Number(value) >= 0 ? "positive" : "negative") : "";
+
+  const renderAShareAnalysis = (snapshot) => {
+    if (!snapshot) return "";
+    const status = (code) => aShareStatus[code] || [code || "UNKNOWN", "unknown"];
+    const indexRows = (snapshot.index_flows || []).map((item) => `<div class="dm-a-index"><span>${escapeHtml(item.name)}</span><strong class="${aShareFlowTone(item.main_net_flow_billion_cny)}">${aShareMoney(item.main_net_flow_billion_cny)}</strong></div>`).join("");
+    const sectorRows = (snapshot.sectors || []).map((item) => {
+      const [label, tone] = status(item.continuity);
+      return `<tr class="${tone === "unknown" ? "is-unknown" : ""}"><td><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.label || "")}</small></td><td class="${aShareFlowTone(item.today_billion_cny)}">${aShareMoney(item.today_billion_cny)}</td><td class="${aShareFlowTone(item.five_day_billion_cny)}">${aShareMoney(item.five_day_billion_cny)}</td><td>${finite(item.market_cap_trillion_cny) ? `${formatCompact(item.market_cap_trillion_cny, 2)}万亿` : "—"}</td><td>${aSharePct(item.today_to_cap_pct)}</td><td>${aSharePct(item.five_day_to_cap_pct)}</td><td><span class="dm-a-status ${tone}">${escapeHtml(label)}</span></td></tr>`;
+    }).join("");
+    const conclusionCards = (snapshot.conclusions || []).map((item, index) => `<article class="dm-a-conclusion ${escapeHtml(item.tone || "neutral")}"><span>结论 ${index + 1}</span><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.body)}</p></article>`).join("");
+    const watchRows = (snapshot.watchlist || []).map((item) => {
+      const [label, tone] = status(item.status);
+      return `<tr><td><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.sector || "")}</small></td><td><span class="dm-a-status ${tone}">${escapeHtml(label)}</span><small>${escapeHtml(item.actionability || "")}</small></td><td>${escapeHtml(item.reason || "")}</td><td class="dm-a-missing">${escapeHtml(item.missing || "")}</td></tr>`;
+    }).join("");
+    const framework = (snapshot.framework || []).map((item, index) => `<span><b>${index + 1}</b>${escapeHtml(item)}</span>`).join("");
+    return `<section class="dm-a-share" id="a-share-analysis">
+      <div class="dm-subhead"><div><span>A-share flow &amp; price-volume rules · V0.3</span><h3>A股资金流与量价观察</h3></div><time>快照 ${escapeHtml(snapshot.snapshot_date)} · ${escapeHtml(snapshot.timezone || "Asia/Shanghai")}</time></div>
+      <div class="dm-a-share-note"><strong>用户提供快照 · ${escapeHtml(snapshot.observation_finality || "未注明")}</strong><span>${escapeHtml(snapshot.source_note || "")}</span></div>
+      <div class="dm-a-kpis"><div><span>沪深成交额</span><strong>${finite(snapshot.market?.turnover_trillion_cny) ? `${formatCompact(snapshot.market.turnover_trillion_cny, 2)}万亿` : "—"}</strong></div><div><span>四指数主力净额合计</span><strong class="positive">${aShareMoney(snapshot.market?.main_net_flow_billion_cny)}</strong></div><div><span>结构判定</span><strong>${escapeHtml(snapshot.market?.structure_label || "待判定")}</strong></div></div>
+      <div class="dm-a-index-grid">${indexRows}</div>
+      <div class="dm-a-subhead"><div><span>Today × 5-day × market-cap ratio</span><h4>板块三维资金表</h4></div><small>单位：净额 = 亿元；市值 = 万亿元</small></div>
+      <div class="dm-a-table-wrap"><table class="dm-a-table"><thead><tr><th>板块</th><th>今日净额</th><th>5日净额</th><th>市值</th><th>今日/市值</th><th>5日/市值</th><th>连续性</th></tr></thead><tbody>${sectorRows}</tbody></table></div>
+      <div class="dm-a-conclusion-grid">${conclusionCards}</div>
+      <div class="dm-a-subhead"><div><span>Watchlist gates · no auto-trading</span><h4>个股接回卡</h4></div><small>UNKNOWN 不等于 0；需个股 OHLCV 与确认/证伪位</small></div>
+      <div class="dm-a-table-wrap"><table class="dm-a-table dm-a-watch-table"><thead><tr><th>标的</th><th>状态 / 权限</th><th>规则读法</th><th>缺失证据</th></tr></thead><tbody>${watchRows}</tbody></table></div>
+      <div class="dm-a-framework"><strong>分析链</strong>${framework}</div>
+      <p class="dm-flow-note">规则边界：资金流是价格结构的置信度修正项，不单独生成方向；板块连续流入但广度或主动流向分裂时，分裂状态优先。当前快照来自用户粘贴信息，未自动绑定个股代码、复权口径或实时行情。</p>
+    </section>`;
+  };
+
   const renderCalendar = (data) => {
     const calendar = data.calendar;
     const events = (calendar?.events || []).slice(0, 10);
@@ -340,6 +385,7 @@
       </div>
       ${errorNote}<div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
+      ${renderAShareAnalysis(data.a_share)}
       <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
@@ -498,6 +544,13 @@
     return production ? [`${rawEndpoint}?${cacheKey}`, relative] : [relative, `${rawEndpoint}?${cacheKey}`];
   };
 
+  const aShareEndpoints = (force) => {
+    const bucket = force ? Date.now() : Math.floor(Date.now() / 300000);
+    const cacheKey = `v=${bucket}`;
+    const relative = `${aShareRelativeEndpoint}${aShareRelativeEndpoint.includes("?") ? "&" : "?"}${cacheKey}`;
+    return production ? [`${aShareRawEndpoint}?${cacheKey}`, relative] : [relative, `${aShareRawEndpoint}?${cacheKey}`];
+  };
+
   const fetchFirst = async (urls) => {
     const errors = [];
     for (const url of urls) {
@@ -514,11 +567,27 @@
     throw new Error(errors.join(" | "));
   };
 
+  const fetchAShare = async (force) => {
+    for (const url of aShareEndpoints(force)) {
+      try {
+        const response = await fetch(url, {cache: "no-store"});
+        if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+        const data = await response.json();
+        if (data.schema_version !== 1 || data.data_type !== "a_share_snapshot") throw new Error("invalid A-share schema");
+        return data;
+      } catch (error) {
+        // The global market dashboard remains usable if the optional A-share snapshot is unavailable.
+      }
+    }
+    return null;
+  };
+
   const loadData = async (force = false) => {
     const button = document.getElementById("dmRefresh");
     if (button) { button.disabled = true; button.textContent = "读取中…"; }
     try {
       const data = await fetchFirst(endpoints(force));
+      data.a_share = await fetchAShare(force);
       currentData = data;
       render(data);
       patchPage(data);

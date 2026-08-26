@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "data_type": "a_share_snapshot",
+  "snapshot_date": "2026-08-26",
+  "timezone": "Asia/Shanghai",
+  "observation_finality": "FULL_DAY_USER_PROVIDED",
+  "evaluation_status": "PARTIAL",
+  "source": "用户提供的 8/26 全天资金流拆解",
+  "source_note": "主力净额为数据商依据成交方向推断的主动买卖差额；来源、算法版本、大小单分档与精确截至时刻未提供，因此不视为交易所无误差事实。",
+  "market": {
+    "turnover_trillion_cny": 1.81,
+    "main_net_flow_billion_cny": 172.0,
+    "structure_label": "总量净流入为正，但结构高度偏科"
+  },
+  "index_flows": [
+    {"name": "上证指数", "main_net_flow_billion_cny": 95.6},
+    {"name": "科创50", "main_net_flow_billion_cny": 30.5},
+    {"name": "深成指", "main_net_flow_billion_cny": 24.1},
+    {"name": "创业板", "main_net_flow_billion_cny": 21.8}
+  ],
+  "sectors": [
+    {"name": "铜", "today_billion_cny": 59.8, "five_day_billion_cny": 102.8, "market_cap_trillion_cny": 2.01, "today_to_cap_pct": 0.30, "five_day_to_cap_pct": 0.51, "continuity": "CONTINUOUS_GREEN", "label": "连续流入且强度第一"},
+    {"name": "工业金属", "today_billion_cny": 71.2, "five_day_billion_cny": 105.6, "market_cap_trillion_cny": 3.11, "today_to_cap_pct": 0.23, "five_day_to_cap_pct": 0.34, "continuity": "CONTINUOUS_GREEN", "label": "连续流入"},
+    {"name": "证券", "today_billion_cny": 49.2, "five_day_billion_cny": 42.5, "market_cap_trillion_cny": 3.57, "today_to_cap_pct": 0.14, "five_day_to_cap_pct": 0.12, "continuity": "CONTINUOUS_GREEN", "label": "连续流入，强度温和"},
+    {"name": "印制电路板", "today_billion_cny": 18.6, "five_day_billion_cny": 27.8, "market_cap_trillion_cny": 2.59, "today_to_cap_pct": 0.07, "five_day_to_cap_pct": 0.11, "continuity": "PROVISIONAL_GREEN", "label": "连续流入（AI链内唯一）"},
+    {"name": "酿酒", "today_billion_cny": 11.1, "five_day_billion_cny": -0.4, "market_cap_trillion_cny": 3.52, "today_to_cap_pct": 0.03, "five_day_to_cap_pct": 0.00, "continuity": "ONE_DAY_SPIKE", "label": "单日异动，无连续性"},
+    {"name": "电力设备", "today_billion_cny": 3.4, "five_day_billion_cny": -14.1, "market_cap_trillion_cny": 1.49, "today_to_cap_pct": 0.02, "five_day_to_cap_pct": -0.09, "continuity": "REBOUND_ONLY", "label": "反抽性质"},
+    {"name": "通信设备", "today_billion_cny": -16.8, "five_day_billion_cny": -25.3, "market_cap_trillion_cny": 4.18, "today_to_cap_pct": -0.04, "five_day_to_cap_pct": -0.06, "continuity": "RED", "label": "连续流出"},
+    {"name": "半导体材料", "today_billion_cny": -14.3, "five_day_billion_cny": -56.9, "market_cap_trillion_cny": 1.02, "today_to_cap_pct": -0.14, "five_day_to_cap_pct": -0.56, "continuity": "RED_STRONG", "label": "流出强度全场最大"},
+    {"name": "半导体", "today_billion_cny": 0.0, "five_day_billion_cny": -157.8, "market_cap_trillion_cny": 6.64, "today_to_cap_pct": 0.00, "five_day_to_cap_pct": -0.24, "continuity": "RED_STRONG", "label": "5日失血 157.8 亿"},
+    {"name": "银行", "today_billion_cny": -5.5, "five_day_billion_cny": -22.1, "market_cap_trillion_cny": 15.77, "today_to_cap_pct": 0.00, "five_day_to_cap_pct": -0.01, "continuity": "RED", "label": "连续流出（相对市值轻微）"},
+    {"name": "有色金属/贵金属", "today_billion_cny": null, "five_day_billion_cny": null, "market_cap_trillion_cny": null, "today_to_cap_pct": null, "five_day_to_cap_pct": null, "continuity": "UNKNOWN", "label": "成分聚合异常，按数据闸门不凭印象填"}
+  ],
+  "conclusions": [
+    {"title": "资源流入具备趋势级特征", "body": "铜今日/市值 0.30%、5日/市值 0.51%，5日累计 +102.8 亿；工业金属同向。连续性和相对市值强度同时成立，支持资源主线资金底座有效。", "tone": "positive"},
+    {"title": "半导体更像持续撤退", "body": "半导体 5日净流出 -157.8 亿，半导体材料 5日/市值 -0.56% 为全场最弱；与科创50量比 0.84 的用户观察互相印证，但量比原始数据尚未接入。", "tone": "negative"},
+    {"title": "当前定性：b反轮动盘", "body": "券商连续流入更接近指数冲关前的补涨段，而不是牛市旗手确认。5-3 所需的科技领涨与资金回流条件尚未出现。", "tone": "neutral"}
+  ],
+  "watchlist": [
+    {"name": "太极实业", "symbol": null, "sector": "半导体封测链", "status": "RED", "actionability": "FREEZE_BUY", "reason": "所属半导体板块 5日 -157.8 亿，接回资金绿灯不满足；即使价格收复 20，也不能仅据此接回。", "missing": "股票代码、复权口径、收盘价、个股成交额/RVOL、正式证伪位"},
+    {"name": "云锗", "symbol": null, "sector": "小金属", "status": "UNKNOWN", "actionability": "NON_ACTIONABLE", "reason": "板块数据为 UNKNOWN；铜的强流入只能作为间接背景，正式判断等待个股放量收复 105+。", "missing": "确切证券代码、个股 OHLCV、105+ 的价格口径与确认时点"},
+    {"name": "紫金", "symbol": null, "sector": "铜/工业金属", "status": "PROVISIONAL_GREEN", "actionability": "MANUAL_REVIEW", "reason": "资源主线资金底座得到板块数据支持，但个股绿灯仍需自身价格、成交额和广度证据。", "missing": "确切证券代码、个股确认/证伪位与目标仓位"},
+    {"name": "兴业", "symbol": null, "sector": "铜/工业金属", "status": "PROVISIONAL_GREEN", "actionability": "MANUAL_REVIEW", "reason": "资源主线资金底座得到板块数据支持，但个股绿灯仍需自身价格、成交额和广度证据。", "missing": "确切证券代码、个股确认/证伪位与目标仓位"},
+    {"name": "中铝", "symbol": null, "sector": "铜/工业金属", "status": "PROVISIONAL_GREEN", "actionability": "MANUAL_REVIEW", "reason": "资源主线资金底座得到板块数据支持，但个股绿灯仍需自身价格、成交额和广度证据。", "missing": "确切证券代码、个股确认/证伪位与目标仓位"}
+  ],
+  "framework": ["宏观货币环境", "大盘（指数）位置", "行业资金连续性与市值比例", "行业内生态位", "个股价格/量价/RVOL", "风险政策与人工确认"],
+  "rules_applied": [
+    "UNKNOWN 不等于 0，不生成自动买入绿灯",
+    "连续流入必须同时看 1日、5日和市值比例",
+    "资金流是置信度修正项，不能覆盖价格证伪和风险硬线",
+    "波浪/结构只提出情景，不直接触发交易动作"
+  ],
+  "next_data_needed": ["A股指数与个股日内 OHLCV", "同一时点累计成交额与20日可比 RVOL", "上涨家数/上涨成交额占比", "板块主动流向来源、算法版本和大小单分档", "个股代码、复权口径和版本化确认/证伪位"]
+}
