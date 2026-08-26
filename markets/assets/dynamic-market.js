@@ -76,7 +76,7 @@
     if (mode === "today" && points.length) {
       const latestDay = dayKey(points.at(-1).stamp);
       const sameDay = points.filter((point) => dayKey(point.stamp) === latestDay);
-      if (sameDay.length >= 2) return sameDay;
+      return sameDay;
     }
     return points.slice(-32);
   };
