@@ -64,7 +64,9 @@
   };
 
   const endpointList = () => {
-    const key = `v=${Math.floor(Date.now() / 300000)}`;
+    // Use a unique cache key: GitHub raw/CDN can otherwise serve the old
+    // snapshot for the remainder of a 5-minute bucket after a workflow commit.
+    const key = `v=${Date.now()}`;
     const local = `${relativeEndpoint}${relativeEndpoint.includes("?") ? "&" : "?"}${key}`;
     return production ? [`${rawEndpoint}?${key}`, local] : [local, `${rawEndpoint}?${key}`];
   };
