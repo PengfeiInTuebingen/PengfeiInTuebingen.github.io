@@ -45,11 +45,39 @@ CALENDAR_FEED_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 BEA_CALENDAR_URL = "https://www.bea.gov/news/schedule"
 FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
 ECB_CALENDAR_URL = "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+CME_WAREHOUSE_PAGE_URL = "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
+CME_WAREHOUSE_URLS = {
+    "gold": "https://www.cmegroup.com/delivery_reports/Gold_Stocks.xls",
+    "silver": "https://www.cmegroup.com/delivery_reports/Silver_stocks.xls",
+}
+COINGLASS_API_BASE = "https://open-api-v4.coinglass.com/api"
+BINANCE_FUTURES_BASE = "https://fapi.binance.com"
+
+# Last verified official CME snapshot retained when CME's anti-scraping edge
+# blocks automated downloads.  A successful future report replaces these rows;
+# the UI labels this snapshot as fallback and shows its report date.
+CME_SEED_INVENTORY = {
+    "gold": {
+        "label": "COMEX 黄金库存", "metal": "gold", "report_date": "2026-08-25", "activity_date": "2026-08-24",
+        "unit": "troy oz", "contract_size_oz": 100, "registered_oz": 14545334.889, "eligible_oz": 12276889.007,
+        "pledged_oz": 1695988.548, "total_oz": 26822223.896, "registered_net_change_oz": 30184.854,
+        "eligible_net_change_oz": 64302.0, "total_net_change_oz": 94486.854, "registered_share_pct": 54.231,
+        "registered_contract_equivalents": 145453.35, "history": [["2026-08-24", 14545334.889, 12276889.007, 26822223.896]],
+    },
+    "silver": {
+        "label": "COMEX 白银库存", "metal": "silver", "report_date": "2026-08-25", "activity_date": "2026-08-24",
+        "unit": "troy oz", "contract_size_oz": 5000, "registered_oz": 99207707.582, "eligible_oz": 239144674.283,
+        "pledged_oz": None, "total_oz": 338352381.865, "registered_net_change_oz": 90128.695,
+        "eligible_net_change_oz": 583983.53, "total_net_change_oz": 583983.53, "registered_share_pct": 29.316,
+        "registered_contract_equivalents": 19841.54, "history": [["2026-08-24", 99207707.582, 239144674.283, 338352381.865]],
+    },
+}
 
 RUN_INTERVAL_MINUTES = 15
 MACRO_REFRESH_HOURS = 6
 CFTC_REFRESH_HOURS = 12
 CALENDAR_REFRESH_HOURS = 1
+WAREHOUSE_REFRESH_HOURS = 6
 
 FRED_SERIES = {
     "WALCL": ("美联储总资产", "百万美元", "流动性"),
@@ -111,15 +139,17 @@ def write_json(path: Path, payload: Any) -> None:
     temporary.replace(path)
 
 
-def request_text(url: str, attempts: int = 3) -> str:
+def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = None) -> str:
     last_error: Exception | None = None
+    request_headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json,text/html,text/csv,text/plain,application/xml,*/*",
+    }
+    request_headers.update(headers or {})
     for attempt in range(attempts):
         request = urllib.request.Request(
             url,
-            headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "application/json,text/html,text/csv,text/plain,application/xml,*/*",
-            },
+            headers=request_headers,
         )
         try:
             with urllib.request.urlopen(request, timeout=45) as response:
@@ -133,7 +163,7 @@ def request_text(url: str, attempts: int = 3) -> str:
     if last_error and "CERTIFICATE_VERIFY_FAILED" in str(last_error):
         try:
             completed = subprocess.run(
-                ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "-A", USER_AGENT, "--max-time", "60", url],
+                ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "-A", request_headers.get("User-Agent", USER_AGENT), "--max-time", "60", url],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -145,11 +175,337 @@ def request_text(url: str, attempts: int = 3) -> str:
     raise RuntimeError(f"download failed: {url}: {last_error}")
 
 
-def request_json(url: str) -> Any:
+def request_json(url: str, headers: dict[str, str] | None = None) -> Any:
     try:
-        return json.loads(request_text(url))
+        return json.loads(request_text(url, headers=headers))
     except json.JSONDecodeError as error:
         raise ValueError(f"invalid JSON from {url}: {error}") from error
+
+
+def download_cme_report(url: str) -> bytes:
+    """Download a CME CDFV2 workbook with browser-like headers.
+
+    CME's delivery-report host rejects the default urllib fingerprint.  The
+    report remains an official, read-only source; curl is used only for the
+    transport and the workbook is parsed locally with xlrd.
+    """
+    headers = [
+        ("Connection", "keep-alive"),
+        ("sec-ch-ua", '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"'),
+        ("sec-ch-ua-mobile", "?0"),
+        ("sec-ch-ua-platform", '"Windows"'),
+        ("Upgrade-Insecure-Requests", "1"),
+        ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"),
+        ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"),
+        ("Sec-Fetch-Site", "none"),
+        ("Sec-Fetch-Mode", "navigate"),
+        ("Sec-Fetch-User", "?1"),
+        ("Sec-Fetch-Dest", "document"),
+        ("Accept-Language", "en-US,en;q=0.9"),
+    ]
+    args = ["curl", "--http1.1", "--fail", "--silent", "--show-error", "-L", "--compressed"]
+    for key, value in headers:
+        args.extend(["-H", f"{key}: {value}"])
+    args.extend(["--max-time", "60", url])
+    try:
+        completed = subprocess.run(args, check=True, capture_output=True, timeout=75)
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or b"").decode("utf-8", errors="replace")[-240:]
+        raise RuntimeError(f"CME report download blocked: {url}: {detail or error}") from error
+    except (subprocess.SubprocessError, OSError) as error:
+        raise RuntimeError(f"CME report download failed: {url}: {error}") from error
+    if not completed.stdout.startswith(b"\xd0\xcf\x11\xe0"):
+        raise ValueError(f"CME report is not an XLS workbook: {url}")
+    return completed.stdout
+
+
+def _cme_date(text: str) -> str | None:
+    match = re.search(r"(?:Report|Activity) Date\s*:\s*(\d{1,2}/\d{1,2}/\d{4})", text, re.I)
+    if not match:
+        return None
+    try:
+        return datetime.strptime(match.group(1), "%m/%d/%Y").date().isoformat()
+    except ValueError:
+        return None
+
+
+def parse_cme_inventory(raw: bytes, metal: str, previous: dict[str, Any] | None = None) -> dict[str, Any]:
+    try:
+        import xlrd  # type: ignore
+    except ImportError as error:
+        raise RuntimeError("xlrd is required to parse CME warehouse reports") from error
+
+    workbook = xlrd.open_workbook(file_contents=raw)
+    sheet = workbook.sheet_by_index(0)
+    cells = [str(sheet.cell_value(row, col)).strip() for row in range(sheet.nrows) for col in range(sheet.ncols)]
+    report_date = next((date for text in cells if (date := _cme_date(text)) and "report" in text.lower()), None)
+    activity_date = next((date for text in cells if (date := _cme_date(text)) and "activity" in text.lower()), None)
+    if not report_date:
+        raise ValueError(f"CME {metal} report date missing")
+
+    def row_for(label: str) -> list[Any]:
+        expected = re.sub(r"\s+", " ", label.strip().upper())
+        for row in range(sheet.nrows):
+            first = re.sub(r"\s+", " ", str(sheet.cell_value(row, 0)).strip().upper())
+            if first == expected or expected in first:
+                return [sheet.cell_value(row, col) for col in range(sheet.ncols)]
+        raise ValueError(f"CME {metal} row missing: {label}")
+
+    def value(row: list[Any], col: int) -> float | None:
+        return number(row[col]) if len(row) > col else None
+
+    registered = row_for("TOTAL REGISTERED")
+    eligible = row_for("TOTAL ELIGIBLE")
+    combined = row_for("COMBINED TOTAL")
+    try:
+        pledged = row_for("TOTAL PLEDGED")
+    except ValueError:
+        pledged = []
+    registered_oz = value(registered, 7)
+    eligible_oz = value(eligible, 7)
+    total_oz = value(combined, 7)
+    if None in (registered_oz, eligible_oz, total_oz):
+        raise ValueError(f"CME {metal} totals are incomplete")
+    registered_net = value(registered, 5)
+    eligible_net = value(eligible, 5)
+    total_net = value(combined, 5)
+    pledged_oz = value(pledged, 7) if pledged else None
+    contract_size = 100 if metal == "gold" else 5000
+    history = list((previous or {}).get("history", []))
+    history_key = activity_date or report_date
+    point = [history_key, round_value(registered_oz, 3), round_value(eligible_oz, 3), round_value(total_oz, 3)]
+    if not history or history[-1][0] != history_key:
+        history.append(point)
+    else:
+        history[-1] = point
+    return {
+        "label": "COMEX 黄金库存" if metal == "gold" else "COMEX 白银库存",
+        "metal": metal,
+        "report_date": report_date,
+        "activity_date": activity_date,
+        "unit": "troy oz",
+        "contract_size_oz": contract_size,
+        "registered_oz": round_value(registered_oz, 3),
+        "eligible_oz": round_value(eligible_oz, 3),
+        "pledged_oz": round_value(pledged_oz, 3),
+        "total_oz": round_value(total_oz, 3),
+        "registered_net_change_oz": round_value(registered_net, 3),
+        "eligible_net_change_oz": round_value(eligible_net, 3),
+        "total_net_change_oz": round_value(total_net, 3),
+        "registered_share_pct": round_value(registered_oz / total_oz * 100 if total_oz else None, 3),
+        "registered_contract_equivalents": round_value(registered_oz / contract_size, 2),
+        "history": history[-180:],
+        "source": "CME Group COMEX",
+        "source_url": CME_WAREHOUSE_PAGE_URL,
+        "report_url": CME_WAREHOUSE_URLS[metal],
+        "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。三者不可当作同一口径的可售库存。",
+    }
+
+
+def fetch_cme_inventory_asset(metal: str, previous: dict[str, Any] | None = None) -> dict[str, Any]:
+    return parse_cme_inventory(download_cme_report(CME_WAREHOUSE_URLS[metal]), metal, previous)
+
+
+def _milliseconds_iso(value: Any) -> str | None:
+    timestamp = number(value)
+    if timestamp is None:
+        return None
+    try:
+        return datetime.fromtimestamp(timestamp / 1000, timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    except (OverflowError, OSError, ValueError):
+        return None
+
+
+def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
+    pair = f"{symbol}USDT"
+    ticker = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/ticker/24hr?symbol={pair}")
+    oi_rows = request_json(f"{BINANCE_FUTURES_BASE}/futures/data/openInterestHist?symbol={pair}&period=15m&limit=97")
+    premium = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/premiumIndex?symbol={pair}")
+    if not isinstance(oi_rows, list) or not oi_rows:
+        raise ValueError(f"Binance {pair} open interest history is empty")
+    history = []
+    for item in oi_rows:
+        timestamp = _milliseconds_iso(item.get("timestamp"))
+        value = number(item.get("sumOpenInterestValue"))
+        if timestamp and value is not None:
+            history.append([timestamp, round_value(value, 2)])
+    if not history:
+        raise ValueError(f"Binance {pair} open interest values are empty")
+    current_oi = history[-1][1]
+    first_oi = history[0][1]
+    funding = number(premium.get("lastFundingRate"))
+    return {
+        "symbol": symbol,
+        "label": f"{symbol} 永续合约",
+        "provider": "Binance USDⓈ-M public fallback",
+        "scope": "single-venue",
+        "aggregated": False,
+        "price_usd": round_value(number(ticker.get("lastPrice")), 6),
+        "price_change_24h_pct": round_value(number(ticker.get("priceChangePercent")), 4),
+        "volume_24h_usd": round_value(number(ticker.get("quoteVolume")), 2),
+        "open_interest_usd": round_value(current_oi, 2),
+        "open_interest_change_24h_pct": round_value((current_oi / first_oi - 1) * 100 if first_oi else None, 4),
+        "funding_rate": round_value(funding, 8),
+        "funding_rate_pct": round_value(funding * 100 if funding is not None else None, 5),
+        "next_funding_at": _milliseconds_iso(premium.get("nextFundingTime")),
+        "observed_at": history[-1][0],
+        "oi_history": history[-97:],
+        "source": "Binance USDⓈ-M public API",
+        "source_url": "https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api",
+        "note": "单一交易所公开代理值；不等于全市场持仓量、成交量或资金费率聚合。",
+    }
+
+
+def fetch_binance_positioning() -> dict[str, Any]:
+    assets = {}
+    errors = []
+    for symbol in ("BTC", "ETH"):
+        try:
+            assets[symbol] = fetch_binance_crypto_asset(symbol)
+        except Exception as error:
+            errors.append(f"{symbol}: {str(error)[:180]}")
+    if not assets:
+        raise RuntimeError("Binance public positioning unavailable: " + "; ".join(errors))
+    return {
+        "checked_at": utc_now(),
+        "provider": "Binance USDⓈ-M public fallback",
+        "scope": "single-venue",
+        "aggregated": False,
+        "assets": assets,
+        "exchange_totals": {},
+        "etf": {},
+        "activation_note": "设置 GitHub Actions Secret COINGLASS_API_KEY 后启用 CoinGlass 多交易所聚合；当前值仅作单交易所代理。",
+        "errors": errors,
+    }
+
+
+def _coinglass_rows(payload: Any) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if isinstance(payload, dict):
+        for key in ("list", "data", "result", "rows"):
+            value = payload.get(key)
+            if isinstance(value, list):
+                return [item for item in value if isinstance(item, dict)]
+        return [payload]
+    return []
+
+
+def coinglass_json(path: str, params: dict[str, Any], api_key: str) -> Any:
+    query = urllib.parse.urlencode({key: value for key, value in params.items() if value is not None})
+    url = f"{COINGLASS_API_BASE}/{path.lstrip('/')}" + (f"?{query}" if query else "")
+    payload = request_json(url, headers={"CG-API-KEY": api_key, "Accept": "application/json"})
+    if not isinstance(payload, dict) or str(payload.get("code", "0")) not in {"0", "200"}:
+        raise ValueError(f"CoinGlass API error at {path}: {str(payload.get('msg', payload))[:180] if isinstance(payload, dict) else payload}")
+    return payload.get("data", payload)
+
+
+def _coinglass_time(item: dict[str, Any]) -> str | None:
+    for key in ("time", "timestamp", "ts", "date"):
+        if item.get(key) is not None:
+            return _milliseconds_iso(item[key]) or str(item[key])
+    return None
+
+
+def _coinglass_close(item: dict[str, Any], keys: tuple[str, ...]) -> float | None:
+    for key in keys:
+        value = number(item.get(key))
+        if value is not None:
+            return value
+    return None
+
+
+def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
+    oi = _coinglass_rows(coinglass_json("futures/open-interest/aggregated-history", {"symbol": symbol, "interval": "4h", "limit": 7, "unit": "usd"}, api_key))
+    funding = _coinglass_rows(coinglass_json("futures/funding-rate/oi-weight-history", {"symbol": symbol, "interval": "4h", "limit": 7}, api_key))
+    oi_history = []
+    for item in oi:
+        stamp = _coinglass_time(item)
+        value = _coinglass_close(item, ("close", "open_interest", "openInterest", "oi", "value"))
+        if stamp and value is not None:
+            oi_history.append([stamp, round_value(value, 2)])
+    if not oi_history:
+        raise ValueError(f"CoinGlass {symbol} OI history is empty")
+    funding_value = _coinglass_close(funding[-1], ("close", "funding_rate", "fundingRate", "value")) if funding else None
+    latest = oi_history[-1]
+    first = oi_history[0]
+    # Price and volume are deliberately sourced from Binance public API and
+    # labeled as such; CoinGlass Hobbyist does not expose the all-in-one market
+    # endpoint needed for those fields.
+    proxy = fetch_binance_crypto_asset(symbol)
+    return {
+        "symbol": symbol,
+        "label": f"{symbol} 永续合约",
+        "provider": "CoinGlass aggregate OI/funding + Binance price/volume proxy",
+        "scope": "multi-venue OI/funding",
+        "aggregated": True,
+        "price_usd": proxy.get("price_usd"),
+        "price_change_24h_pct": proxy.get("price_change_24h_pct"),
+        "volume_24h_usd": proxy.get("volume_24h_usd"),
+        "open_interest_usd": latest[1],
+        "open_interest_change_24h_pct": round_value((latest[1] / first[1] - 1) * 100 if first[1] else None, 4),
+        "funding_rate": round_value(funding_value, 8),
+        "funding_rate_pct": round_value(funding_value * 100 if funding_value is not None else None, 5),
+        "next_funding_at": proxy.get("next_funding_at"),
+        "observed_at": latest[0],
+        "oi_history": oi_history,
+        "source": "CoinGlass API v4",
+        "source_url": "https://docs.coinglass.com/reference/getting-started-with-your-api",
+        "note": "持仓量与资金费率为 CoinGlass 多交易所聚合；价格与成交量为 Binance USDⓈ-M 公开代理。",
+    }
+
+
+def fetch_coinglass_positioning(api_key: str) -> dict[str, Any]:
+    assets = {symbol: fetch_coinglass_crypto_asset(symbol, api_key) for symbol in ("BTC", "ETH")}
+    exchange_totals: dict[str, Any] = {}
+    try:
+        rank_rows = _coinglass_rows(coinglass_json("futures/exchange-rank", {}, api_key))
+        totals = {"open_interest_usd": 0.0, "volume_24h_usd": 0.0, "liquidation_24h_usd": 0.0}
+        for row in rank_rows:
+            totals["open_interest_usd"] += number(row.get("open_interest_usd") or row.get("openInterestUsd")) or 0
+            totals["volume_24h_usd"] += number(row.get("volume_usd") or row.get("volumeUsd")) or 0
+            totals["liquidation_24h_usd"] += number(row.get("liquidation_usd_24h") or row.get("liquidationUsd24h")) or 0
+        if any(totals.values()):
+            exchange_totals = {key: round_value(value, 2) for key, value in totals.items()}
+    except Exception:
+        exchange_totals = {}
+    etf = {}
+    try:
+        etf_rows = _coinglass_rows(coinglass_json("etf/bitcoin/list", {}, api_key))
+        etf_totals = {"aum_usd": 0.0, "volume_24h_usd": 0.0, "btc_holdings": 0.0}
+        for row in etf_rows:
+            etf_totals["aum_usd"] += number(row.get("aum_usd") or row.get("aumUsd")) or 0
+            etf_totals["volume_24h_usd"] += number(row.get("volume_usd") or row.get("volumeUsd")) or 0
+            details = row.get("asset_details") if isinstance(row.get("asset_details"), dict) else {}
+            etf_totals["btc_holdings"] += number(details.get("btc_holding") or row.get("btc_holding") or row.get("btcHolding")) or 0
+        if any(etf_totals.values()):
+            etf = {key: round_value(value, 2) for key, value in etf_totals.items()}
+    except Exception:
+        etf = {}
+    return {
+        "checked_at": utc_now(),
+        "provider": "CoinGlass API v4",
+        "scope": "multi-venue aggregate",
+        "aggregated": True,
+        "assets": assets,
+        "exchange_totals": exchange_totals,
+        "etf": etf,
+        "activation_note": "CoinGlass 聚合已启用；成交量/价格字段注明 Binance 代理，避免把不同口径混为全市场数据。",
+        "errors": [],
+    }
+
+
+def fetch_crypto_positioning() -> dict[str, Any]:
+    api_key = os.environ.get("COINGLASS_API_KEY", "").strip()
+    if api_key:
+        try:
+            return fetch_coinglass_positioning(api_key)
+        except Exception as error:
+            fallback = fetch_binance_positioning()
+            fallback["activation_note"] = f"CoinGlass API 暂时失败，已降级为 Binance 单交易所代理；错误：{str(error)[:180]}"
+            fallback["coinglass_error"] = str(error)[:240]
+            return fallback
+    return fetch_binance_positioning()
 
 
 def clean_html(value: str) -> str:
@@ -909,7 +1265,7 @@ def build_daily_conclusion(
         "assets": assets,
         "next_event_text": event_text,
         "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；缺失因子不参与加权，不用 AI 补写。",
+        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据与 CFTC 持仓；CME 库存和加密衍生品指标作为风险背景展示，不直接改变金银规则分数；缺失因子不参与加权，不用 AI 补写。",
     }
 
 
@@ -917,6 +1273,10 @@ def signature(payload: dict[str, Any]) -> str:
     compact = {
         "series": {key: [item.get("date"), item.get("value")] for key, item in payload.get("series", {}).items()},
         "cftc": [payload.get("cftc", {}).get("report_date"), [[item["name"], item["contracts"]] for item in payload.get("cftc", {}).get("positions", [])]],
+        "flow_positioning": {
+            "cme": {key: [item.get("report_date"), item.get("registered_oz"), item.get("total_oz")] for key, item in payload.get("flow_positioning", {}).get("cme_inventory", {}).get("metals", {}).items()},
+            "crypto": {key: [item.get("open_interest_usd"), item.get("volume_24h_usd"), item.get("funding_rate")] for key, item in payload.get("flow_positioning", {}).get("crypto", {}).get("assets", {}).items()},
+        },
     }
     return hashlib.sha256(json.dumps(compact, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -925,6 +1285,7 @@ def main() -> int:
     previous = load_json(LATEST_PATH, {})
     previous_series = previous.get("series", {})
     previous_pipeline = previous.get("pipeline", {})
+    previous_flow = previous.get("flow_positioning", {})
     series: dict[str, dict[str, Any]] = {}
     errors: list[dict[str, Any]] = []
     statuses: list[dict[str, Any]] = []
@@ -1020,6 +1381,59 @@ def main() -> int:
         calendar_checked_at = previous_pipeline.get("calendar_checked_at")
         statuses.append({"source": "Economic calendar", "status": "cached", "date": calendar.get("checked_at")})
 
+    previous_inventory = previous_flow.get("cme_inventory", {})
+    previous_metals = previous_inventory.get("metals", {})
+    inventory_due = cadence_due(previous_pipeline.get("inventory_checked_at"), WAREHOUSE_REFRESH_HOURS) or not previous_metals
+    if inventory_due:
+        cme_inventory = {
+            "checked_at": run_at,
+            "source": "CME Group COMEX",
+            "source_url": CME_WAREHOUSE_PAGE_URL,
+            "metals": dict(previous_metals),
+            "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
+        }
+        cme_success = False
+        for metal in ("gold", "silver"):
+            try:
+                cme_inventory["metals"][metal] = fetch_cme_inventory_asset(metal, previous_metals.get(metal))
+                cme_success = True
+                statuses.append({"source": f"CME {metal} warehouse", "status": "ok", "date": cme_inventory["metals"][metal].get("report_date")})
+            except Exception as error:
+                if metal not in cme_inventory["metals"]:
+                    seeded = dict(CME_SEED_INVENTORY[metal])
+                    seeded.update({"source": "CME Group COMEX (official snapshot fallback)", "source_url": CME_WAREHOUSE_PAGE_URL, "report_url": CME_WAREHOUSE_URLS[metal], "definition_note": "CME 官方快照；自动下载被站点反爬策略拦截时保留。Registered = 已签发仓单；Eligible = 符合规格但未签发仓单。"})
+                    cme_inventory["metals"][metal] = seeded
+                    statuses.append({"source": f"CME {metal} warehouse", "status": "fallback", "date": seeded.get("report_date")})
+                else:
+                    statuses.append({"source": f"CME {metal} warehouse", "status": "fallback", "date": cme_inventory["metals"][metal].get("report_date")})
+                errors.append({"source": "CME Group", "series": metal, "error": str(error)[:240]})
+        cme_inventory["fallback_note"] = "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。"
+        inventory_checked_at = run_at if cme_success or cme_inventory["metals"] else previous_pipeline.get("inventory_checked_at")
+    else:
+        cme_inventory = previous_inventory
+        inventory_checked_at = previous_pipeline.get("inventory_checked_at")
+        for metal in ("gold", "silver"):
+            statuses.append({"source": f"CME {metal} warehouse", "status": "cached" if metal in previous_metals else "failed", "date": previous_metals.get(metal, {}).get("report_date")})
+
+    previous_crypto = previous_flow.get("crypto", {})
+    try:
+        crypto = fetch_crypto_positioning()
+        crypto_status = "ok" if crypto.get("aggregated") else "fallback"
+        statuses.append({"source": "Crypto OI / volume / funding", "status": crypto_status, "date": crypto.get("checked_at")})
+        crypto_checked_at = run_at
+    except Exception as error:
+        crypto = previous_crypto
+        crypto_checked_at = previous_pipeline.get("crypto_checked_at")
+        errors.append({"source": "Crypto positioning", "series": "BTC/ETH", "error": str(error)[:240]})
+        statuses.append({"source": "Crypto OI / volume / funding", "status": "fallback" if crypto.get("assets") else "failed", "date": crypto.get("checked_at")})
+
+    flow_positioning = {
+        "updated_at": run_at,
+        "cme_inventory": cme_inventory,
+        "crypto": crypto,
+        "scope_note": "库存与加密衍生品是风险/资金背景，不直接替代金银现货价格或 CFTC 周度持仓结论。",
+    }
+
     if not series and not cftc.get("positions"):
         raise RuntimeError("No source succeeded and no previous snapshot is available")
 
@@ -1040,6 +1454,8 @@ def main() -> int:
             "macro_checked_at": macro_checked_at,
             "cftc_checked_at": cftc_checked_at,
             "calendar_checked_at": calendar_checked_at,
+            "inventory_checked_at": inventory_checked_at,
+            "crypto_checked_at": crypto_checked_at,
             "source_count": len(statuses),
             "success_count": sum(item["status"] in available_statuses for item in statuses),
             "updated_count": sum(item["status"] == "ok" for item in statuses),
@@ -1053,6 +1469,7 @@ def main() -> int:
         "derived": derived,
         "cftc": cftc,
         "calendar": calendar,
+        "flow_positioning": flow_positioning,
     }
     payload["layers"] = build_layers(series, derived, cftc)
     payload["daily_conclusion"] = build_daily_conclusion(series, derived, cftc, calendar)

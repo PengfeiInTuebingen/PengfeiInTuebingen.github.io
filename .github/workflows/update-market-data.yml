@@ -27,8 +27,15 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-market.txt
+
+      - name: Install pinned workbook parser
+        run: python -m pip install --require-hashes -r scripts/requirements-market.txt
 
       - name: Download and validate public market data
+        env:
+          COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
         run: python scripts/update_market_data.py
 
       - name: Detect data changes

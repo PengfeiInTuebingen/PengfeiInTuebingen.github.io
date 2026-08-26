@@ -119,6 +119,78 @@
     </section>`;
   };
 
+  const formatUsd = (value) => {
+    if (!finite(value)) return "待更新";
+    const amount = Number(value);
+    const absolute = Math.abs(amount);
+    if (absolute >= 1e12) return `$${(amount / 1e12).toFixed(2)}T`;
+    if (absolute >= 1e9) return `$${(amount / 1e9).toFixed(2)}B`;
+    if (absolute >= 1e6) return `$${(amount / 1e6).toFixed(1)}M`;
+    return `$${formatCompact(amount, 0)}`;
+  };
+
+  const formatOz = (value) => {
+    if (!finite(value)) return "待更新";
+    const amount = Number(value);
+    if (Math.abs(amount) >= 1e9) return `${(amount / 1e9).toFixed(2)}B oz`;
+    if (Math.abs(amount) >= 1e6) return `${(amount / 1e6).toFixed(2)}M oz`;
+    return `${formatCompact(amount, 0)} oz`;
+  };
+
+  const renderInventoryCard = (item) => {
+    const change = item.total_net_change_oz;
+    const changeClass = finite(change) ? (Number(change) >= 0 ? "positive" : "negative") : "";
+    return `<article class="dm-flow-card dm-inventory-card">
+      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">CME warehouse · ${escapeHtml(item.metal === "gold" ? "Gold" : "Silver")}</span><h4>${escapeHtml(item.label || "COMEX 库存")}</h4></div><span class="dm-source">${escapeHtml(item.source || "CME")}</span></div>
+      <div class="dm-flow-stats">
+        <div><span>Registered 可交割</span><strong>${formatOz(item.registered_oz)}</strong><small>${formatCompact(item.registered_contract_equivalents, 0)} 张合约等值</small></div>
+        <div><span>Eligible 合格</span><strong>${formatOz(item.eligible_oz)}</strong><small>不代表已签发仓单</small></div>
+        <div><span>Pledged 已质押</span><strong>${formatOz(item.pledged_oz)}</strong><small>若源表提供</small></div>
+        <div><span>Registered 占比</span><strong>${finite(item.registered_share_pct) ? `${Number(item.registered_share_pct).toFixed(2)}%` : "待更新"}</strong><small>占 Registered + Eligible</small></div>
+      </div>
+      <div class="dm-flow-meta"><span>合计 ${formatOz(item.total_oz)}</span><span class="${changeClass}">日变动 ${signed(change, 0, " oz")}</span><span>报告 ${formatDate(item.report_date)} · 活动 ${formatDate(item.activity_date)}</span></div>
+      <p class="dm-flow-note">${escapeHtml(item.definition_note || "Registered 为已签发仓单库存；Eligible 为符合规格但未签发仓单。")}</p>
+    </article>`;
+  };
+
+  const renderCryptoCard = (item, key, aggregate) => {
+    const oiChange = item.open_interest_change_24h_pct;
+    const funding = item.funding_rate_pct;
+    const priceChange = item.price_change_24h_pct;
+    return `<article class="dm-flow-card dm-crypto-card">
+      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${escapeHtml(key)} perpetual</span><h4>${escapeHtml(item.label || `${key} 永续合约`)}</h4></div><span class="dm-source">${aggregate ? "CoinGlass" : "Binance"}</span></div>
+      <div class="dm-flow-stats">
+        <div><span>持仓量 OI</span><strong>${formatUsd(item.open_interest_usd)}</strong><small class="${Number(oiChange) >= 0 ? "positive" : "negative"}">24h ${signed(oiChange, 2, "%")}</small></div>
+        <div><span>成交量 24h</span><strong>${formatUsd(item.volume_24h_usd)}</strong><small>USDT 合约</small></div>
+        <div><span>资金费率</span><strong>${signed(funding, 4, "%")}</strong><small>按最新观测</small></div>
+        <div><span>价格 24h</span><strong>${finite(item.price_usd) ? `$${formatCompact(item.price_usd, 2)}` : "待更新"}</strong><small class="${Number(priceChange) >= 0 ? "positive" : "negative"}">${signed(priceChange, 2, "%")}</small></div>
+      </div>
+      <div class="dm-flow-meta"><span>观测 ${formatGenerated(item.observed_at)}</span><span>${escapeHtml(item.scope || "")}</span></div>
+      <p class="dm-flow-note">${escapeHtml(item.note || "持仓量、成交量和资金费率均需结合交易所口径解读。")}</p>
+    </article>`;
+  };
+
+  const renderFlowPositioning = (data) => {
+    const flow = data.flow_positioning || {};
+    const inventory = flow.cme_inventory?.metals || {};
+    const crypto = flow.crypto || {};
+    const cryptoAssets = crypto.assets || {};
+    const inventoryCards = [inventory.gold, inventory.silver].filter(Boolean).map(renderInventoryCard).join("");
+    const cryptoCards = Object.entries(cryptoAssets).map(([key, item]) => renderCryptoCard(item, key, crypto.aggregated)).join("");
+    if (!inventoryCards && !cryptoCards) return "";
+    const exchange = crypto.exchange_totals || {};
+    const etf = crypto.etf || {};
+    const extras = (finite(exchange.open_interest_usd) || finite(exchange.volume_24h_usd) || finite(exchange.liquidation_24h_usd) || finite(etf.aum_usd))
+      ? `<div class="dm-flow-summary"><span>CoinGlass 市场合计（若已启用）</span><strong>OI ${formatUsd(exchange.open_interest_usd)} · 成交 ${formatUsd(exchange.volume_24h_usd)} · 清算 ${formatUsd(exchange.liquidation_24h_usd)}</strong><small>BTC ETF AUM ${formatUsd(etf.aum_usd)} · 持仓 ${finite(etf.btc_holdings) ? formatCompact(etf.btc_holdings, 0) + " BTC" : "待更新"}</small></div>`
+      : "";
+    const sourceNote = crypto.aggregated ? "CoinGlass 聚合 OI/资金费率已启用；价格与成交量字段保留 Binance 代理标注。" : "当前为 Binance USDⓈ-M 单交易所公开代理；配置 COINGLASS_API_KEY 后自动切换多交易所聚合。";
+    return `<section class="dm-flow" id="dynamic-flow">
+      <div class="dm-subhead"><div><span>Flows · positioning · warehouse</span><h3>资金、持仓与库存雷达</h3></div><time>更新于 ${formatGenerated(flow.updated_at || crypto.checked_at || data.generated_at)}</time></div>
+      <div class="dm-flow-grid">${inventoryCards}${cryptoCards}</div>
+      ${extras}<p class="dm-flow-note dm-flow-source-note"><strong>口径：</strong>${escapeHtml(sourceNote)} ${escapeHtml(flow.scope_note || "库存与衍生品指标是背景信号，不直接替代现货与 CFTC 结论。")}</p>
+    </section>`;
+  };
+
   const renderCalendar = (data) => {
     const calendar = data.calendar;
     const events = (calendar?.events || []).slice(0, 10);
@@ -170,7 +242,7 @@
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
       ${errorNote}<div class="dm-grid">${cardMarkup}</div>
-      <div class="dm-intelligence-grid">${renderConclusion(data)}${renderCalendar(data)}</div>
+      <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
   };

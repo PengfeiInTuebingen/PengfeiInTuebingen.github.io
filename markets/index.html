@@ -452,6 +452,7 @@
         <a href="/">主页</a>
         <a href="#market">行情</a>
         <a href="#dynamic-data">动态数据</a>
+        <a href="#dynamic-flow">资金库存</a>
         <a href="#dynamic-calendar">财经日历</a>
         <a href="#indicators">指标塔</a>
         <a href="#cftc-cross-asset">CFTC</a>
@@ -799,7 +800,7 @@
       <div class="container">
         <div class="source-panel">
           <h3>数据口径与来源</h3>
-          <p>基础技术图表保留 2026-08-25 的研究快照；动态中枢每 15 分钟检查公开金银指示中间价，并按各数据源自身发布频率更新 FRED、ECB、CFTC 与财经日历。现货参考价不是券商可成交报价，宏观数据也按最后发布日期显示，不把滞后数据标成实时值。</p>
+          <p>基础技术图表保留 2026-08-25 的研究快照；动态中枢每 15 分钟检查金银与 Binance 公共合约 OI/成交量/资金费率，CME 金银库存按 6 小时重试，FRED、ECB、CFTC 与财经日历按自身发布频率缓存。CoinGlass 需通过 GitHub Secret 启用；现货参考价不是券商可成交报价，单交易所代理也不等于全市场聚合。</p>
           <div class="source-links">
             <a href="https://www.bea.gov/news/schedule/full" target="_blank" rel="noreferrer">BEA 发布日程</a>
             <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm" target="_blank" rel="noreferrer">Fed 7月声明</a>
@@ -807,6 +808,9 @@
             <a href="https://fred.stlouisfed.org/series/WALCL" target="_blank" rel="noreferrer">Fed 资产负债表</a>
             <a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noreferrer">10年实际利率</a>
             <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noreferrer">CFTC COT</a>
+            <a href="https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html" target="_blank" rel="noreferrer">CME 仓单/库存</a>
+            <a href="https://docs.coinglass.com/reference/getting-started-with-your-api" target="_blank" rel="noreferrer">CoinGlass API 文档</a>
+            <a href="https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api" target="_blank" rel="noreferrer">Binance 合约 API</a>
             <a href="https://finance.yahoo.com/markets/commodities/articles/gold-pulls-back-three-month-093355050.html" target="_blank" rel="noreferrer">现货公开快照</a>
           </div>
         </div>
