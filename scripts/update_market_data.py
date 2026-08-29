@@ -42,6 +42,8 @@ CFTC_DISAGG_URL = "https://www.cftc.gov/dea/newcot/c_disagg.txt"
 CFTC_TFF_URL = "https://www.cftc.gov/dea/newcot/FinComWk.txt"
 GOLD_API_URL = "https://api.gold-api.com/price"
 XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
+GOLD_DAILY_BARS_URL = "https://api.goldprice.dev/v1/bars"
+YAHOO_GOLD_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/GC=F"
 CALENDAR_FEED_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 BEA_CALENDAR_URL = "https://www.bea.gov/news/schedule"
 FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
@@ -1084,6 +1086,212 @@ def fetch_metal_spot(symbol: str, previous: dict[str, Any] | None) -> dict[str, 
     }
 
 
+
+GOLD_POST_CLOSE_SEED = {
+    "as_of": "2026-08-28",
+    "source": "FXEmpire / AlQanaas public spot-CFD snapshots",
+    "source_url": [
+        "https://www.fxempire.com/commodities",
+        "https://alqanaas.com/en/gold-price/daily/2026-08-28",
+    ],
+    "basis": "XAU/USD 现货 CFD 日线；不同供应商日界线可能造成小幅差异",
+    "daily_bar": {
+        "date": "2026-08-28", "open": 4601.95, "high": 4631.98,
+        "low": 4445.46, "close": 4454.99, "volume": None,
+    },
+    "metrics": {
+        "body": 146.96, "range": 186.52, "body_pct": 78.8,
+        "upper_wick": 30.03, "lower_wick": 9.53, "close_location_pct": 5.1,
+        "sma20": 4410.0, "previous_close": None,
+    },
+    "pattern": {
+        "label": "长实体阴线 / 近低位收盘",
+        "bias": "短线转弱，等待支撑确认",
+        "confirmation": "连续日收盘跌破 20 日均线附近支撑，或反弹重新站回开盘区后再定方向",
+    },
+    "levels": {
+        "support_1": 4445.46, "support_2": 4410.0, "midpoint": 4538.72,
+        "resistance_1": 4601.95, "resistance_2": 4631.98, "prior_high": 4697.0,
+        "deep_support": 4200.0,
+    },
+    "scenarios": [
+        {"rank": "A", "priority": "最高", "title": "支撑守住，震荡消化后反抽", "trigger": "日收盘守住 $4,410–4,445，随后收回 $4,539", "invalidation": "有效跌破 $4,410", "watch": "$4,602 开盘区"},
+        {"rank": "B", "priority": "次高", "title": "下破延续，向深层支撑寻找平衡", "trigger": "日收盘跌破 $4,410，且美元/短端利率继续走强", "invalidation": "快速收回 $4,539 并稳定", "watch": "$4,200"},
+        {"rank": "C", "priority": "较低", "title": "快速反包，恢复上行", "trigger": "收回 $4,602 并突破 $4,632", "invalidation": "反弹再次跌回 $4,539 下方", "watch": "$4,697 前高"},
+    ],
+    "silver": {"label": "白银 XAG/USD", "stance": "高波动，等待跟随确认", "value": None, "session_change": None, "note": "白银既受贵金属联动支持，也对实际利率和工业周期更敏感。"},
+    "oil": {"label": "Brent / WTI", "stance": "油价下跌，通胀降温但工业需求偏弱", "brent": None, "wti": None, "brent_change": None, "wti_change": None},
+    "thorson": {
+        "label": "AG Thorson / GoldPredict",
+        "stance": "1–2 周回撤，长期框架未证伪",
+        "summary": "8/28 公开稿：首看 50 日 EMA，若回撤加深则看 $4,200；仍维持长期牛市框架。",
+        "source_url": "https://www.fxempire.com/forecasts/article/gold-price-forecast-a-brief-pullback-before-resuming-higher-1619963",
+        "public_access": True,
+    },
+    "data_quality": "当前种子日线来自公开 CFD 快照；自动接口有新完整收盘日线时替换。现货没有统一交易所成交量，成交量字段为空。",
+}
+
+
+def _validate_daily_bars(bars: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    clean = []
+    for item in bars:
+        opened, high, low, closed = (number(item.get(key)) for key in ("open", "high", "low", "close"))
+        date_text = str(item.get("date") or "")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_text):
+            continue
+        if None in (opened, high, low, closed) or high < max(opened, closed) or low > min(opened, closed):
+            continue
+        clean.append({"date": date_text, "open": opened, "high": high, "low": low, "close": closed, "volume": number(item.get("volume"))})
+    return sorted(clean, key=lambda item: item["date"])
+
+
+def _fetch_goldprice_daily_bars() -> list[dict[str, Any]]:
+    today = datetime.now(timezone.utc).date()
+    query = urllib.parse.urlencode({
+        "symbol": "XAU-USD-SPOT", "interval": "1d", "from": (today - timedelta(days=75)).isoformat(),
+        "to": (today + timedelta(days=1)).isoformat(), "limit": 90,
+    })
+    payload = request_json(f"{GOLD_DAILY_BARS_URL}?{query}")
+    rows = []
+    for item in payload.get("bars", []):
+        if not item.get("is_closed"):
+            continue
+        stamp = parse_timestamp(str(item.get("bar_start")))
+        if stamp is None:
+            continue
+        rows.append({
+            "date": stamp.date().isoformat(), "open": item.get("open"), "high": item.get("high"),
+            "low": item.get("low"), "close": item.get("close"), "volume": item.get("volume"),
+        })
+    return _validate_daily_bars(rows)
+
+
+def _fetch_yahoo_gold_daily_bars() -> list[dict[str, Any]]:
+    payload = request_json(f"{YAHOO_GOLD_CHART_URL}?range=6mo&interval=1d&events=history")
+    result = ((payload.get("chart") or {}).get("result") or [None])[0] or {}
+    timestamps = result.get("timestamp") or []
+    quote = ((result.get("indicators") or {}).get("quote") or [None])[0] or {}
+    today = datetime.now(timezone.utc).date()
+    rows = []
+    for index, timestamp in enumerate(timestamps):
+        stamp = parse_timestamp(datetime.fromtimestamp(timestamp, timezone.utc).isoformat()) if number(timestamp) is not None else None
+        if stamp is None or stamp.date() >= today:
+            continue  # do not treat today's in-progress COMEX bar as a close
+        rows.append({"date": stamp.date().isoformat(), **{key: (quote.get(key) or [None] * len(timestamps))[index] for key in ("open", "high", "low", "close", "volume")}})
+    return _validate_daily_bars(rows)
+
+
+def fetch_gold_daily_bars() -> list[dict[str, Any]]:
+    """Fetch completed gold daily bars, with a public futures proxy fallback.
+
+    Spot CFD vendors do not share a single session boundary.  We therefore
+    prefer a spot OHLC endpoint, then use COMEX GC=F only as a labeled proxy;
+    unfinished or malformed rows are discarded and the last verified page bar
+    is retained when both sources are stale.
+    """
+    errors = []
+    for fetcher in (_fetch_goldprice_daily_bars, _fetch_yahoo_gold_daily_bars):
+        try:
+            bars = fetcher()
+            if len(bars) >= 5:
+                return bars
+            errors.append(f"{fetcher.__name__}: too short")
+        except Exception as error:
+            errors.append(f"{fetcher.__name__}: {error}")
+    raise ValueError("; ".join(errors)[:300] or "public gold daily bars unavailable")
+
+
+def _post_close_seed() -> dict[str, Any]:
+    return json.loads(json.dumps(GOLD_POST_CLOSE_SEED, ensure_ascii=False))
+
+
+def build_post_close_analysis(
+    series: dict[str, dict[str, Any]],
+    derived: dict[str, dict[str, Any]],
+    previous: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build a compact, auditable close-analysis layer for the dashboard."""
+    analysis = json.loads(json.dumps(previous, ensure_ascii=False)) if previous else _post_close_seed()
+    analysis["update_status"] = "cached"
+    bars: list[dict[str, Any]] = []
+    try:
+        bars = fetch_gold_daily_bars()
+    except Exception:
+        bars = []
+    previous_date = str(analysis.get("as_of") or "")
+    if bars and bars[-1]["date"] >= previous_date:
+        bar = bars[-1]
+        bar_range = max(0.0, bar["high"] - bar["low"])
+        body = abs(bar["close"] - bar["open"])
+        upper_wick = bar["high"] - max(bar["open"], bar["close"])
+        lower_wick = min(bar["open"], bar["close"]) - bar["low"]
+        sma20 = sum(item["close"] for item in bars[-20:]) / min(20, len(bars)) if len(bars) >= 10 else None
+        previous_close = bars[-2]["close"] if len(bars) > 1 else None
+        close_location = None if not bar_range else (bar["close"] - bar["low"]) / bar_range * 100
+        body_pct = None if not bar_range else body / bar_range * 100
+        if bar["close"] < bar["open"] and (body_pct or 0) >= 65 and (close_location or 100) <= 20:
+            pattern_label = "长实体阴线 / 近低位收盘"
+            bias = "短线转弱，等待支撑确认"
+        elif bar["close"] < bar["open"] and (body_pct or 0) >= 50:
+            pattern_label = "中长阴线"
+            bias = "短线偏弱"
+        elif bar["close"] > bar["open"] and (body_pct or 0) >= 65:
+            pattern_label = "长实体阳线"
+            bias = "短线偏强"
+        else:
+            pattern_label = "小实体 / 混合 K 线"
+            bias = "方向待确认"
+        midpoint = (bar["high"] + bar["low"]) / 2
+        support_2 = sma20 if sma20 is not None else analysis.get("levels", {}).get("support_2", 4410.0)
+        levels = {
+            "support_1": round(bar["low"], 2), "support_2": round(support_2, 2),
+            "midpoint": round(midpoint, 2), "resistance_1": round(bar["open"], 2),
+            "resistance_2": round(bar["high"], 2),
+            "prior_high": analysis.get("levels", {}).get("prior_high", 4697.0),
+            "deep_support": analysis.get("levels", {}).get("deep_support", 4200.0),
+        }
+        analysis.update({
+            "as_of": bar["date"],
+            "update_status": "ok",
+            "source": "goldprice.dev spot / Yahoo Finance GC=F proxy",
+            "source_url": [GOLD_DAILY_BARS_URL, YAHOO_GOLD_CHART_URL, "https://www.fxempire.com/commodities"],
+            "basis": "优先 XAU/USD spot 日线；接口不可用时使用 COMEX GC=F 日线代理；成交量由源端提供时才展示",
+            "daily_bar": bar,
+            "metrics": {
+                "body": round(body, 2), "range": round(bar_range, 2),
+                "body_pct": round(body_pct, 1) if body_pct is not None else None,
+                "upper_wick": round(upper_wick, 2), "lower_wick": round(lower_wick, 2),
+                "close_location_pct": round(close_location, 1) if close_location is not None else None,
+                "sma20": round(sma20, 2) if sma20 is not None else None,
+                "previous_close": round(previous_close, 2) if previous_close is not None else None,
+            },
+            "pattern": {
+                "label": pattern_label, "bias": bias,
+                "confirmation": "连续日收盘跌破支撑，或反弹重新站回开盘区后再定方向",
+            },
+            "levels": levels,
+            "data_quality": "使用公开 XAU/USD 日线；若源端尚未发布新完整收盘日线，则保留最近已验证日线。",
+        })
+    # The seed remains visible when a free endpoint is stale; the error is
+    # recorded by the pipeline caller rather than replacing the last good bar.
+    xag = series.get("SPOT_XAGUSD", {})
+    xag_session = number(derived.get("XAG_SESSION", {}).get("value"))
+    analysis["silver"] = {
+        "label": "白银 XAG/USD", "stance": "高波动，等待跟随确认",
+        "value": number(xag.get("value")), "session_change": xag_session,
+        "note": "白银既受贵金属联动支持，也对实际利率和工业周期更敏感；跌破自身支撑时不与黄金强行合并。",
+    }
+    brent, wti = series.get("DCOILBRENTEU", {}), series.get("DCOILWTICO", {})
+    brent_change = percent_change(brent)
+    wti_change = percent_change(wti)
+    analysis["oil"] = {
+        "label": "Brent / WTI", "stance": "油价下跌，通胀降温但工业需求偏弱",
+        "brent": number(brent.get("value")), "wti": number(wti.get("value")),
+        "brent_change": brent_change, "wti_change": wti_change,
+        "as_of": max(str(brent.get("date") or ""), str(wti.get("date") or "")),
+    }
+    return analysis
+
 def cftc_ratio(row: list[str], kind: str) -> tuple[float, float, int]:
     if kind == "managed_money":
         oi, long_pos, short_pos = number(row[7]), number(row[13]), number(row[14])
@@ -1845,6 +2053,14 @@ def main() -> int:
         raise RuntimeError("No source succeeded and no previous snapshot is available")
 
     derived = build_derived(series)
+    previous_post_close = previous.get("post_close_analysis")
+    try:
+        post_close_analysis = build_post_close_analysis(series, derived, previous_post_close)
+        statuses.append({"source": "XAU/USD close morphology", "status": post_close_analysis.get("update_status", "cached"), "date": post_close_analysis.get("as_of")})
+    except Exception as error:
+        post_close_analysis = previous_post_close or _post_close_seed()
+        errors.append({"source": "XAU/USD close morphology", "series": "post_close_analysis", "error": str(error)[:240]})
+        statuses.append({"source": "XAU/USD close morphology", "status": "fallback", "date": post_close_analysis.get("as_of")})
     available_statuses = {"ok", "cached", "fallback"}
     run_time = parse_timestamp(run_at) or datetime.now(timezone.utc)
     next_update = run_time.replace(minute=0, second=0) + timedelta(
@@ -1878,6 +2094,7 @@ def main() -> int:
         "cftc": cftc,
         "calendar": calendar,
         "flow_positioning": flow_positioning,
+        "post_close_analysis": post_close_analysis,
         "a_share": a_share,
     }
     payload["layers"] = build_layers(series, derived, cftc)
