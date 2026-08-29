@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-08-28T21:15:40Z",
+    "checked_at": "2026-08-29T03:12:16Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 +27.6 亿（5日/市值 0.14%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -18,7 +18,7 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "LIVE",
+    "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
       "证券: sector not found",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 8
+      "history_live_count": 5
     },
     "index_flows": [
       {
@@ -259,10 +259,10 @@
       },
       {
         "code": "BK1200",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -95.435,
         "five_day_to_cap_pct": -0.125,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -0.76,
@@ -295,7 +295,7 @@
             "main_net_flow_billion_cny": -18.379
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 7.652,
         "name": "电力设备",
         "today_billion_cny": -18.379,
@@ -303,10 +303,10 @@
       },
       {
         "code": "BK0448",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -93.305,
         "five_day_to_cap_pct": -0.217,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -1.31,
@@ -339,7 +339,7 @@
             "main_net_flow_billion_cny": -61.186
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 4.297,
         "name": "通信设备",
         "today_billion_cny": -61.186,
@@ -435,10 +435,10 @@
       },
       {
         "code": "BK1283",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -32.587,
         "five_day_to_cap_pct": -0.021,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": 1.38,
@@ -471,7 +471,7 @@
             "main_net_flow_billion_cny": -5.914
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 15.646,
         "name": "银行",
         "today_billion_cny": -5.914,
@@ -493,7 +493,7 @@
     ],
     "snapshot_date": "2026-08-29",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 5/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-08-28T21:15:32Z",
+    "checked_at": "2026-08-29T03:12:10Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -970,15 +970,15 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-08-28T21:15:29Z",
+    "as_of": "2026-08-29T03:12:00Z",
     "assets": {
       "gold": {
         "drivers": [
           {
-            "direction": "压制",
-            "fact": "黄金 UTC 日内 -3.22%",
+            "direction": "中性",
+            "fact": "黄金 UTC 日内 +0.00%",
             "name": "黄金日内动量",
-            "raw": -1.0,
+            "raw": 0.0,
             "weight": 0.23
           },
           {
@@ -1017,18 +1017,18 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 -10，对黄金温和压制。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +13，对黄金温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": -10,
-        "stance": "温和压制"
+        "score": 13,
+        "stance": "温和支持"
       },
       "silver": {
         "drivers": [
           {
-            "direction": "压制",
-            "fact": "白银 UTC 日内 -5.79%",
+            "direction": "中性",
+            "fact": "白银 UTC 日内 +0.00%",
             "name": "白银日内动量",
-            "raw": -1.0,
+            "raw": 0.0,
             "weight": 0.23
           },
           {
@@ -1074,10 +1074,10 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +24，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +47，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 24,
-        "stance": "温和支持"
+        "score": 47,
+        "stance": "明显支持"
       },
       "yen": {
         "drivers": [
@@ -1116,13 +1116,13 @@
         "stance": "明显压制"
       }
     },
-    "date": "2026-08-28",
-    "headline": "黄金温和压制；白银温和支持；日元明显压制。",
+    "date": "2026-08-29",
+    "headline": "黄金温和支持；白银明显支持；日元明显压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存和加密衍生品指标作为风险背景展示；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：08-29 18:15 杰克逊霍尔央行年会",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金温和压制；白银温和支持；日元明显压制。下一事件：08-29 18:15 杰克逊霍尔央行年会。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和支持；白银明显支持；日元明显压制。下一事件：08-29 18:15 杰克逊霍尔央行年会。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -1147,7 +1147,7 @@
       "value": 3.3039
     },
     "GOLD_SILVER_RATIO": {
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
@@ -1210,32 +1210,32 @@
       "value": -2.826
     },
     "XAG_15M": {
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -5.7938
+      "value": 0.0
     },
     "XAG_SESSION": {
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -5.7938
+      "value": 0.0
     },
     "XAU_15M": {
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -3.2164
+      "value": 0.0
     },
     "XAU_SESSION": {
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -3.2164
+      "value": 0.0
     },
     "YIELD_10Y2Y": {
       "date": "2026-08-27",
@@ -4516,9 +4516,9 @@
       "scope": "single-venue"
     },
     "scope_note": "库存与加密衍生品是风险/资金背景，不直接替代金银现货价格或 CFTC 周度持仓结论。",
-    "updated_at": "2026-08-28T21:15:16Z"
+    "updated_at": "2026-08-29T03:12:07Z"
   },
-  "generated_at": "2026-08-28T21:15:16Z",
+  "generated_at": "2026-08-29T03:12:07Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -4572,10 +4572,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-08-28T21:15:40Z",
+    "a_share_checked_at": "2026-08-29T03:12:16Z",
     "ai_tokens_used": 0,
-    "cached_count": 0,
-    "calendar_checked_at": "2026-08-28T21:15:16Z",
+    "cached_count": 29,
+    "calendar_checked_at": "2026-08-29T03:12:07Z",
     "cftc_checked_at": "2026-08-28T21:15:16Z",
     "crypto_checked_at": "2026-08-26T19:38:06Z",
     "error_count": 4,
@@ -4601,173 +4601,173 @@
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 1,
+    "fallback_count": 2,
     "inventory_checked_at": "2026-08-28T21:15:16Z",
     "macro_checked_at": "2026-08-28T21:15:16Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-08-28T21:30:00Z",
+    "next_scheduled_at": "2026-08-29T03:15:00Z",
     "run_interval_minutes": 15,
     "source_count": 34,
     "statuses": [
       {
         "date": "2026-08-26",
         "source": "FRED WALCL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-28",
         "source": "FRED RRPONTSYD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-26",
         "source": "FRED WDTGAL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED TOTRESNS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-03",
         "source": "FRED WM2NS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED DGS2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED DGS10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED DGS30",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED DFII10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-28",
         "source": "FRED T10YIE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED DFF",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED VIXCLS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED SP500",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-27",
         "source": "FRED NASDAQCOM",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-21",
         "source": "FRED DTWEXBGS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-25",
         "source": "FRED DCOILBRENTEU",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-25",
         "source": "FRED DCOILWTICO",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PAYEMS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED UNRATE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-06-01",
         "source": "FRED JTSJOL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED CPIAUCSL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-28",
         "source": "ECB FX",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-08-28T21:15:29Z",
+        "date": "2026-08-29T03:12:00Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-08-28T21:15:28Z",
+        "date": "2026-08-29T03:11:59Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
       {
         "date": "2026-08-25",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-08-28T21:15:32Z",
+        "date": "2026-08-29T03:12:10Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-08-28",
         "source": "CME gold warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-28",
         "source": "CME silver warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-26T19:38:09Z",
@@ -4775,13 +4775,13 @@
         "status": "fallback"
       },
       {
-        "date": "2026-08-28T21:15:40Z",
+        "date": "2026-08-29T03:12:16Z",
         "source": "A股指数/板块资金流",
-        "status": "ok"
+        "status": "fallback"
       }
     ],
     "success_count": 34,
-    "updated_count": 33
+    "updated_count": 3
   },
   "schema_version": 1,
   "series": {
@@ -10541,7 +10541,7 @@
     },
     "SPOT_XAGUSD": {
       "category": "贵金属",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "history": [
         [
           "2026-08-26T11:28:42Z",
@@ -10606,14 +10606,18 @@
         [
           "2026-08-28T21:15:28Z",
           66.502998
+        ],
+        [
+          "2026-08-29T03:11:59Z",
+          66.502998
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-08-28T21:15:28Z",
-      "previous": 70.593002,
-      "previous_date": "2026-08-28T10:41:57Z",
+      "observed_at": "2026-08-29T03:11:59Z",
+      "previous": 66.502998,
+      "previous_date": "2026-08-28T21:15:28Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xag",
@@ -10625,7 +10629,7 @@
     },
     "SPOT_XAUUSD": {
       "category": "贵金属",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "history": [
         [
           "2026-08-26T11:28:43Z",
@@ -10690,14 +10694,18 @@
         [
           "2026-08-28T21:15:29Z",
           4456.399902
+        ],
+        [
+          "2026-08-29T03:12:00Z",
+          4456.399902
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-08-28T21:15:29Z",
-      "previous": 4604.5,
-      "previous_date": "2026-08-28T10:41:57Z",
+      "observed_at": "2026-08-29T03:12:00Z",
+      "previous": 4456.399902,
+      "previous_date": "2026-08-28T21:15:29Z",
       "quote_basis": "公开聚合现货指示中间价（非可成交报价）",
       "source": "Gold-API.com",
       "source_url": "https://gold-api.com/xau",
@@ -12946,5 +12954,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "52f187bc0fcb516c"
+  "snapshot_id": "b1f0171349cb23d3"
 }
