@@ -309,6 +309,54 @@
     </section>`;
   };
 
+  const renderCloseAnalysis = (data) => {
+    const analysis = data.post_close_analysis;
+    const bar = analysis?.daily_bar;
+    if (!analysis || !bar) return "";
+    const metrics = analysis.metrics || {};
+    const levels = analysis.levels || {};
+    const silver = analysis.silver || {};
+    const oil = analysis.oil || {};
+    const thorson = analysis.thorson || {};
+    const pattern = analysis.pattern || {};
+    const scenarios = (analysis.scenarios || []).map((item) => {
+      const tone = item.rank === "A" ? "a" : item.rank === "B" ? "b" : "c";
+      return `<article class="dm-scenario ${tone}">
+        <div class="dm-scenario-head"><span>优先级 ${escapeHtml(item.rank || "?")}</span><strong>${escapeHtml(item.priority || "")}</strong></div>
+        <h4>${escapeHtml(item.title || "情景待定义")}</h4>
+        <p><b>触发：</b>${escapeHtml(item.trigger || "待更新")}</p>
+        <p><b>失效：</b>${escapeHtml(item.invalidation || "待更新")}</p>
+        <small>观察位：${escapeHtml(item.watch || "待更新")}</small>
+      </article>`;
+    }).join("");
+    const sourceLinks = (Array.isArray(analysis.source_url) ? analysis.source_url : [analysis.source_url]).filter(Boolean).slice(0, 3).map((url) => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">公开来源</a>`).join(" · ");
+    const money = (value, digits = 2) => finite(value) ? `$${formatCompact(value, digits)}` : "待更新";
+    const level = (label, value) => `<span><b>${escapeHtml(label)}</b>${money(value)}</span>`;
+    return `<section class="dm-close-analysis" id="close-analysis">
+      <div class="dm-subhead"><div><span>Close analysis · classical patterns</span><h3>收盘形态与金银原油联动</h3></div><time>形态日线 ${escapeHtml(analysis.as_of || "待更新")} · ${escapeHtml(analysis.basis || "")}</time></div>
+      <div class="dm-close-lead"><strong>${escapeHtml(pattern.label || "形态待确认")} · ${escapeHtml(pattern.bias || "方向待确认")}</strong><p>基于 ${escapeHtml(analysis.as_of || "最近完整收盘日")} 的 XAU/USD 日线：实体 ${finite(metrics.body_pct) ? `${formatCompact(metrics.body_pct, 1)}%` : "待更新"}，收盘位于日内区间 ${finite(metrics.close_location_pct) ? `${formatCompact(metrics.close_location_pct, 1)}%` : "待更新"}；${escapeHtml(pattern.confirmation || "等待下一根日线确认")}</p></div>
+      <div class="dm-close-grid">
+        <article class="dm-analysis-card gold"><div class="dm-analysis-card-head"><div><span>London spot · XAU/USD</span><h4>黄金日线结构</h4></div><b>${money(bar.close)}</b></div>
+          <div class="dm-analysis-stats"><div><span>开 / 高</span><strong>${money(bar.open)} / ${money(bar.high)}</strong></div><div><span>低 / 收</span><strong>${money(bar.low)} / ${money(bar.close)}</strong></div><div><span>实体 / 区间</span><strong>${money(metrics.body)} / ${money(metrics.range)}</strong></div><div><span>上下影线</span><strong>${money(metrics.upper_wick)} / ${money(metrics.lower_wick)}</strong></div></div>
+          <div class="dm-analysis-levels">${level("支撑 1", levels.support_1)}${level("支撑 2", levels.support_2)}${level("中位", levels.midpoint)}${level("压力 1", levels.resistance_1)}${level("压力 2", levels.resistance_2)}</div>
+        </article>
+        <article class="dm-analysis-card silver"><div class="dm-analysis-card-head"><div><span>Cross-asset confirmation</span><h4>白银 XAG/USD</h4></div><b>${money(silver.value, 3)}</b></div>
+          <div class="dm-analysis-stat-line"><span>日内变动</span><strong class="${Number(silver.session_change) >= 0 ? "positive" : "negative"}">${signed(silver.session_change, 2, "%")}</strong></div>
+          <p class="dm-analysis-stance">${escapeHtml(silver.stance || "等待确认")}</p><p>${escapeHtml(silver.note || "白银对实际利率与工业周期更敏感。")}</p>
+        </article>
+        <article class="dm-analysis-card oil"><div class="dm-analysis-card-head"><div><span>Energy · inflation / demand</span><h4>Brent / WTI</h4></div><b>${escapeHtml(oil.stance || "待更新")}</b></div>
+          <div class="dm-analysis-stats"><div><span>Brent</span><strong>${money(oil.brent)}</strong><small>${signed(oil.brent_change, 2, "%")}</small></div><div><span>WTI</span><strong>${money(oil.wti)}</strong><small>${signed(oil.wti_change, 2, "%")}</small></div></div>
+          <p>油价方向用于校验通胀预期与工业需求背景，不替代黄金自身的价格确认。数据日 ${escapeHtml(oil.as_of || "待更新")}。</p>
+        </article>
+        <article class="dm-analysis-card thorson"><div class="dm-analysis-card-head"><div><span>External view · public source</span><h4>${escapeHtml(thorson.label || "AG Thorson")}</h4></div><b>${escapeHtml(thorson.stance || "待更新")}</b></div>
+          <p>${escapeHtml(thorson.summary || "暂无公开观点摘要")}</p><a class="dm-analysis-link" href="${escapeHtml(thorson.source_url || "#")}" target="_blank" rel="noopener">查看公开原文 ↗</a>
+        </article>
+      </div>
+      <div class="dm-scenario-grid">${scenarios}</div>
+      <p class="dm-close-note"><strong>数据纪律：</strong>${escapeHtml(analysis.data_quality || "日线与现货源的交易日界线可能不同；现货没有统一交易所成交量，不把变动代理标成真实成交量。")} ${sourceLinks ? `· ${sourceLinks}` : ""}</p>
+    </section>`;
+  };
+
   const render = (data) => {
     const pipeline = data.pipeline || {};
     const tone = statusTone(data);
@@ -340,6 +388,7 @@
       </div>
       ${errorNote}<div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
+      ${renderCloseAnalysis(data)}
       <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
