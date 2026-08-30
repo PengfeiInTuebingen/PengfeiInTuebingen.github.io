@@ -4,6 +4,7 @@
   if (!mount) return;
 
   const rawEndpoint = "https://raw.githubusercontent.com/PengfeiInTuebingen/PengfeiInTuebingen.github.io/gh-pages/markets/data/latest.json";
+  const apiEndpoint = "https://api.github.com/repos/PengfeiInTuebingen/PengfeiInTuebingen.github.io/contents/markets/data/latest.json?ref=gh-pages";
   const relativeEndpoint = loaderScript?.dataset.dataUrl || "./data/latest.json";
   const production = location.hostname === "pengfeiintuebingen.github.io";
   let currentData = null;
@@ -108,6 +109,7 @@
     const values = useCandles ? candles.flatMap((point) => [point.low, point.high]) : points.map((point) => point.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
+    const flat = values.length > 1 && max - min <= Math.max(Math.abs(max) * 0.00001, 0.000001);
     const range = max - min || Math.max(Math.abs(max) * .01, 1);
     const x = (index) => (index / (points.length - 1)) * width;
     const y = (value) => plotBottom - ((value - min) / range) * (plotBottom - plotTop);
@@ -139,11 +141,12 @@
     }).join("") : "";
     const firstLabel = mode === "today" ? "00:00" : formatDate(points[0].stamp);
     const lastLabel = mode === "today" ? "最新" : formatDate(points.at(-1).stamp);
+    const statusMessage = mode === "today" && flat ? "源端暂无新的日内报价（周末/休市），图表保留最近有效价。" : "";
     return `<svg class="dm-trend-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)}${useCandles ? "K线与成交量" : "走势与相邻观测变动"}">
       <line class="dm-trend-gridline" x1="0" y1="${plotTop}" x2="${width}" y2="${plotTop}"></line><line class="dm-trend-gridline" x1="0" y1="${plotBottom}" x2="${width}" y2="${plotBottom}"></line><line class="dm-trend-baseline" x1="0" y1="${barsBase}" x2="${width}" y2="${barsBase}"></line>
       ${useCandles ? candleMarkup : `<path class="dm-trend-area" style="--dm-color:${color}" d="${area}"></path><polyline class="dm-trend-line" style="--dm-color:${color}" points="${line}"></polyline>`}${bars}
       <text class="dm-trend-axis" x="0" y="242">${escapeHtml(firstLabel)}</text><text class="dm-trend-axis" x="${width}" y="242" text-anchor="end">${escapeHtml(lastLabel)}</text>
-    </svg><div class="dm-trend-volume-label">${hasVolume ? "下方：成交量；红绿柱颜色跟随 K 线涨跌" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）"}</div>`;
+    </svg><div class="dm-trend-volume-label ${statusMessage ? "dm-trend-status" : ""}">${statusMessage || (hasVolume ? "下方：成交量；红绿柱颜色跟随 K 线涨跌" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）")}</div>`;
   };
 
   const renderDailyTrends = (data) => {
@@ -296,6 +299,61 @@
     </article>`;
   };
 
+
+  const renderCftcTrend = (data) => {
+    const categories = ["生产商/贸易商", "掉期商", "管理资金", "其他报告商", "非报告商"];
+    const colors = {"生产商/贸易商": "#c64752", "掉期商": "#276aa1", "管理资金": "#168c78", "其他报告商": "#b97c1f", "非报告商": "#7565cf"};
+    const sourceHistory = data.cftc?.history || {};
+    const metals = [["黄金", sourceHistory["黄金"] || []], ["白银", sourceHistory["白银"] || []]]
+      .map(([label, history]) => [label, history.filter((item) => item?.date && item.categories && categories.every((category) => Number.isFinite(Number(item.categories[category])))).slice(-10)])
+      .filter(([, history]) => history.length >= 2);
+    if (!metals.length) {
+      return `<section class="dm-cftc-trend" id="cftc-cross-asset"><div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>资金来源与持仓结构</h3></div><time>历史样本待首次同步</time></div><div class="dm-cftc-empty">CFTC 历史数据暂未完整读取；不会用插值或截图值代替真实持仓。</div></section>`;
+    }
+    const chart = (label, rows) => {
+      const values = rows.flatMap((item) => categories.map((category) => Number(item.categories[category])));
+      const maxAbs = Math.max(...values.map((value) => Math.abs(value)), 1);
+      const width = 700;
+      const height = 238;
+      const left = 55;
+      const right = 10;
+      const top = 14;
+      const bottom = 190;
+      const baseline = (top + bottom) / 2;
+      const scale = ((bottom - top) / 2) / maxAbs;
+      const step = (width - left - right) / rows.length;
+      const barWidth = Math.max(5, Math.min(12, step / 7));
+      const groupWidth = categories.length * barWidth + (categories.length - 1) * 2;
+      const bars = rows.map((row, rowIndex) => categories.map((category, categoryIndex) => {
+        const value = Number(row.categories[category]);
+        const heightBar = Math.max(1.5, Math.abs(value) * scale);
+        const x = left + rowIndex * step + (step - groupWidth) / 2 + categoryIndex * (barWidth + 2);
+        const y = value >= 0 ? baseline - heightBar : baseline;
+        const title = `${label} · ${row.date} · ${category} · ${value > 0 ? "+" : ""}${Math.round(value).toLocaleString("zh-CN")} 张`;
+        return `<rect class="dm-cftc-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${heightBar.toFixed(1)}" rx="2" fill="${colors[category]}"><title>${escapeHtml(title)}</title></rect>`;
+      }).join("")).join("");
+      const maxLabel = Math.round(maxAbs).toLocaleString("zh-CN");
+      const labels = rows.map((row, index) => {
+        if (index % 2 === 1 && index !== rows.length - 1) return "";
+        return `<text class="dm-cftc-axis" x="${(left + index * step + step / 2).toFixed(1)}" y="${height - 20}" text-anchor="middle">${escapeHtml(row.date.slice(5))}</text>`;
+      }).join("");
+      const grid = `<line class="dm-cftc-gridline" x1="${left}" y1="${top}" x2="${width - right}" y2="${top}"></line><line class="dm-cftc-zero" x1="${left}" y1="${baseline}" x2="${width - right}" y2="${baseline}"></line><line class="dm-cftc-gridline" x1="${left}" y1="${bottom}" x2="${width - right}" y2="${bottom}"></line><text class="dm-cftc-axis" x="${left - 8}" y="${top + 4}" text-anchor="end">+${maxLabel}</text><text class="dm-cftc-axis" x="${left - 8}" y="${baseline + 4}" text-anchor="end">0</text><text class="dm-cftc-axis" x="${left - 8}" y="${bottom + 4}" text-anchor="end">−${maxLabel}</text>`;
+      const latest = rows.at(-1);
+      const latestRows = categories.map((category) => `<span><i style="--dm-color:${colors[category]}"></i>${escapeHtml(category)} <strong>${Number(latest.categories[category]).toLocaleString("zh-CN")} 张</strong></span>`).join("");
+      return `<article class="dm-cftc-bar-card"><div class="dm-cftc-bar-head"><h4>${escapeHtml(label)} · 五类来源</h4><span>报告 ${escapeHtml(latest.date)}</span></div><div class="dm-cftc-chart-wrap"><svg class="dm-cftc-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)} CFTC 五类资金来源分组柱状图">${grid}${bars}${labels}</svg></div><div class="dm-cftc-latest">${latestRows}</div></article>`;
+    };
+    const allDates = metals.flatMap(([, rows]) => rows.map((item) => item.date)).sort();
+    const latestDate = allDates.at(-1);
+    const legend = categories.map((category) => `<span><i style="--dm-color:${colors[category]}"></i>${escapeHtml(category)}</span>`).join("");
+    return `<section class="dm-cftc-trend" id="cftc-cross-asset">
+      <div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>资金来源与持仓结构 · 分组柱状图</h3></div><time>报告截至 ${escapeHtml(latestDate)} · 近 10 次周报</time></div>
+      <div class="dm-cftc-callout"><strong>一簇 = 一次 CFTC 周报：</strong>每种颜色代表一个持仓来源，正值为净多、负值为净空。图中是合约净持仓，不是美元资金流；黄金和白银各自使用独立纵轴。</div>
+      <div class="dm-cftc-bar-grid">${metals.map(([label, rows]) => chart(label, rows)).join("")}</div>
+      <div class="dm-cftc-legend">${legend}</div>
+      <p class="dm-flow-note">生产商/贸易商、掉期商、管理资金、其他报告商与非报告商均按 CFTC Disaggregated Futures-and-Options Combined 的多头减空头计算；不把净持仓/OI 与合约张数混为一谈。数据源：<a href="${escapeHtml(data.cftc?.history_source_url || data.cftc?.source_url || "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm")}" target="_blank" rel="noopener">CFTC 官方历史文件 ↗</a></p>
+    </section>`;
+  };
+
   const renderFlowPositioning = (data) => {
     const flow = data.flow_positioning || {};
     const inventory = flow.cme_inventory?.metals || {};
@@ -315,96 +373,8 @@
     return `<section class="dm-flow" id="dynamic-flow">
       <div class="dm-subhead"><div><span>Flows · positioning · warehouse</span><h3>资金、持仓与库存雷达</h3></div><time>更新于 ${formatGenerated(flow.updated_at || crypto.checked_at || data.generated_at)}</time></div>
       <div class="dm-flow-grid">${inventoryCards}${cryptoCards}${spotCards}</div>
+      ${renderCftcTrend(data)}
       ${extras}<p class="dm-flow-note dm-flow-source-note"><strong>口径：</strong>${escapeHtml(sourceNote)} ${escapeHtml(flow.scope_note || "库存与衍生品指标是背景信号，不直接替代现货与 CFTC 结论。")}</p>
-    </section>`;
-  };
-
-  const cftcSourceOrder = ["producer_merchant", "swap_dealers", "managed_money", "other_reportables", "non_reportables"];
-  const cftcSourceColors = {
-    producer_merchant: "#c64752",
-    swap_dealers: "#276aa1",
-    managed_money: "#168c78",
-    other_reportables: "#b97c1f",
-    non_reportables: "#7565cf",
-  };
-
-  const formatContracts = (value) => {
-    if (!finite(value)) return "待更新";
-    const amount = Math.round(Number(value));
-    return `${amount > 0 ? "+" : amount < 0 ? "−" : ""}${Math.abs(amount).toLocaleString("zh-CN")} 张`;
-  };
-
-  const cftcSourceChart = (metal) => {
-    const rows = (metal.history || []).slice(-10);
-    if (rows.length < 2) return `<div class="dm-cftc-empty">CFTC 周度样本不足，等待更多报告。</div>`;
-    const values = rows.flatMap((row) => cftcSourceOrder.map((key) => Number(row.sources?.[key]?.net)).filter(Number.isFinite));
-    const maxAbs = Math.max(...values.map((value) => Math.abs(value)), 1);
-    const width = 700;
-    const height = 238;
-    const left = 52;
-    const right = 10;
-    const top = 14;
-    const bottom = 190;
-    const baseline = (top + bottom) / 2;
-    const halfHeight = (bottom - top) / 2;
-    const scale = halfHeight / maxAbs;
-    const plotWidth = width - left - right;
-    const step = plotWidth / rows.length;
-    const barWidth = Math.max(5, Math.min(13, step / 7));
-    const groupWidth = cftcSourceOrder.length * barWidth + (cftcSourceOrder.length - 1) * 2;
-    const bars = rows.map((row, index) => cftcSourceOrder.map((key, sourceIndex) => {
-      const value = Number(row.sources?.[key]?.net);
-      if (!Number.isFinite(value)) return "";
-      const amount = Math.abs(value) * scale;
-      const x = left + index * step + (step - groupWidth) / 2 + sourceIndex * (barWidth + 2);
-      const y = value >= 0 ? baseline - amount : baseline;
-      const title = `${metal.label} · ${row.report_date} · ${row.sources?.[key]?.label || key} · ${formatContracts(value)}`;
-      return `<rect class="dm-cftc-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${Math.max(1.5, amount).toFixed(1)}" rx="2" fill="${cftcSourceColors[key]}"><title>${escapeHtml(title)}</title></rect>`;
-    }).join("")).join("");
-    const labels = rows.map((row, index) => {
-      if (index % 2 === 1 && index !== rows.length - 1) return "";
-      const x = left + index * step + step / 2;
-      return `<text class="dm-cftc-axis" x="${x.toFixed(1)}" y="${height - 20}" text-anchor="middle">${escapeHtml(row.report_date.slice(5))}</text>`;
-    }).join("");
-    const maxLabel = Math.round(maxAbs).toLocaleString("zh-CN");
-    return `<svg class="dm-cftc-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(metal.label)} CFTC 五类资金来源分组柱状图">
-      <line class="dm-cftc-grid" x1="${left}" y1="${top}" x2="${width - right}" y2="${top}"></line>
-      <line class="dm-cftc-grid" x1="${left}" y1="${baseline}" x2="${width - right}" y2="${baseline}"></line>
-      <line class="dm-cftc-grid" x1="${left}" y1="${bottom}" x2="${width - right}" y2="${bottom}"></line>
-      <text class="dm-cftc-axis" x="${left - 7}" y="${top + 3}" text-anchor="end">+${escapeHtml(maxLabel)}</text>
-      <text class="dm-cftc-axis" x="${left - 7}" y="${baseline + 3}" text-anchor="end">0</text>
-      <text class="dm-cftc-axis" x="${left - 7}" y="${bottom + 3}" text-anchor="end">−${escapeHtml(maxLabel)}</text>
-      ${bars}${labels}
-    </svg>`;
-  };
-
-  const renderCftcSourceCard = (metal) => {
-    const latest = metal.latest || metal.history?.at(-1) || {};
-    const rows = cftcSourceOrder.map((key) => {
-      const item = latest.sources?.[key] || {};
-      const direction = Number(item.net) >= 0 ? "positive" : "negative";
-      return `<tr><td><span class="dm-cftc-dot" style="--dm-cftc-color:${cftcSourceColors[key]}"></span>${escapeHtml(item.label || key)}</td><td class="${direction}">${formatContracts(item.net)}</td><td>${signed(item.ratio_pct, 2, "%")}</td><td>${formatContracts(item.weekly_change)}</td></tr>`;
-    }).join("");
-    return `<article class="dm-cftc-metal">
-      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">CFTC source split · weekly</span><h4>${escapeHtml(metal.label)} · ${escapeHtml(metal.contract_name || "")}</h4></div><span class="dm-source">${escapeHtml(latest.report_date || "待更新")}</span></div>
-      <div class="dm-cftc-metal-summary"><span>未平仓量 OI</span><strong>${formatContracts(latest.open_interest)}</strong><small>五类来源按净持仓拆分</small></div>
-      <div class="dm-cftc-table-wrap"><table class="dm-cftc-table"><thead><tr><th>来源</th><th>净持仓</th><th>占 OI</th><th>周变化</th></tr></thead><tbody>${rows}</tbody></table></div>
-      <div class="dm-cftc-chart-title"><span>近 10 次报告</span><small>正值=净多 · 负值=净空</small></div>${cftcSourceChart(metal)}
-    </article>`;
-  };
-
-  const renderCftcSection = (data) => {
-    const source = data.cftc_source_breakdown || {};
-    const metals = [source.metals?.gold, source.metals?.silver].filter(Boolean);
-    const positions = (data.cftc?.positions || []).slice().sort((a, b) => Math.abs(Number(b.contracts) || 0) - Math.abs(Number(a.contracts) || 0));
-    const crossRows = positions.map((item) => `<tr><td>${escapeHtml(item.name)}</td><td class="${Number(item.contracts) >= 0 ? "positive" : "negative"}">${formatContracts(item.contracts)}</td><td>${signed(item.ratio, 2, "%")}</td><td>${signed(item.weekly_ratio_change, 2, "pct")}</td></tr>`).join("");
-    if (!metals.length && !positions.length) return "";
-    return `<section class="dm-cftc" id="cftc-cross-asset">
-      <div class="dm-subhead"><div><span>CFTC positioning · source breakdown</span><h3>资金来源与持仓结构</h3></div><time>报告 ${formatDate(source.report_date || data.cftc?.report_date)} · 更新 ${formatGenerated(source.checked_at || data.generated_at)}</time></div>
-      <div class="dm-cftc-callout"><strong>先看来源，再看方向：</strong>柱状图按 CFTC 五类报告口径分组；净持仓是合约数量，不是美元资金流。正值表示该类持仓净多，负值表示净空。</div>
-      <div class="dm-cftc-metal-grid">${metals.map(renderCftcSourceCard).join("")}</div>
-      <div class="dm-cftc-cross"><div class="dm-cftc-cross-head"><div><h4>跨资产 CFTC 快照</h4><p>用于观察金银之外的久期、美元与风险资产仓位；不与上面的五类来源重复相加。</p></div><span>${positions.length} 个合约 · ${escapeHtml(data.cftc?.report_date || source.report_date || "待更新")}</span></div><div class="dm-cftc-table-wrap"><table class="dm-cftc-table dm-cftc-cross-table"><thead><tr><th>合约</th><th>净持仓</th><th>净持仓 / OI</th><th>周度变化</th></tr></thead><tbody>${crossRows}</tbody></table></div></div>
-      <p class="dm-flow-note"><strong>数据纪律：</strong>${escapeHtml(source.definition_note || "CFTC 周频数据按报告日展示；非报告持仓不等于全部散户。")} · <a href="${escapeHtml(source.source_url || data.cftc?.source_url || "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm")}" target="_blank" rel="noopener">CFTC 官方来源 ↗</a></p>
     </section>`;
   };
 
@@ -508,7 +478,7 @@
       ${errorNote}<p class="dm-source-line"><strong>动态来源：</strong>金银公开现货 API；BTC/ETH 现货 Coinbase 7×24；永续 OI/资金费率 Binance 或 CoinGlass；宏观 FRED/ECB；库存 CME。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
       ${renderCloseAnalysis(data)}
-      <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCftcSection(data)}${renderCalendar(data)}</div>
+      <div class="dm-intelligence-grid">${renderConclusion(data)}${renderFlowPositioning(data)}${renderCalendar(data)}</div>
     </div></section>`;
     document.getElementById("dmRefresh")?.addEventListener("click", () => loadData(true));
   };
@@ -663,7 +633,8 @@
     const bucket = force ? Date.now() : Math.floor(Date.now() / 300000);
     const cacheKey = `v=${bucket}`;
     const relative = `${relativeEndpoint}${relativeEndpoint.includes("?") ? "&" : "?"}${cacheKey}`;
-    return production ? [`${rawEndpoint}?${cacheKey}`, relative] : [relative, `${rawEndpoint}?${cacheKey}`];
+    const api = `${apiEndpoint}&${cacheKey}`;
+    return production ? [api, relative, `${rawEndpoint}?${cacheKey}`] : [relative, api, `${rawEndpoint}?${cacheKey}`];
   };
 
   const fetchFirst = async (urls) => {
@@ -672,7 +643,11 @@
       try {
         const response = await fetch(url, {cache: "no-store"});
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-        const data = await response.json();
+        let data = await response.json();
+        if (url.startsWith("https://api.github.com/") && data.content) {
+          const bytes = Uint8Array.from(atob(data.content.replace(/\s/g, "")), (char) => char.charCodeAt(0));
+          data = JSON.parse(new TextDecoder().decode(bytes));
+        }
         if (data.schema_version !== 1 || !data.series) throw new Error("invalid schema");
         return data;
       } catch (error) {

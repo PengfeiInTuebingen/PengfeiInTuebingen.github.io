@@ -22,6 +22,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import zipfile
 from datetime import datetime, timedelta, timezone
 from html import unescape
 from pathlib import Path
@@ -40,7 +41,7 @@ FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 ECB_URL = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
 CFTC_DISAGG_URL = "https://www.cftc.gov/dea/newcot/c_disagg.txt"
 CFTC_TFF_URL = "https://www.cftc.gov/dea/newcot/FinComWk.txt"
-CFTC_SOURCE_API_URL = "https://publicreporting.cftc.gov/resource/72hh-3qpy.json"
+CFTC_DISAGG_HISTORY_URL = "https://www.cftc.gov/files/dea/history/com_disagg_txt_{year}.zip"
 GOLD_API_URL = "https://api.gold-api.com/price"
 XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
 GOLD_DAILY_BARS_URL = "https://api.goldprice.dev/v1/bars"
@@ -208,6 +209,22 @@ def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = N
             return completed.stdout
         except (subprocess.SubprocessError, OSError) as curl_error:
             last_error = curl_error
+    raise RuntimeError(f"download failed: {url}: {last_error}")
+
+
+def request_bytes(url: str, attempts: int = 3, headers: dict[str, str] | None = None, timeout: float = 75) -> bytes:
+    request_headers = {"User-Agent": USER_AGENT, "Accept": "application/zip,application/octet-stream,*/*"}
+    request_headers.update(headers or {})
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        request = urllib.request.Request(url, headers=request_headers)
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read()
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as error:
+            last_error = error
+            if attempt + 1 < attempts:
+                time.sleep(2**attempt)
     raise RuntimeError(f"download failed: {url}: {last_error}")
 
 
@@ -1389,6 +1406,60 @@ def find_contract(rows: list[list[str]], prefix: str) -> list[str] | None:
     return next((row for row in rows if row[0].strip().upper().startswith(prefix)), None)
 
 
+CFTC_CATEGORY_COLUMNS = {
+    "生产商/贸易商": (8, 9),
+    "掉期商": (10, 11),
+    "管理资金": (13, 14),
+    "其他报告商": (16, 17),
+    "非报告商": (21, 22),
+}
+
+
+def cftc_category_breakdown(row: list[str]) -> dict[str, dict[str, float | int | None]]:
+    oi = number(row[7])
+    output = {}
+    for label, (long_index, short_index) in CFTC_CATEGORY_COLUMNS.items():
+        long_pos, short_pos = number(row[long_index]), number(row[short_index])
+        net = None if None in (long_pos, short_pos) else int(round(long_pos - short_pos))
+        output[label] = {"contracts": net, "ratio": round(100 * net / oi, 2) if net is not None and oi else None}
+    return output
+
+
+def fetch_cftc_category_history() -> dict[str, list[dict[str, Any]]]:
+    today = datetime.now(timezone.utc).date()
+    start = today - timedelta(days=130)
+    rows = []
+    for year in range(start.year, today.year + 1):
+        archive = request_bytes(CFTC_DISAGG_HISTORY_URL.format(year=year), attempts=2, timeout=90)
+        with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+            member = next((name for name in bundle.namelist() if name.lower().endswith(".txt")), None)
+            if not member:
+                continue
+            rows.extend(parse_cftc_rows(bundle.read(member).decode("utf-8-sig", errors="replace"))[1:])
+    output = {}
+    for display_name, prefix in (("黄金", "GOLD - COMMODITY EXCHANGE"), ("白银", "SILVER - COMMODITY EXCHANGE")):
+        points = []
+        for row in rows:
+            if not row or not row[0].strip().upper().startswith(prefix):
+                continue
+            report_date = row[2].strip()
+            try:
+                date_value = datetime.strptime(report_date, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if date_value < start or date_value > today:
+                continue
+            breakdown = cftc_category_breakdown(row)
+            points.append({
+                "date": report_date,
+                "open_interest": number(row[7]),
+                "categories": {name: item.get("contracts") for name, item in breakdown.items()},
+            })
+        dedup = {item["date"]: item for item in points}
+        output[display_name] = [dedup[key] for key in sorted(dedup)]
+    return output
+
+
 def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     disaggregated = parse_cftc_rows(request_text(CFTC_DISAGG_URL))
     financial = parse_cftc_rows(request_text(CFTC_TFF_URL))
@@ -1415,7 +1486,7 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
         ratio, weekly, net = cftc_ratio(row, kind)
         report_date = row[2].strip()
         report_dates.append(report_date)
-        positions.append({
+        item = {
             "name": display_name,
             "contract_name": row[0].strip(),
             "contracts": net,
@@ -1424,108 +1495,25 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
             "category": "管理资金" if kind == "managed_money" else "杠杆基金",
             "report_date": report_date,
             "source": "CFTC COT Futures + Options Combined",
-        })
+        }
+        if display_name in {"黄金", "白银"} and kind == "managed_money":
+            item["breakdown"] = cftc_category_breakdown(row)
+        positions.append(item)
+    history = {}
+    try:
+        history = fetch_cftc_category_history()
+    except Exception as error:
+        missing.append({"source": "CFTC history", "series": "黄金/白银", "error": str(error)[:240]})
     positions.sort(key=lambda item: item["ratio"], reverse=True)
     return {
         "report_date": max(report_dates) if report_dates else None,
         "positions": positions,
+        "history": history,
         "dynamic_count": len(positions),
         "target_count": len(contracts),
         "source_url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+        "history_source_url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm",
     }, missing
-
-
-def fetch_cftc_source_breakdown() -> dict[str, Any]:
-    """Fetch weekly gold/silver positioning split by CFTC trader category.
-
-    This public Socrata dataset is disaggregated futures-only COT data. It is
-    separate from ``fetch_cftc`` so the cross-asset screen and the grouped
-    source-of-position bars can retain their own clearly labelled fields.
-    """
-    fields = [
-        "report_date_as_yyyy_mm_dd", "contract_market_name", "open_interest_all",
-        "prod_merc_positions_long", "prod_merc_positions_short",
-        "swap_positions_long_all", "swap__positions_short_all",
-        "m_money_positions_long_all", "m_money_positions_short_all",
-        "other_rept_positions_long", "other_rept_positions_short",
-        "nonrept_positions_long_all", "nonrept_positions_short_all",
-        "change_in_prod_merc_long", "change_in_prod_merc_short",
-        "change_in_swap_long_all", "change_in_swap_short_all",
-        "change_in_m_money_long_all", "change_in_m_money_short_all",
-        "change_in_other_rept_long", "change_in_other_rept_short",
-        "change_in_nonrept_long_all", "change_in_nonrept_short_all",
-    ]
-    params = {
-        "$select": ",".join(fields),
-        "$where": "contract_market_name in ('GOLD','SILVER')",
-        "$order": "report_date_as_yyyy_mm_dd DESC",
-        "$limit": 80,
-    }
-    payload = request_json(f"{CFTC_SOURCE_API_URL}?{urllib.parse.urlencode(params)}")
-    if not isinstance(payload, list):
-        raise ValueError("CFTC source breakdown did not return a list")
-
-    category_specs = (
-        ("producer_merchant", "生产商/贸易商", "prod_merc_positions_long", "prod_merc_positions_short", "change_in_prod_merc_long", "change_in_prod_merc_short"),
-        ("swap_dealers", "做市商/掉期商", "swap_positions_long_all", "swap__positions_short_all", "change_in_swap_long_all", "change_in_swap_short_all"),
-        ("managed_money", "管理基金", "m_money_positions_long_all", "m_money_positions_short_all", "change_in_m_money_long_all", "change_in_m_money_short_all"),
-        ("other_reportables", "其他报告机构", "other_rept_positions_long", "other_rept_positions_short", "change_in_other_rept_long", "change_in_other_rept_short"),
-        ("non_reportables", "非报告持仓", "nonrept_positions_long_all", "nonrept_positions_short_all", "change_in_nonrept_long_all", "change_in_nonrept_short_all"),
-    )
-    grouped: dict[str, list[dict[str, Any]]] = {"GOLD": [], "SILVER": []}
-    for raw in payload:
-        contract = str(raw.get("contract_market_name") or "").upper()
-        if contract not in grouped:
-            continue
-        date_value = str(raw.get("report_date_as_yyyy_mm_dd") or "")[:10]
-        oi = number(raw.get("open_interest_all"))
-        if not date_value or oi is None or oi <= 0:
-            continue
-        sources: dict[str, dict[str, Any]] = {}
-        for key, label, long_key, short_key, long_change_key, short_change_key in category_specs:
-            long_pos = number(raw.get(long_key))
-            short_pos = number(raw.get(short_key))
-            if long_pos is None or short_pos is None:
-                continue
-            net = int(round(long_pos - short_pos))
-            long_change = number(raw.get(long_change_key))
-            short_change = number(raw.get(short_change_key))
-            weekly_change = None if long_change is None or short_change is None else int(round(long_change - short_change))
-            sources[key] = {
-                "label": label,
-                "net": net,
-                "weekly_change": weekly_change,
-                "ratio_pct": round_value(100 * net / oi, 3),
-            }
-        if len(sources) < 3:
-            continue
-        grouped[contract].append({
-            "report_date": date_value,
-            "open_interest": int(round(oi)),
-            "sources": sources,
-        })
-
-    metals: dict[str, dict[str, Any]] = {}
-    for contract, label in (("GOLD", "黄金"), ("SILVER", "白银")):
-        history = sorted(grouped[contract], key=lambda item: item["report_date"])[-16:]
-        if not history:
-            raise ValueError(f"CFTC source breakdown missing {contract}")
-        metals[contract.lower()] = {
-            "label": label,
-            "contract_name": contract,
-            "latest": history[-1],
-            "history": history,
-        }
-    report_dates = [item["latest"]["report_date"] for item in metals.values()]
-    return {
-        "checked_at": utc_now(),
-        "report_date": max(report_dates) if report_dates else None,
-        "source": "CFTC Disaggregated Futures Only",
-        "source_url": CFTC_SOURCE_API_URL,
-        "unit": "张合约",
-        "definition_note": "净持仓 = 多头 − 空头；周变化 = 本周净持仓 − 上周净持仓。仓位统计周二、通常周五发布；非报告持仓不等于全部散户。",
-        "metals": metals,
-    }
 
 
 def translate_event(title: str, country: str) -> str:
@@ -2035,7 +2023,6 @@ def signature(payload: dict[str, Any]) -> str:
     compact = {
         "series": {key: [item.get("date"), item.get("value")] for key, item in payload.get("series", {}).items()},
         "cftc": [payload.get("cftc", {}).get("report_date"), [[item["name"], item["contracts"]] for item in payload.get("cftc", {}).get("positions", [])]],
-        "cftc_source_breakdown": payload.get("cftc_source_breakdown", {}).get("report_date"),
         "flow_positioning": {
             "cme": {key: [item.get("report_date"), item.get("registered_oz"), item.get("total_oz")] for key, item in payload.get("flow_positioning", {}).get("cme_inventory", {}).get("metals", {}).items()},
             "crypto": {key: [item.get("open_interest_usd"), item.get("volume_24h_usd"), item.get("funding_rate")] for key, item in payload.get("flow_positioning", {}).get("crypto", {}).get("assets", {}).items()},
@@ -2125,23 +2112,6 @@ def main() -> int:
         cftc = previous.get("cftc", {"positions": [], "dynamic_count": 0, "target_count": 10})
         cftc_checked_at = previous_pipeline.get("cftc_checked_at")
         statuses.append({"source": "CFTC", "status": "cached", "date": cftc.get("report_date")})
-
-    previous_cftc_sources = previous.get("cftc_source_breakdown", {})
-    cftc_sources_due = cadence_due(previous_pipeline.get("cftc_sources_checked_at"), CFTC_REFRESH_HOURS) or not previous_cftc_sources.get("metals")
-    if cftc_sources_due:
-        try:
-            cftc_source_breakdown = fetch_cftc_source_breakdown()
-            cftc_sources_checked_at = run_at
-            statuses.append({"source": "CFTC source breakdown", "status": "ok", "date": cftc_source_breakdown.get("report_date")})
-        except Exception as error:
-            cftc_source_breakdown = previous_cftc_sources
-            cftc_sources_checked_at = previous_pipeline.get("cftc_sources_checked_at")
-            errors.append({"source": "CFTC Socrata", "series": "GOLD/SILVER trader categories", "error": str(error)[:240]})
-            statuses.append({"source": "CFTC source breakdown", "status": "fallback" if cftc_source_breakdown.get("metals") else "failed", "date": cftc_source_breakdown.get("report_date")})
-    else:
-        cftc_source_breakdown = previous_cftc_sources
-        cftc_sources_checked_at = previous_pipeline.get("cftc_sources_checked_at")
-        statuses.append({"source": "CFTC source breakdown", "status": "cached", "date": cftc_source_breakdown.get("report_date")})
 
     previous_calendar = previous.get("calendar", {})
     calendar_due = cadence_due(previous_pipeline.get("calendar_checked_at"), CALENDAR_REFRESH_HOURS) or not previous_calendar.get("events")
@@ -2255,7 +2225,6 @@ def main() -> int:
             "next_scheduled_at": next_update.isoformat().replace("+00:00", "Z"),
             "macro_checked_at": macro_checked_at,
             "cftc_checked_at": cftc_checked_at,
-            "cftc_sources_checked_at": cftc_sources_checked_at,
             "calendar_checked_at": calendar_checked_at,
             "inventory_checked_at": inventory_checked_at,
             "crypto_checked_at": crypto_checked_at,
@@ -2272,7 +2241,6 @@ def main() -> int:
         "series": series,
         "derived": derived,
         "cftc": cftc,
-        "cftc_source_breakdown": cftc_source_breakdown,
         "calendar": calendar,
         "flow_positioning": flow_positioning,
         "post_close_analysis": post_close_analysis,
@@ -2306,7 +2274,6 @@ def main() -> int:
         "metal_quotes": sum(key in series for key in ("SPOT_XAUUSD", "SPOT_XAGUSD")),
         "calendar_events": len(calendar.get("events", [])),
         "cftc_positions": cftc.get("dynamic_count", 0),
-        "cftc_source_breakdown": bool(cftc_source_breakdown.get("metals")),
         "success": payload["pipeline"]["success_count"],
         "updated": payload["pipeline"]["updated_count"],
         "cached": payload["pipeline"]["cached_count"],
