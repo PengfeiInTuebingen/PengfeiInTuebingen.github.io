@@ -7,6 +7,14 @@
   const apiEndpoint = "https://api.github.com/repos/PengfeiInTuebingen/PengfeiInTuebingen.github.io/contents/markets/data/latest.json?ref=gh-pages";
   const relativeEndpoint = loaderScript?.dataset.dataUrl || "./data/latest.json";
   const production = location.hostname === "pengfeiintuebingen.github.io";
+  const tradingViewSymbols = {
+    "crypto-BTC": "BINANCE:BTCUSDT",
+    "crypto-ETH": "BINANCE:ETHUSDT",
+    gold: "TVC:GOLD",
+    silver: "TVC:SILVER",
+    brent: "TVC:UKOIL",
+    wti: "TVC:USOIL",
+  };
   let currentData = null;
 
   const escapeHtml = (value) => String(value).replace(/[&<>"]/g, (char) => ({
@@ -121,6 +129,7 @@
         label: symbol,
         subtitle: gateSource ? "Gate 现货 / 永续" : (spot ? "Coinbase 现货" : "Binance 永续"),
         source: source.source || (gateSource ? "Gate" : (spot ? "Coinbase" : (futures.aggregated ? "CoinGlass OI · Binance价格" : "Binance"))),
+        tvSymbol: tradingViewSymbols[`crypto-${symbol}`],
         color: symbol === "BTC" ? "#0f8b78" : "#6274c5",
         unit: "USD",
         value: spot?.price_usd ?? futures?.price_usd,
@@ -133,7 +142,7 @@
       if (!series?.history?.length) return;
       const longHistory = data.cross_asset?.histories?.[id] || [];
       const longSource = data.cross_asset?.sources?.[id] || (longHistory.length >= 2 ? "Gate CFD 日线" : null);
-      instruments.push({id, label, subtitle, source: series.source || "公开源", longSource, color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
+      instruments.push({id, label, subtitle, source: series.source || "公开源", tvSymbol: tradingViewSymbols[id], longSource, color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
     };
     addSeries("gold", "黄金", "XAU/USD 现货", "SPOT_XAUUSD", "#bd861f", "USD/oz");
     addSeries("silver", "白银", "XAG/USD 现货", "SPOT_XAGUSD", "#718096", "USD/oz");
@@ -175,7 +184,39 @@
     return rows.slice(-180);
   };
 
+
+  const tradingViewChart = (instrument, period) => {
+    const ranges = {"1D": "1D", "1W": "5D", "1M": "1M", "ALL": "12M"};
+    const intervals = {"1D": "15", "1W": "60", "1M": "240", "ALL": "D"};
+    const params = new URLSearchParams({
+      frameElementId: `tv_${instrument.id}_${period}`,
+      symbol: instrument.tvSymbol,
+      interval: intervals[period] || "15",
+      range: ranges[period] || "1D",
+      hide_top_toolbar: "0",
+      hide_side_toolbar: "1",
+      symboledit: "0",
+      saveimage: "0",
+      toolbarbg: "f5f8f7",
+      studies: "[]",
+      theme: "light",
+      style: "1",
+      timezone: "Europe/Berlin",
+      withdateranges: "1",
+      hide_volume: "0",
+      allow_symbol_change: "0",
+      details: "0",
+      hotlist: "0",
+      calendar: "0",
+      hideideas: "1",
+    });
+    const src = `https://www.tradingview.com/widgetembed/?${params.toString()}`;
+    const direct = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(instrument.tvSymbol)}`;
+    return `<div class="dm-tv-chart" role="region" aria-label="${escapeHtml(instrument.label)} TradingView实时图"><iframe title="${escapeHtml(instrument.label)} TradingView chart" src="${src}" loading="lazy" referrerpolicy="origin" allow="fullscreen"></iframe></div><div class="dm-interactive-chart-note">价格、K线与成交量由 TradingView 实时图提供；<a href="${direct}" target="_blank" rel="noopener">在 TradingView 打开</a>。持仓量/资金费率仍采用下方 Gate 公共接口。</div>`;
+  };
+
   const trendChart = (instrument, metric, period) => {
+    if (metric === "price" && instrument.tvSymbol) return tradingViewChart(instrument, period);
     const rows = trendRows(instrument, metric, period);
     if (rows.length < 2) return `<div class="dm-interactive-empty">${metric === "price" ? "价格样本不足" : "该资产暂未提供此项历史数据"}</div>`;
     const width = 900;
@@ -238,9 +279,9 @@
     return `<section class="dm-interactive-trends" id="dynamic-trends" data-trend-selected="${initial.id}" data-trend-period="1D" data-trend-metric="price">
       <div class="dm-subhead"><div><span>Interactive chart · CoinGlass-style controls</span><h3>价格、持仓量与成交量</h3></div><time>数据按实际时间戳显示 · 15 分钟刷新</time></div>
       <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
-      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
+      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${initial.tvSymbol ? "TradingView 实时图" : escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
-      <p class="dm-flow-note">BTC/ETH 行情优先使用 Gate 现货与 Gate USDT-M 永续公共接口；持仓量/资金费率为单一交易所口径。若 Gate 暂时不可用，标题会标注回退源。黄金、白银、Brent、WTI 的 1周/1月使用 Gate CFD 日线 OHLC（CFD 参考价，不等于交易所可成交报价）。</p>
+      <p class="dm-flow-note">价格、K线与成交量图改用 TradingView 官方嵌入图；BTC/ETH 的持仓量与资金费率仍来自 Gate USDT-M 永续公共接口。TradingView 链接按标准品种映射，原链接全部指向 BTC 的情况不会被误用于其他资产。</p>
     </section>`;
   };
 
@@ -262,7 +303,9 @@
       panel.dataset.trendMetric = state.metric;
       panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, state.metric, state.period);
       panel.querySelector("#dmTrendTitle").textContent = `${instrument.label} · ${instrument.subtitle}`;
-      const displaySource = state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source);
+      const displaySource = state.metric === "price" && instrument.tvSymbol
+        ? "TradingView 实时图"
+        : (state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source));
       panel.querySelector("#dmTrendMeta").textContent = `${displaySource} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
       panel.querySelector("#dmTrendWindow").textContent = `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
       panel.querySelector("#dmTrendValue").textContent = finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新";
@@ -690,7 +733,7 @@
         <div class="dm-status-stat"><span>AI token</span><strong>${pipeline.ai_tokens_used || 0}</strong></div>
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
-      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>BTC/ETH 现货与永续优先使用 Gate 公共接口；黄金、白银、Brent、WTI 长周期优先使用 Gate CFD 日线；宏观仍使用 FRED/ECB，CFTC 与库存使用官方源。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
+      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>价格/K线/成交量图使用 TradingView 官方嵌入（BTC、ETH、黄金、白银、WTI、Brent）；Gate 公共接口提供加密货币持仓量/资金费率及 CFD 备用数据；宏观仍使用 FRED/ECB，CFTC 与库存使用官方源。所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
       ${renderCloseAnalysis(data)}
       ${renderFlowPositioning(data)}
