@@ -107,6 +107,9 @@
       if (!source) continue;
       const ohlcv = spot?.ohlcv_history?.length >= 2 ? spot.ohlcv_history : (futures?.ohlcv_history || []);
       const ohlcvLong = spot?.ohlcv_history_long?.length >= 2 ? spot.ohlcv_history_long : (futures?.ohlcv_history_long || []);
+      const longSource = spot?.ohlcv_history_long?.length >= 2
+        ? "Coinbase 6小时K线"
+        : (futures?.ohlcv_history_long?.length >= 2 ? "Binance 1小时K线" : null);
       const oi = futures?.oi_history || [];
       const oiLong = futures?.oi_history_long?.length >= 2 ? futures.oi_history_long : oi;
       const volume = spot?.volume_history?.length ? spot.volume_history : (futures?.volume_history || []);
@@ -121,14 +124,15 @@
         unit: "USD",
         value: spot?.price_usd ?? futures?.price_usd,
         change: spot?.price_change_24h_pct ?? futures?.price_change_24h_pct,
-        ohlcv, ohlcvLong, oi, oiLong, volume, volumeLong,
+        ohlcv, ohlcvLong, longSource, oi, oiLong, volume, volumeLong,
       });
     }
     const addSeries = (id, label, subtitle, key, color, unit) => {
       const series = data.series?.[key];
       if (!series?.history?.length) return;
       const longHistory = data.cross_asset?.histories?.[id] || [];
-      instruments.push({id, label, subtitle, source: series.source || "公开源", color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
+      const longSource = data.cross_asset?.sources?.[id] || (longHistory.length >= 2 ? "Gate CFD 日线" : null);
+      instruments.push({id, label, subtitle, source: series.source || "公开源", longSource, color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
     };
     addSeries("gold", "黄金", "XAU/USD 现货", "SPOT_XAUUSD", "#bd861f", "USD/oz");
     addSeries("silver", "白银", "XAG/USD 现货", "SPOT_XAGUSD", "#718096", "USD/oz");
@@ -235,7 +239,7 @@
       <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
       <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
-      <p class="dm-flow-note">CoinGlass 聚合权限启用时，持仓量/成交量使用多交易所聚合；否则显示 Binance 永续代理。金银与原油没有统一的实时交易所 OHLC，因此保留公开现货价格序列，不把变动代理冒充成交量。</p>
+      <p class="dm-flow-note">CoinGlass 聚合权限启用时，持仓量/成交量使用多交易所聚合；否则显示 Binance 永续代理。金银 1日为公开现货快照，1周/1月使用 Gate CFD 日线 OHLC（CFD 代理，不等于交易所可成交报价）。</p>
     </section>`;
   };
 
@@ -257,7 +261,8 @@
       panel.dataset.trendMetric = state.metric;
       panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, state.metric, state.period);
       panel.querySelector("#dmTrendTitle").textContent = `${instrument.label} · ${instrument.subtitle}`;
-      panel.querySelector("#dmTrendMeta").textContent = `${instrument.source} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
+      const displaySource = state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source);
+      panel.querySelector("#dmTrendMeta").textContent = `${displaySource} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
       panel.querySelector("#dmTrendWindow").textContent = `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
       panel.querySelector("#dmTrendValue").textContent = finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新";
       panel.querySelectorAll("[data-trend-asset]").forEach((button) => {
@@ -683,7 +688,7 @@
         <div class="dm-status-stat"><span>AI token</span><strong>${pipeline.ai_tokens_used || 0}</strong></div>
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
-      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>金银公开现货 API；BTC/ETH 现货 Coinbase 7×24；永续 OI/资金费率 Binance 或 CoinGlass；宏观 FRED/ECB；库存 CME。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
+      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>金银 1日公开现货 API、1周/1月 Gate CFD 日线；BTC/ETH 现货 Coinbase 7×24；永续 OI/资金费率 Binance 或 CoinGlass；宏观 FRED/ECB；库存 CME。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
       ${renderCloseAnalysis(data)}
       ${renderFlowPositioning(data)}

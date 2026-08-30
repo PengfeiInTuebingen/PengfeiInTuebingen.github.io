@@ -59,6 +59,7 @@ CME_WAREHOUSE_URLS = {
 COINGLASS_API_BASE = "https://open-api-v4.coinglass.com/api"
 BINANCE_FUTURES_BASE = "https://fapi.binance.com"
 COINBASE_EXCHANGE_BASE = "https://api.exchange.coinbase.com"
+GATE_CFD_BASE = "https://api.gateio.ws/api/v4"
 EASTMONEY_QUOTE_BASES = (
     "https://push2.eastmoney.com/webguest/api/qt",
     "https://82.push2.eastmoney.com/webguest/api/qt",
@@ -1338,24 +1339,68 @@ def _fetch_yahoo_silver_daily_bars() -> list[dict[str, Any]]:
     return _fetch_yahoo_daily_bars(YAHOO_SILVER_CHART_URL)
 
 
-def fetch_gold_daily_bars() -> list[dict[str, Any]]:
-    """Fetch completed gold daily bars, with a public futures proxy fallback.
+def _fetch_gate_cfd_daily_bars(symbol: str) -> list[dict[str, Any]]:
+    """Fetch public Gate TradFi CFD daily OHLC for XAUUSD/XAGUSD.
 
-    Spot CFD vendors do not share a single session boundary.  We therefore
-    prefer a spot OHLC endpoint, then use COMEX GC=F only as a labeled proxy;
-    unfinished or malformed rows are discarded and the last verified page bar
-    is retained when both sources are stale.
+    Gate labels these instruments as CFD symbols rather than exchange-traded
+    futures.  We use the daily OHLC only for the long-window chart and cross-
+    asset statistics; the live 15-minute quote remains the existing OTC spot
+    feed, so the two roles are not mixed.
     """
+    symbol = symbol.upper()
+    if symbol not in {"XAUUSD", "XAGUSD"}:
+        raise ValueError(f"unsupported Gate CFD symbol {symbol}")
+    query = urllib.parse.urlencode({"kline_type": "1d", "limit": 120})
+    payload = request_json(f"{GATE_CFD_BASE}/tradfi/symbols/{symbol}/klines?{query}")
+    data = payload.get("data") if isinstance(payload, dict) else payload
+    raw_rows = data.get("list") if isinstance(data, dict) else data
+    rows: list[dict[str, Any]] = []
+    for item in raw_rows or []:
+        if not isinstance(item, dict):
+            continue
+        timestamp = number(item.get("t"))
+        if timestamp is None:
+            continue
+        stamp = parse_timestamp(datetime.fromtimestamp(timestamp, timezone.utc).isoformat())
+        if stamp is None:
+            continue
+        rows.append({
+            "date": stamp.date().isoformat(),
+            "open": item.get("o"), "high": item.get("h"),
+            "low": item.get("l"), "close": item.get("c"), "volume": None,
+        })
+    clean = _validate_daily_bars(rows)
+    if len(clean) < 5:
+        raise ValueError(f"Gate {symbol} daily bars are too short")
+    return clean
+
+
+def _fetch_gate_gold_daily_bars() -> list[dict[str, Any]]:
+    return _fetch_gate_cfd_daily_bars("XAUUSD")
+
+
+def _fetch_gold_daily_bars_with_source() -> tuple[list[dict[str, Any]], str]:
+    """Fetch completed gold daily bars and return the source label used."""
     errors = []
-    for fetcher in (_fetch_goldprice_daily_bars, _fetch_yahoo_gold_daily_bars):
+    fetchers = (
+        (_fetch_gate_gold_daily_bars, "Gate CFD XAUUSD daily OHLC"),
+        (_fetch_goldprice_daily_bars, "goldprice.dev spot OHLC"),
+        (_fetch_yahoo_gold_daily_bars, "Yahoo Finance GC=F proxy"),
+    )
+    for fetcher, source in fetchers:
         try:
             bars = fetcher()
             if len(bars) >= 5:
-                return bars
+                return bars, source
             errors.append(f"{fetcher.__name__}: too short")
         except Exception as error:
             errors.append(f"{fetcher.__name__}: {error}")
     raise ValueError("; ".join(errors)[:300] or "public gold daily bars unavailable")
+
+
+def fetch_gold_daily_bars() -> list[dict[str, Any]]:
+    """Fetch completed gold daily bars, preferring the public Gate CFD series."""
+    return _fetch_gold_daily_bars_with_source()[0]
 
 
 def _post_close_seed() -> dict[str, Any]:
@@ -1408,15 +1453,20 @@ def build_cross_asset_analysis(series: dict[str, dict[str, Any]], previous: dict
     sources = dict(analysis.get("sources") or {})
     errors: list[str] = []
     try:
-        gold = fetch_gold_daily_bars()
+        gold, gold_source = _fetch_gold_daily_bars_with_source()
         histories["gold"] = [[item["date"], item["close"]] for item in gold if number(item.get("close")) is not None]
-        sources["gold"] = "goldprice.dev / Yahoo GC=F proxy"
+        sources["gold"] = gold_source
     except Exception as error:
         errors.append(f"gold daily: {error}")
     try:
-        silver = _fetch_yahoo_silver_daily_bars()
+        try:
+            silver = _fetch_gate_cfd_daily_bars("XAGUSD")
+            silver_source = "Gate CFD XAGUSD daily OHLC"
+        except Exception as gate_error:
+            silver = _fetch_yahoo_silver_daily_bars()
+            silver_source = "Yahoo Finance SI=F proxy (Gate fallback)"
         histories["silver"] = [[item["date"], item["close"]] for item in silver if number(item.get("close")) is not None]
-        sources["silver"] = "Yahoo Finance SI=F proxy"
+        sources["silver"] = silver_source
     except Exception as error:
         errors.append(f"silver daily: {error}")
     for key, series_id in (("dollar", "DTWEXBGS"), ("real", "DFII10"), ("nominal", "DGS10"), ("brent", "DCOILBRENTEU"), ("wti", "DCOILWTICO"), ("usdjpy", "FX_USDJPY"), ("vix", "VIXCLS")):
