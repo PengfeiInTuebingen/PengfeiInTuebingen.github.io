@@ -109,6 +109,7 @@
     const values = useCandles ? candles.flatMap((point) => [point.low, point.high]) : points.map((point) => point.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
+    const flat = values.length > 1 && max - min <= Math.max(Math.abs(max) * 0.00001, 0.000001);
     const range = max - min || Math.max(Math.abs(max) * .01, 1);
     const x = (index) => (index / (points.length - 1)) * width;
     const y = (value) => plotBottom - ((value - min) / range) * (plotBottom - plotTop);
@@ -140,11 +141,12 @@
     }).join("") : "";
     const firstLabel = mode === "today" ? "00:00" : formatDate(points[0].stamp);
     const lastLabel = mode === "today" ? "最新" : formatDate(points.at(-1).stamp);
+    const statusMessage = mode === "today" && flat ? "源端暂无新的日内报价（周末/休市），图表保留最近有效价。" : "";
     return `<svg class="dm-trend-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(label)}${useCandles ? "K线与成交量" : "走势与相邻观测变动"}">
       <line class="dm-trend-gridline" x1="0" y1="${plotTop}" x2="${width}" y2="${plotTop}"></line><line class="dm-trend-gridline" x1="0" y1="${plotBottom}" x2="${width}" y2="${plotBottom}"></line><line class="dm-trend-baseline" x1="0" y1="${barsBase}" x2="${width}" y2="${barsBase}"></line>
       ${useCandles ? candleMarkup : `<path class="dm-trend-area" style="--dm-color:${color}" d="${area}"></path><polyline class="dm-trend-line" style="--dm-color:${color}" points="${line}"></polyline>`}${bars}
       <text class="dm-trend-axis" x="0" y="242">${escapeHtml(firstLabel)}</text><text class="dm-trend-axis" x="${width}" y="242" text-anchor="end">${escapeHtml(lastLabel)}</text>
-    </svg><div class="dm-trend-volume-label">${hasVolume ? "下方：成交量；红绿柱颜色跟随 K 线涨跌" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）"}</div>`;
+    </svg><div class="dm-trend-volume-label ${statusMessage ? "dm-trend-status" : ""}">${statusMessage || (hasVolume ? "下方：成交量；红绿柱颜色跟随 K 线涨跌" : "下方：相邻观测变动代理（源数据未提供逐笔成交量）")}</div>`;
   };
 
   const renderDailyTrends = (data) => {
