@@ -22,6 +22,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import zipfile
 from datetime import datetime, timedelta, timezone
 from html import unescape
 from pathlib import Path
@@ -40,6 +41,7 @@ FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 ECB_URL = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
 CFTC_DISAGG_URL = "https://www.cftc.gov/dea/newcot/c_disagg.txt"
 CFTC_TFF_URL = "https://www.cftc.gov/dea/newcot/FinComWk.txt"
+CFTC_DISAGG_HISTORY_URL = "https://www.cftc.gov/files/dea/history/com_disagg_txt_{year}.zip"
 GOLD_API_URL = "https://api.gold-api.com/price"
 XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
 GOLD_DAILY_BARS_URL = "https://api.goldprice.dev/v1/bars"
@@ -207,6 +209,22 @@ def request_text(url: str, attempts: int = 3, headers: dict[str, str] | None = N
             return completed.stdout
         except (subprocess.SubprocessError, OSError) as curl_error:
             last_error = curl_error
+    raise RuntimeError(f"download failed: {url}: {last_error}")
+
+
+def request_bytes(url: str, attempts: int = 3, headers: dict[str, str] | None = None, timeout: float = 75) -> bytes:
+    request_headers = {"User-Agent": USER_AGENT, "Accept": "application/zip,application/octet-stream,*/*"}
+    request_headers.update(headers or {})
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        request = urllib.request.Request(url, headers=request_headers)
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read()
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as error:
+            last_error = error
+            if attempt + 1 < attempts:
+                time.sleep(2**attempt)
     raise RuntimeError(f"download failed: {url}: {last_error}")
 
 
@@ -1388,6 +1406,60 @@ def find_contract(rows: list[list[str]], prefix: str) -> list[str] | None:
     return next((row for row in rows if row[0].strip().upper().startswith(prefix)), None)
 
 
+CFTC_CATEGORY_COLUMNS = {
+    "生产商/贸易商": (8, 9),
+    "掉期商": (10, 11),
+    "管理资金": (13, 14),
+    "其他报告商": (16, 17),
+    "非报告商": (21, 22),
+}
+
+
+def cftc_category_breakdown(row: list[str]) -> dict[str, dict[str, float | int | None]]:
+    oi = number(row[7])
+    output = {}
+    for label, (long_index, short_index) in CFTC_CATEGORY_COLUMNS.items():
+        long_pos, short_pos = number(row[long_index]), number(row[short_index])
+        net = None if None in (long_pos, short_pos) else int(round(long_pos - short_pos))
+        output[label] = {"contracts": net, "ratio": round(100 * net / oi, 2) if net is not None and oi else None}
+    return output
+
+
+def fetch_cftc_category_history() -> dict[str, list[dict[str, Any]]]:
+    today = datetime.now(timezone.utc).date()
+    start = today - timedelta(days=130)
+    rows = []
+    for year in range(start.year, today.year + 1):
+        archive = request_bytes(CFTC_DISAGG_HISTORY_URL.format(year=year), attempts=2, timeout=90)
+        with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+            member = next((name for name in bundle.namelist() if name.lower().endswith(".txt")), None)
+            if not member:
+                continue
+            rows.extend(parse_cftc_rows(bundle.read(member).decode("utf-8-sig", errors="replace"))[1:])
+    output = {}
+    for display_name, prefix in (("黄金", "GOLD - COMMODITY EXCHANGE"), ("白银", "SILVER - COMMODITY EXCHANGE")):
+        points = []
+        for row in rows:
+            if not row or not row[0].strip().upper().startswith(prefix):
+                continue
+            report_date = row[2].strip()
+            try:
+                date_value = datetime.strptime(report_date, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if date_value < start or date_value > today:
+                continue
+            breakdown = cftc_category_breakdown(row)
+            points.append({
+                "date": report_date,
+                "open_interest": number(row[7]),
+                "categories": {name: item.get("contracts") for name, item in breakdown.items()},
+            })
+        dedup = {item["date"]: item for item in points}
+        output[display_name] = [dedup[key] for key in sorted(dedup)]
+    return output
+
+
 def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     disaggregated = parse_cftc_rows(request_text(CFTC_DISAGG_URL))
     financial = parse_cftc_rows(request_text(CFTC_TFF_URL))
@@ -1414,7 +1486,7 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
         ratio, weekly, net = cftc_ratio(row, kind)
         report_date = row[2].strip()
         report_dates.append(report_date)
-        positions.append({
+        item = {
             "name": display_name,
             "contract_name": row[0].strip(),
             "contracts": net,
@@ -1423,14 +1495,24 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
             "category": "管理资金" if kind == "managed_money" else "杠杆基金",
             "report_date": report_date,
             "source": "CFTC COT Futures + Options Combined",
-        })
+        }
+        if display_name in {"黄金", "白银"} and kind == "managed_money":
+            item["breakdown"] = cftc_category_breakdown(row)
+        positions.append(item)
+    history = {}
+    try:
+        history = fetch_cftc_category_history()
+    except Exception as error:
+        missing.append({"source": "CFTC history", "series": "黄金/白银", "error": str(error)[:240]})
     positions.sort(key=lambda item: item["ratio"], reverse=True)
     return {
         "report_date": max(report_dates) if report_dates else None,
         "positions": positions,
+        "history": history,
         "dynamic_count": len(positions),
         "target_count": len(contracts),
         "source_url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+        "history_source_url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm",
     }, missing
 
 
