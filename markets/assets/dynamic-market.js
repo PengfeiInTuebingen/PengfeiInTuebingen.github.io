@@ -225,7 +225,7 @@
     return `<section class="dm-interactive-trends" id="dynamic-trends" data-trend-selected="${initial.id}" data-trend-period="1D" data-trend-metric="price">
       <div class="dm-subhead"><div><span>Interactive chart · CoinGlass-style controls</span><h3>价格、持仓量与成交量</h3></div><time>数据按实际时间戳显示 · 15 分钟刷新</time></div>
       <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
-      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${escapeHtml(initial.source)} · 价格</span></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
+      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
       <p class="dm-flow-note">CoinGlass 聚合权限启用时，持仓量/成交量使用多交易所聚合；否则显示 Binance 永续代理。金银与原油没有统一的实时交易所 OHLC，因此保留公开现货价格序列，不把变动代理冒充成交量。</p>
     </section>`;
@@ -235,30 +235,47 @@
     const panel = document.querySelector(".dm-interactive-trends");
     if (!panel) return;
     const instruments = buildTrendInstruments(data);
+    const periodLabels = {"1D": "1日", "1W": "1周", "1M": "1月", "ALL": "全部"};
     const state = {asset: panel.dataset.trendSelected || instruments[0]?.id, period: panel.dataset.trendPeriod || "1D", metric: panel.dataset.trendMetric || "price"};
     const update = () => {
       const instrument = instruments.find((item) => item.id === state.asset) || instruments[0];
       if (!instrument) return;
+      const hasVolume = instrument.volume?.length >= 2 || normalizeCandles(instrument.ohlcv).some((row) => Number.isFinite(row.volume));
       if (state.metric === "oi" && instrument.oi?.length < 2) state.metric = "price";
-      if (state.metric === "volume" && !(instrument.volume?.length >= 2 || normalizeCandles(instrument.ohlcv).some((row) => Number.isFinite(row.volume)))) state.metric = "price";
+      if (state.metric === "volume" && !hasVolume) state.metric = "price";
+      const rows = trendRows(instrument, state.metric, state.period);
       panel.dataset.trendSelected = instrument.id;
       panel.dataset.trendPeriod = state.period;
       panel.dataset.trendMetric = state.metric;
       panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, state.metric, state.period);
       panel.querySelector("#dmTrendTitle").textContent = `${instrument.label} · ${instrument.subtitle}`;
       panel.querySelector("#dmTrendMeta").textContent = `${instrument.source} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
+      panel.querySelector("#dmTrendWindow").textContent = `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
       panel.querySelector("#dmTrendValue").textContent = finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新";
-      panel.querySelectorAll("[data-trend-asset]").forEach((button) => button.classList.toggle("active", button.dataset.trendAsset === state.asset));
-      panel.querySelectorAll("[data-trend-period]").forEach((button) => button.classList.toggle("active", button.dataset.trendPeriod === state.period));
+      panel.querySelectorAll("[data-trend-asset]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.trendAsset === state.asset);
+        button.setAttribute("aria-pressed", button.dataset.trendAsset === state.asset ? "true" : "false");
+      });
+      panel.querySelectorAll("[data-trend-period]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.trendPeriod === state.period);
+        button.setAttribute("aria-pressed", button.dataset.trendPeriod === state.period ? "true" : "false");
+      });
       panel.querySelectorAll("[data-trend-metric]").forEach((button) => {
         button.classList.toggle("active", button.dataset.trendMetric === state.metric);
         if (button.dataset.trendMetric === "oi") button.disabled = instrument.oi?.length < 2;
-        if (button.dataset.trendMetric === "volume") button.disabled = !(instrument.volume?.length >= 2 || normalizeCandles(instrument.ohlcv).some((row) => Number.isFinite(row.volume)));
+        if (button.dataset.trendMetric === "volume") button.disabled = !hasVolume;
+        button.setAttribute("aria-pressed", button.dataset.trendMetric === state.metric ? "true" : "false");
       });
     };
-    panel.querySelectorAll("[data-trend-asset]").forEach((button) => button.addEventListener("click", () => { state.asset = button.dataset.trendAsset; update(); }));
-    panel.querySelectorAll("[data-trend-period]").forEach((button) => button.addEventListener("click", () => { state.period = button.dataset.trendPeriod; update(); }));
-    panel.querySelectorAll("[data-trend-metric]").forEach((button) => button.addEventListener("click", () => { if (!button.disabled) { state.metric = button.dataset.trendMetric; update(); } }));
+    panel.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-trend-asset], button[data-trend-period], button[data-trend-metric]");
+      if (!button || button.disabled) return;
+      if (button.dataset.trendAsset) state.asset = button.getAttribute("data-trend-asset");
+      if (button.dataset.trendPeriod) state.period = button.getAttribute("data-trend-period");
+      if (button.dataset.trendMetric) state.metric = button.getAttribute("data-trend-metric");
+      update();
+    });
+    update();
   };
 
   const getSeries = (data, key) => data.series?.[key] || null;
@@ -310,7 +327,7 @@
         <p>${escapeHtml(asset.interpretation)}</p>
       </article>`;
     }).join("");
-    return `<section class="dm-conclusion">
+    return `<section class="dm-conclusion" id="daily-conclusion">
       <div class="dm-subhead"><div><span>Daily conclusion · transparent rules</span><h3>每日规则结论 · 截至 ${escapeHtml(conclusion.date || formatDate(conclusion.as_of))}</h3></div><time>数据观测 ${formatGenerated(conclusion.as_of)}</time></div>
       <div class="dm-conclusion-lead"><strong>${escapeHtml(conclusion.headline)}</strong><p>${escapeHtml(conclusion.summary)}</p></div>
       <div class="dm-conclusion-grid">${assets}</div>
@@ -779,10 +796,6 @@
     if (description) description.content = `${briefDate} 黄金、白银与日元动态市场简报；金银参考价与规则结论每15分钟检查。`;
     const eyebrow = document.querySelector(".hero .eyebrow");
     if (eyebrow) eyebrow.textContent = "Daily briefing · Dynamic";
-    const heroTitle = document.querySelector(".hero h1");
-    const heroCopy = document.querySelector(".hero-copy");
-    if (heroTitle && conclusion?.headline) heroTitle.textContent = conclusion.headline;
-    if (heroCopy && conclusion?.summary) heroCopy.textContent = conclusion.summary;
     const firstPill = document.querySelector(".hero .meta-row .pill");
     if (firstPill) firstPill.innerHTML = `<span class="dot"></span>动态数据 ${formatGenerated(data.generated_at)}`;
     const nextEvent = data.calendar?.next_event;
