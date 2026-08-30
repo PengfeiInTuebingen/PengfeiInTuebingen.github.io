@@ -9,7 +9,7 @@
   <link rel="canonical" href="https://pengfeiintuebingen.github.io/markets/">
   <title>黄金 · 白银 · 日元每日简报｜2026-08-25</title>
   <link rel="stylesheet" href="./assets/decision-pyramid.css">
-  <link rel="stylesheet" href="./assets/dynamic-market.css?v=20260829-close-analysis">
+  <link rel="stylesheet" href="./assets/dynamic-market.css?v=20260830-interactive-correlation">
   <style>
     :root {
       --bg: #eef3f1;
@@ -450,11 +450,10 @@
       </div>
       <nav class="nav" aria-label="页面导航">
         <a href="/markets/">主页</a>
-        <a href="#market">行情</a>
-        <a href="#dynamic-data">动态数据</a>
+        <a href="#dynamic-data">动态行情</a>
         <a href="#dynamic-trends">动态图</a>
         <a href="./a-share/">A股独立页</a>
-        <a href="#dynamic-flow">资金库存</a>
+        <a href="#dynamic-flow">相关性与资金</a>
         <a href="#dynamic-calendar">财经日历</a>
         <a href="#close-analysis">收盘分析</a>
         <a href="#indicators">指标塔</a>
@@ -497,14 +496,14 @@
       </div>
     </section>
 
-    <section class="section" id="market">
+    <section class="section legacy-snapshot" id="market" aria-hidden="true">
       <div class="container">
         <div class="section-head">
           <div>
             <div class="section-kicker">Market snapshot</div>
             <h2>行情快照</h2>
           </div>
-          <p class="section-note">本区为研究快照；下方动态中枢按公开 API/FRED 的实际观测时间更新。不同市场的交易时段和延迟各不相同，此处不是实时行情终端。</p>
+          <p class="section-note">本区为研究快照；下方动态中枢按公开 API/FRED 的实际观测时间更新；不同市场的交易时段和延迟各不相同。</p>
         </div>
         <div class="tape">
           <article class="quote-card">
@@ -774,7 +773,7 @@
             <div class="section-kicker">Positioning &amp; events</div>
             <h2>仓位与事件风险已接入动态中枢</h2>
           </div>
-          <p class="section-note">旧版写死的白银 CFTC 数字与过期时间线已移除；请查看上方“资金来源与持仓结构”和“自动财经日历”。</p>
+          <p class="section-note">旧版写死的白银 CFTC 数字与过期时间线已移除；请查看动态区上方的“跨资产关系与资金确认”和“自动财经日历”。</p>
         </div>
       </div>
     </section>
@@ -809,7 +808,7 @@
   </footer>
 
   <script src="./assets/decision-pyramid.js"></script>
-  <script src="./assets/dynamic-market.js?v=20260830-cftc-bars" data-data-url="./data/latest.json"></script>
+  <script src="./assets/dynamic-market.js?v=20260830-interactive-correlation" data-data-url="./data/latest.json"></script>
   <script>
     const root = document.documentElement;
     const themeButton = document.getElementById("themeToggle");

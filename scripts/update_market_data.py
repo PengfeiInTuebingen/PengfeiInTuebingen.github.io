@@ -46,6 +46,7 @@ GOLD_API_URL = "https://api.gold-api.com/price"
 XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
 GOLD_DAILY_BARS_URL = "https://api.goldprice.dev/v1/bars"
 YAHOO_GOLD_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/GC=F"
+YAHOO_SILVER_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/SI=F"
 CALENDAR_FEED_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 BEA_CALENDAR_URL = "https://www.bea.gov/news/schedule"
 FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
@@ -113,6 +114,7 @@ MACRO_REFRESH_HOURS = 6
 CFTC_REFRESH_HOURS = 12
 CALENDAR_REFRESH_HOURS = 1
 WAREHOUSE_REFRESH_HOURS = 6
+CROSS_ASSET_REFRESH_HOURS = 24
 
 FRED_SERIES = {
     "WALCL": ("美联储总资产", "百万美元", "流动性"),
@@ -1251,8 +1253,8 @@ def _fetch_goldprice_daily_bars() -> list[dict[str, Any]]:
     return _validate_daily_bars(rows)
 
 
-def _fetch_yahoo_gold_daily_bars() -> list[dict[str, Any]]:
-    payload = request_json(f"{YAHOO_GOLD_CHART_URL}?range=6mo&interval=1d&events=history")
+def _fetch_yahoo_daily_bars(chart_url: str) -> list[dict[str, Any]]:
+    payload = request_json(f"{chart_url}?range=6mo&interval=1d&events=history")
     result = ((payload.get("chart") or {}).get("result") or [None])[0] or {}
     timestamps = result.get("timestamp") or []
     quote = ((result.get("indicators") or {}).get("quote") or [None])[0] or {}
@@ -1261,9 +1263,17 @@ def _fetch_yahoo_gold_daily_bars() -> list[dict[str, Any]]:
     for index, timestamp in enumerate(timestamps):
         stamp = parse_timestamp(datetime.fromtimestamp(timestamp, timezone.utc).isoformat()) if number(timestamp) is not None else None
         if stamp is None or stamp.date() >= today:
-            continue  # do not treat today's in-progress COMEX bar as a close
+            continue  # do not treat today's in-progress futures bar as a close
         rows.append({"date": stamp.date().isoformat(), **{key: (quote.get(key) or [None] * len(timestamps))[index] for key in ("open", "high", "low", "close", "volume")}})
     return _validate_daily_bars(rows)
+
+
+def _fetch_yahoo_gold_daily_bars() -> list[dict[str, Any]]:
+    return _fetch_yahoo_daily_bars(YAHOO_GOLD_CHART_URL)
+
+
+def _fetch_yahoo_silver_daily_bars() -> list[dict[str, Any]]:
+    return _fetch_yahoo_daily_bars(YAHOO_SILVER_CHART_URL)
 
 
 def fetch_gold_daily_bars() -> list[dict[str, Any]]:
@@ -1288,6 +1298,93 @@ def fetch_gold_daily_bars() -> list[dict[str, Any]]:
 
 def _post_close_seed() -> dict[str, Any]:
     return json.loads(json.dumps(GOLD_POST_CLOSE_SEED, ensure_ascii=False))
+
+
+def _series_daily_history(series_item: dict[str, Any] | None) -> list[list[Any]]:
+    values: dict[str, float] = {}
+    for item in (series_item or {}).get("history", []):
+        if not isinstance(item, list) or len(item) < 2:
+            continue
+        stamp = parse_timestamp(str(item[0]))
+        value = number(item[1])
+        if stamp is not None and value is not None:
+            values[stamp.date().isoformat()] = float(value)
+    return [[date, round_value(value, 8)] for date, value in sorted(values.items())]
+
+
+def _daily_change_history(history: list[list[Any]], mode: str = "return") -> dict[str, float]:
+    changes: dict[str, float] = {}
+    for index in range(1, len(history)):
+        previous = number(history[index - 1][1])
+        current = number(history[index][1])
+        if previous in (None, 0) or current is None:
+            continue
+        value = current - previous if mode == "difference" else current / previous - 1
+        if math.isfinite(value):
+            changes[str(history[index][0])] = float(value)
+    return changes
+
+
+def _pearson(left: dict[str, float], right: dict[str, float]) -> tuple[float | None, int]:
+    common = sorted(set(left) & set(right))
+    values = [(left[day], right[day]) for day in common if math.isfinite(left[day]) and math.isfinite(right[day])]
+    if len(values) < 5:
+        return None, len(values)
+    left_mean = sum(item[0] for item in values) / len(values)
+    right_mean = sum(item[1] for item in values) / len(values)
+    numerator = sum((a - left_mean) * (b - right_mean) for a, b in values)
+    left_sum = sum((a - left_mean) ** 2 for a, _ in values)
+    right_sum = sum((b - right_mean) ** 2 for _, b in values)
+    denominator = math.sqrt(left_sum * right_sum)
+    return (numerator / denominator if denominator else 0.0), len(values)
+
+
+def build_cross_asset_analysis(series: dict[str, dict[str, Any]], previous: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Build a transparent rolling correlation layer from common daily changes."""
+    analysis = json.loads(json.dumps(previous, ensure_ascii=False)) if previous else {}
+    histories = dict(analysis.get("histories") or {})
+    sources = dict(analysis.get("sources") or {})
+    errors: list[str] = []
+    try:
+        gold = fetch_gold_daily_bars()
+        histories["gold"] = [[item["date"], item["close"]] for item in gold if number(item.get("close")) is not None]
+        sources["gold"] = "goldprice.dev / Yahoo GC=F proxy"
+    except Exception as error:
+        errors.append(f"gold daily: {error}")
+    try:
+        silver = _fetch_yahoo_silver_daily_bars()
+        histories["silver"] = [[item["date"], item["close"]] for item in silver if number(item.get("close")) is not None]
+        sources["silver"] = "Yahoo Finance SI=F proxy"
+    except Exception as error:
+        errors.append(f"silver daily: {error}")
+    for key, series_id in (("dollar", "DTWEXBGS"), ("real", "DFII10"), ("nominal", "DGS10"), ("brent", "DCOILBRENTEU"), ("wti", "DCOILWTICO"), ("usdjpy", "FX_USDJPY"), ("vix", "VIXCLS")):
+        history = _series_daily_history(series.get(series_id))
+        if history:
+            histories[key] = history
+            sources[key] = series.get(series_id, {}).get("source", "FRED/ECB")
+    modes = {"gold": "return", "silver": "return", "dollar": "return", "real": "difference", "nominal": "difference", "brent": "return", "wti": "return", "usdjpy": "return", "vix": "return"}
+    changes = {key: _daily_change_history(history, modes[key]) for key, history in histories.items() if key in modes}
+    matrix: dict[str, dict[str, dict[str, Any]]] = {}
+    for row in ("gold", "silver"):
+        matrix[row] = {}
+        for column in ("dollar", "real", "nominal", "brent", "wti", "usdjpy", "vix"):
+            value, sample_count = _pearson(changes.get(row, {}), changes.get(column, {}))
+            matrix[row][column] = {"value": round_value(value, 4) if value is not None else None, "n": sample_count}
+    gold_silver, gold_silver_n = _pearson(changes.get("gold", {}), changes.get("silver", {}))
+    latest_dates = [history[-1][0] for history in histories.values() if history]
+    analysis.update({
+        "updated_at": utc_now(),
+        "status": "ok" if histories.get("gold") and histories.get("silver") else "partial",
+        "window": "rolling-common-daily-changes",
+        "as_of": max(latest_dates) if latest_dates else None,
+        "histories": histories,
+        "sources": sources,
+        "matrix": matrix,
+        "gold_silver": {"value": round_value(gold_silver, 4) if gold_silver is not None else None, "n": gold_silver_n},
+        "sample_floor": 5,
+        "error": "; ".join(errors)[:500] if errors else None,
+    })
+    return analysis
 
 
 def build_post_close_analysis(
@@ -2023,6 +2120,7 @@ def signature(payload: dict[str, Any]) -> str:
     compact = {
         "series": {key: [item.get("date"), item.get("value")] for key, item in payload.get("series", {}).items()},
         "cftc": [payload.get("cftc", {}).get("report_date"), [[item["name"], item["contracts"]] for item in payload.get("cftc", {}).get("positions", [])]],
+        "cross_asset": [payload.get("cross_asset", {}).get("as_of"), payload.get("cross_asset", {}).get("gold_silver")],
         "flow_positioning": {
             "cme": {key: [item.get("report_date"), item.get("registered_oz"), item.get("total_oz")] for key, item in payload.get("flow_positioning", {}).get("cme_inventory", {}).get("metals", {}).items()},
             "crypto": {key: [item.get("open_interest_usd"), item.get("volume_24h_usd"), item.get("funding_rate")] for key, item in payload.get("flow_positioning", {}).get("crypto", {}).get("assets", {}).items()},
@@ -2210,6 +2308,27 @@ def main() -> int:
         post_close_analysis = previous_post_close or _post_close_seed()
         errors.append({"source": "XAU/USD close morphology", "series": "post_close_analysis", "error": str(error)[:240]})
         statuses.append({"source": "XAU/USD close morphology", "status": "fallback", "date": post_close_analysis.get("as_of")})
+
+    previous_cross_asset = previous.get("cross_asset", {})
+    cross_asset_due = cadence_due(previous_pipeline.get("cross_asset_checked_at"), CROSS_ASSET_REFRESH_HOURS) or not previous_cross_asset.get("histories", {}).get("gold") or not previous_cross_asset.get("histories", {}).get("silver")
+    if cross_asset_due:
+        try:
+            cross_asset = build_cross_asset_analysis(series, previous_cross_asset)
+            cross_asset_status = "ok" if cross_asset.get("status") == "ok" else "fallback"
+            cross_asset_checked_at = run_at if cross_asset_status == "ok" else previous_pipeline.get("cross_asset_checked_at")
+            statuses.append({"source": "Cross-asset correlation", "status": cross_asset_status, "date": cross_asset.get("as_of")})
+            if cross_asset.get("error"):
+                errors.append({"source": "Cross-asset correlation", "series": "gold/silver/daily", "error": cross_asset["error"]})
+        except Exception as error:
+            cross_asset = previous_cross_asset
+            cross_asset_checked_at = previous_pipeline.get("cross_asset_checked_at")
+            errors.append({"source": "Cross-asset correlation", "series": "gold/silver/daily", "error": str(error)[:240]})
+            statuses.append({"source": "Cross-asset correlation", "status": "fallback" if cross_asset else "failed", "date": cross_asset.get("as_of")})
+    else:
+        cross_asset = previous_cross_asset
+        cross_asset_checked_at = previous_pipeline.get("cross_asset_checked_at")
+        statuses.append({"source": "Cross-asset correlation", "status": "cached" if cross_asset else "failed", "date": cross_asset.get("as_of")})
+
     available_statuses = {"ok", "cached", "fallback"}
     run_time = parse_timestamp(run_at) or datetime.now(timezone.utc)
     next_update = run_time.replace(minute=0, second=0) + timedelta(
@@ -2228,6 +2347,7 @@ def main() -> int:
             "calendar_checked_at": calendar_checked_at,
             "inventory_checked_at": inventory_checked_at,
             "crypto_checked_at": crypto_checked_at,
+            "cross_asset_checked_at": cross_asset_checked_at,
             "a_share_checked_at": a_share.get("checked_at"),
             "source_count": len(statuses),
             "success_count": sum(item["status"] in available_statuses for item in statuses),
@@ -2244,6 +2364,7 @@ def main() -> int:
         "calendar": calendar,
         "flow_positioning": flow_positioning,
         "post_close_analysis": post_close_analysis,
+        "cross_asset": cross_asset,
         "a_share": a_share,
     }
     payload["layers"] = build_layers(series, derived, cftc)
