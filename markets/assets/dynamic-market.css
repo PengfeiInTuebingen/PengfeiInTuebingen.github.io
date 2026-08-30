@@ -380,6 +380,68 @@
 .dm-flow-stats .negative, .dm-flow-meta .negative { color: var(--red); }
 .dm-flow-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px; margin-top: 10px; color: var(--muted); font-size: .61rem; font-variant-numeric: tabular-nums; }
 .dm-flow-note { margin: 10px 0 0; color: var(--muted); font-size: .65rem; line-height: 1.5; }
+
+.dm-cftc-trend {
+  margin-top: 1.25rem;
+  padding: 1.15rem;
+  border: 1px solid var(--dm-border, #d8e1e4);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfdfd 0%, #f4f8f7 100%);
+}
+.dm-cftc-chart-wrap {
+  border: 1px solid rgba(38, 85, 93, .12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .82);
+  padding: .65rem .75rem .3rem;
+}
+.dm-cftc-chart {
+  width: 100%;
+  min-height: 260px;
+  display: block;
+}
+.dm-cftc-gridline { stroke: #dfe7e8; stroke-width: 1; stroke-dasharray: 2 4; }
+.dm-cftc-zero { stroke: #809397; stroke-width: 1.2; }
+.dm-cftc-axis { fill: #718187; font-size: 10px; }
+.dm-cftc-line { fill: none; stroke: var(--dm-color); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.dm-cftc-dot { fill: var(--dm-color); stroke: #fff; stroke-width: 1.5; }
+.dm-cftc-legend, .dm-cftc-latest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .9rem;
+  align-items: center;
+  color: #617278;
+  font-size: .78rem;
+}
+.dm-cftc-legend { padding: .55rem .15rem .2rem; }
+.dm-cftc-legend span, .dm-cftc-latest span { display: inline-flex; align-items: center; gap: .3rem; }
+.dm-cftc-legend i, .dm-cftc-latest i {
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  background: var(--dm-color);
+  display: inline-block;
+}
+.dm-cftc-latest {
+  margin-top: .6rem;
+  padding: .65rem .75rem;
+  border-radius: 10px;
+  background: #fff;
+}
+.dm-cftc-latest strong { color: #273b40; margin-right: .3rem; }
+.dm-cftc-empty {
+  padding: 1.1rem;
+  border-radius: 10px;
+  background: #f7f9f9;
+  color: #66777b;
+  font-size: .88rem;
+}
+@media (max-width: 700px) {
+  .dm-cftc-trend { padding: .85rem; }
+  .dm-cftc-chart { min-height: 210px; }
+  .dm-cftc-axis { font-size: 9px; }
+  .dm-cftc-latest { display: grid; gap: .4rem; }
+}
+
 .dm-flow-source-note { margin-top: 14px; }
 .dm-flow-summary { margin-top: 12px; padding: 11px 13px; border-left: 3px solid var(--amber); border-radius: 0 10px 10px 0; background: color-mix(in srgb, var(--amber-soft) 55%, var(--surface)); color: var(--muted); font-size: .68rem; }
 .dm-flow-summary span, .dm-flow-summary strong, .dm-flow-summary small { display: block; }
