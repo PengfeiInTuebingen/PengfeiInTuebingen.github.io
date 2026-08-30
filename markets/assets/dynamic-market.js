@@ -304,7 +304,7 @@
     const history = (data.cftc?.history?.["黄金"] || []).slice(-20);
     const categories = ["生产商/贸易商", "掉期商", "管理资金", "其他报告商", "非报告商"];
     const colors = {"生产商/贸易商": "#d84b4b", "掉期商": "#2f6fb2", "管理资金": "#147d69", "其他报告商": "#b7771f", "非报告商": "#7664cf"};
-    const valid = history.filter((item) => item?.date && item.categories);
+    const valid = history.filter((item) => item?.date && item.categories && categories.every((category) => Number.isFinite(Number(item.categories[category]))));
     if (!valid.length) {
       return `<section class="dm-cftc-trend" id="dynamic-cftc-trend"><div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>黄金 · CFTC 净持仓走势</h3></div><time>历史样本待首次同步</time></div><div class="dm-cftc-empty">CFTC 历史文件暂未成功读取；不会用插值或截图值代替真实持仓。当前快照仍显示在下方风险区。</div></section>`;
     }
