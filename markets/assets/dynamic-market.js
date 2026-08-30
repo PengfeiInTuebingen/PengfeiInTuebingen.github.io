@@ -185,7 +185,7 @@
   };
 
 
-  const tradingViewChart = (instrument, period) => {
+  const tradingViewChart = (instrument, period, metric = "price") => {
     const ranges = {"1D": "1D", "1W": "5D", "1M": "1M", "ALL": "12M"};
     const intervals = {"1D": "15", "1W": "60", "1M": "240", "ALL": "D"};
     const params = new URLSearchParams({
@@ -212,11 +212,12 @@
     });
     const src = `https://www.tradingview.com/widgetembed/?${params.toString()}`;
     const direct = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(instrument.tvSymbol)}`;
-    return `<div class="dm-tv-chart" role="region" aria-label="${escapeHtml(instrument.label)} TradingView实时图"><iframe title="${escapeHtml(instrument.label)} TradingView chart" src="${src}" loading="lazy" referrerpolicy="origin" allow="fullscreen"></iframe></div><div class="dm-interactive-chart-note">价格、K线与成交量由 TradingView 实时图提供；<a href="${direct}" target="_blank" rel="noopener">在 TradingView 打开</a>。持仓量/资金费率仍采用下方 Gate 公共接口。</div>`;
+    const metricLabel = metric === "volume" ? "成交量" : "价格与K线";
+    return `<div class="dm-tv-chart" role="region" aria-label="${escapeHtml(instrument.label)} TradingView实时图"><iframe title="${escapeHtml(instrument.label)} TradingView chart" src="${src}" loading="lazy" referrerpolicy="origin" allow="fullscreen"></iframe></div><div class="dm-interactive-chart-note">${metricLabel}由 TradingView 实时图提供；<a href="${direct}" target="_blank" rel="noopener">在 TradingView 打开</a>。持仓量/资金费率仍采用下方 Gate 公共接口。</div>`;
   };
 
   const trendChart = (instrument, metric, period) => {
-    if (metric === "price" && instrument.tvSymbol) return tradingViewChart(instrument, period);
+    if ((metric === "price" || metric === "volume") && instrument.tvSymbol) return tradingViewChart(instrument, period, metric);
     const rows = trendRows(instrument, metric, period);
     if (rows.length < 2) return `<div class="dm-interactive-empty">${metric === "price" ? "价格样本不足" : "该资产暂未提供此项历史数据"}</div>`;
     const width = 900;
@@ -272,7 +273,7 @@
     const metricButtons = (item, active) => [
       ["price", "价格", true],
       ["oi", "持仓量", item.oi?.length >= 2],
-      ["volume", "成交量", item.volume?.length >= 2 || normalizeCandles(item.ohlcv).some((row) => Number.isFinite(row.volume))],
+      ["volume", "成交量", Boolean(item.tvSymbol) || item.volume?.length >= 2 || normalizeCandles(item.ohlcv).some((row) => Number.isFinite(row.volume))],
     ].map(([key, label, enabled]) => `<button type="button" class="dm-trend-control ${active === key ? "active" : ""}" data-trend-metric="${key}" ${enabled ? "" : "disabled"}>${label}</button>`).join("");
     const assets = instruments.map((item) => `<button type="button" class="dm-trend-asset ${item.id === initial.id ? "active" : ""}" data-trend-asset="${item.id}"><span class="dm-trend-asset-dot" style="--dm-color:${item.color}"></span>${escapeHtml(item.label)}<small>${escapeHtml(item.subtitle)}</small></button>`).join("");
     const periods = [["1D", "1日"], ["1W", "1周"], ["1M", "1月"], ["ALL", "全部"]].map(([key, label], index) => `<button type="button" class="dm-trend-control ${index === 0 ? "active" : ""}" data-trend-period="${key}">${label}</button>`).join("");
@@ -281,7 +282,7 @@
       <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
       <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${initial.tvSymbol ? "TradingView 实时图" : escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
-      <p class="dm-flow-note">价格、K线与成交量图改用 TradingView 官方嵌入图；BTC/ETH 的持仓量与资金费率仍来自 Gate USDT-M 永续公共接口。TradingView 链接按标准品种映射，原链接全部指向 BTC 的情况不会被误用于其他资产。</p>
+      <p class="dm-flow-note">价格、K线与成交量图均改用 TradingView 官方嵌入图，成交量不再读取 Gate。BTC/ETH 的持仓量与资金费率仍来自 Gate USDT-M 永续公共接口；TradingView 链接按标准品种映射，原链接全部指向 BTC 的情况不会被误用于其他资产。</p>
     </section>`;
   };
 
@@ -303,11 +304,14 @@
       panel.dataset.trendMetric = state.metric;
       panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, state.metric, state.period);
       panel.querySelector("#dmTrendTitle").textContent = `${instrument.label} · ${instrument.subtitle}`;
-      const displaySource = state.metric === "price" && instrument.tvSymbol
+      const displaySource = (state.metric === "price" || state.metric === "volume") && instrument.tvSymbol
         ? "TradingView 实时图"
         : (state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source));
       panel.querySelector("#dmTrendMeta").textContent = `${displaySource} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
-      panel.querySelector("#dmTrendWindow").textContent = `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
+      const windowText = ((state.metric === "price" || state.metric === "volume") && instrument.tvSymbol)
+        ? `${periodLabels[state.period] || state.period} · TradingView 实时图`
+        : `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
+      panel.querySelector("#dmTrendWindow").textContent = windowText;
       panel.querySelector("#dmTrendValue").textContent = finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新";
       panel.querySelectorAll("[data-trend-asset]").forEach((button) => {
         button.classList.toggle("active", button.dataset.trendAsset === state.asset);
@@ -435,7 +439,7 @@
       <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${escapeHtml(key)} perpetual</span><h4>${escapeHtml(item.label || `${key} 永续合约`)}</h4></div><span class="dm-source">${sourceBadge}</span></div>
       <div class="dm-flow-stats">
         <div><span>持仓量 OI</span><strong>${formatUsd(item.open_interest_usd)}</strong><small class="${Number(oiChange) >= 0 ? "positive" : "negative"}">24h ${signed(oiChange, 2, "%")}</small></div>
-        <div><span>成交量 24h</span><strong>${formatUsd(item.volume_24h_usd)}</strong><small>USDT 合约</small></div>
+        <div><span>成交量 24h</span><strong>TradingView</strong><small>图表 Volume 面板</small></div>
         <div><span>资金费率</span><strong>${signed(funding, 4, "%")}</strong><small>按最新观测</small></div>
         <div><span>价格 24h</span><strong>${finite(item.price_usd) ? `$${formatCompact(item.price_usd, 2)}` : "待更新"}</strong><small class="${Number(priceChange) >= 0 ? "positive" : "negative"}">${signed(priceChange, 2, "%")}</small></div>
       </div>
@@ -450,7 +454,7 @@
     const changeClass = Number(item.price_change_24h_pct) >= 0 ? "positive" : "negative";
     return `<article class="dm-flow-card dm-spot-card">
       <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${String(item.provider || item.source || "").startsWith("Gate") ? "Gate spot · 7×24" : "Coinbase spot · 7×24"}</span><h4>${escapeHtml(item.label || `${key} 现货`)}</h4></div><span class="dm-source">${escapeHtml(String(item.provider || item.source || "Gate").startsWith("Gate") ? "Gate" : "Coinbase")}</span></div>
-      <div class="dm-flow-stats"><div><span>现货价格</span><strong>${price}</strong><small class="${changeClass}">24h ${signed(item.price_change_24h_pct, 2, "%")}</small></div><div><span>24h 成交额估算</span><strong>${formatUsd(item.volume_24h_usd)}</strong><small>USD 现货</small></div><div><span>24h 区间</span><strong>${range}</strong><small>低 – 高</small></div><div><span>最新观测</span><strong>${formatGenerated(item.observed_at)}</strong><small>柏林时间换算</small></div></div>
+      <div class="dm-flow-stats"><div><span>现货价格</span><strong>${price}</strong><small class="${changeClass}">24h ${signed(item.price_change_24h_pct, 2, "%")}</small></div><div><span>24h 成交量</span><strong>TradingView</strong><small>图表 Volume 面板</small></div><div><span>24h 区间</span><strong>${range}</strong><small>低 – 高</small></div><div><span>最新观测</span><strong>${formatGenerated(item.observed_at)}</strong><small>柏林时间换算</small></div></div>
       <p class="dm-flow-note">${escapeHtml(item.note || "Gate 现货市场 7×24 更新；不包含全市场聚合持仓量。")}</p>
     </article>`;
   };
