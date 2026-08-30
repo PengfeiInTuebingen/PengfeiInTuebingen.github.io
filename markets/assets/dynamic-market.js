@@ -297,6 +297,48 @@
     </article>`;
   };
 
+
+  const renderCftcTrend = (data) => {
+    const history = (data.cftc?.history?.["黄金"] || []).slice(-20);
+    const categories = ["生产商/贸易商", "掉期商", "管理资金", "其他报告商", "非报告商"];
+    const colors = {"生产商/贸易商": "#d84b4b", "掉期商": "#2f6fb2", "管理资金": "#147d69", "其他报告商": "#b7771f", "非报告商": "#7664cf"};
+    const valid = history.filter((item) => item?.date && item.categories);
+    if (!valid.length) {
+      return `<section class="dm-cftc-trend" id="dynamic-cftc-trend"><div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>黄金 · CFTC 净持仓走势</h3></div><time>历史样本待首次同步</time></div><div class="dm-cftc-empty">CFTC 历史文件暂未成功读取；不会用插值或截图值代替真实持仓。当前快照仍显示在下方风险区。</div></section>`;
+    }
+    const width = 760;
+    const height = 300;
+    const left = 58;
+    const right = 18;
+    const top = 26;
+    const bottom = 48;
+    const plotWidth = width - left - right;
+    const plotHeight = height - top - bottom;
+    const values = valid.flatMap((item) => categories.map((category) => Number(item.categories[category])).filter(Number.isFinite));
+    const maxAbs = Math.max(...values.map((value) => Math.abs(value)), 1);
+    const x = (index) => left + (index / Math.max(valid.length - 1, 1)) * plotWidth;
+    const y = (value) => top + (maxAbs - value) / (2 * maxAbs) * plotHeight;
+    const gridValues = [maxAbs, maxAbs / 2, 0, -maxAbs / 2, -maxAbs];
+    const grid = gridValues.map((value) => `<line class="${value === 0 ? "dm-cftc-zero" : "dm-cftc-gridline"}" x1="${left}" y1="${y(value).toFixed(1)}" x2="${width - right}" y2="${y(value).toFixed(1)}"></line><text class="dm-cftc-axis" x="${left - 8}" y="${(y(value) + 4).toFixed(1)}" text-anchor="end">${Math.round(value).toLocaleString("zh-CN")}</text>`).join("");
+    const paths = categories.map((category) => {
+      const points = valid.map((item, index) => `${x(index).toFixed(1)},${y(Number(item.categories[category])).toFixed(1)}`).join(" ");
+      const latestPoint = valid.at(-1);
+      const latestValue = Number(latestPoint.categories[category]);
+      return `<polyline class="dm-cftc-line" style="--dm-color:${colors[category]}" points="${points}"></polyline><circle class="dm-cftc-dot" style="--dm-color:${colors[category]}" cx="${x(valid.length - 1).toFixed(1)}" cy="${y(latestValue).toFixed(1)}" r="4"></circle>`;
+    }).join("");
+    const labels = [valid[0], valid[Math.floor((valid.length - 1) / 2)], valid.at(-1)].filter((item, index, arr) => item && arr.findIndex((candidate) => candidate.date === item.date) === index).map((item) => `<text class="dm-cftc-axis" x="${x(valid.findIndex((candidate) => candidate.date === item.date)).toFixed(1)}" y="${height - 18}" text-anchor="middle">${escapeHtml(item.date.slice(5))}</text>`).join("");
+    const legend = categories.map((category) => `<span><i style="--dm-color:${colors[category]}"></i>${escapeHtml(category)}</span>`).join("");
+    const latestPoint = valid.at(-1);
+    const latestRows = categories.map((category) => `<span><i style="--dm-color:${colors[category]}"></i>${escapeHtml(category)} <strong>${Number(latestPoint.categories[category]).toLocaleString("zh-CN")} 张</strong></span>`).join("");
+    const windowLabel = valid.length >= 12 ? "近 100 日 · 周报" : "历史窗口 " + valid.length + " 期 · 正在累积";
+    return `<section class="dm-cftc-trend" id="dynamic-cftc-trend">
+      <div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>黄金 · 净持仓历史线</h3></div><time>报告截至 ${escapeHtml(latestPoint.date)} · ${windowLabel}</time></div>
+      <div class="dm-cftc-chart-wrap"><svg class="dm-cftc-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="黄金 CFTC 各类交易者净持仓历史线">${grid}${paths}${labels}</svg><div class="dm-cftc-legend">${legend}</div></div>
+      <div class="dm-cftc-latest"><strong>最新报告 ${escapeHtml(latestPoint.date)} · 净持仓（张）</strong>${latestRows}</div>
+      <p class="dm-flow-note">生产商/贸易商、掉期商、管理资金、其他报告商与非报告商均按 CFTC Disaggregated Futures-and-Options Combined 的多头减空头计算；不把净持仓/OI 与合约张数混为一谈。数据源：CFTC 历史压缩文件。</p>
+    </section>`;
+  };
+
   const renderFlowPositioning = (data) => {
     const flow = data.flow_positioning || {};
     const inventory = flow.cme_inventory?.metals || {};
@@ -316,6 +358,7 @@
     return `<section class="dm-flow" id="dynamic-flow">
       <div class="dm-subhead"><div><span>Flows · positioning · warehouse</span><h3>资金、持仓与库存雷达</h3></div><time>更新于 ${formatGenerated(flow.updated_at || crypto.checked_at || data.generated_at)}</time></div>
       <div class="dm-flow-grid">${inventoryCards}${cryptoCards}${spotCards}</div>
+      ${renderCftcTrend(data)}
       ${extras}<p class="dm-flow-note dm-flow-source-note"><strong>口径：</strong>${escapeHtml(sourceNote)} ${escapeHtml(flow.scope_note || "库存与衍生品指标是背景信号，不直接替代现货与 CFTC 结论。")}</p>
     </section>`;
   };
