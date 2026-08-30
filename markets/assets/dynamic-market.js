@@ -111,25 +111,22 @@
     for (const symbol of ["BTC", "ETH"]) {
       const spot = spotAssets[symbol];
       const futures = cryptoAssets[symbol];
-      const source = spot || futures;
-      if (!source) continue;
+      const source = spot || futures || {};
       const ohlcv = spot?.ohlcv_history?.length >= 2 ? spot.ohlcv_history : (futures?.ohlcv_history || []);
       const ohlcvLong = spot?.ohlcv_history_long?.length >= 2 ? spot.ohlcv_history_long : (futures?.ohlcv_history_long || []);
-      const gateSource = String(source.provider || source.source || "").startsWith("Gate");
-      const longSource = spot?.ohlcv_history_long?.length >= 2
-        ? (gateSource ? "Gate 6小时K线" : "Coinbase 6小时K线")
-        : (futures?.ohlcv_history_long?.length >= 2 ? (gateSource ? "Gate 6小时K线" : "Binance 1小时K线") : null);
-      const oi = futures?.oi_history || [];
-      const oiLong = futures?.oi_history_long?.length >= 2 ? futures.oi_history_long : oi;
-      const volume = spot?.volume_history?.length ? spot.volume_history : (futures?.volume_history || []);
-      const volumeLong = spot?.volume_history_long?.length >= 2 ? spot.volume_history_long : (futures?.volume_history_long || volume);
-      if (!ohlcv.length && !ohlcvLong.length && !oi.length && !volume.length) continue;
+      const longSource = spot?.ohlcv_history_long?.length >= 2 ? "TradingView" : (futures?.ohlcv_history_long?.length >= 2 ? "TradingView" : null);
+      const oi = [];
+      const oiLong = [];
+      const volume = [];
+      const volumeLong = [];
+      const tvSymbol = tradingViewSymbols[`crypto-${symbol}`];
+      if (!tvSymbol && !ohlcv.length && !ohlcvLong.length) continue;
       instruments.push({
         id: `crypto-${symbol}`,
         label: symbol,
-        subtitle: gateSource ? "Gate 现货 / 永续" : (spot ? "Coinbase 现货" : "Binance 永续"),
-        source: source.source || (gateSource ? "Gate" : (spot ? "Coinbase" : (futures.aggregated ? "CoinGlass OI · Binance价格" : "Binance"))),
-        tvSymbol: tradingViewSymbols[`crypto-${symbol}`],
+        subtitle: "TradingView 现货",
+        source: "TradingView",
+        tvSymbol,
         color: symbol === "BTC" ? "#0f8b78" : "#6274c5",
         unit: "USD",
         value: spot?.price_usd ?? futures?.price_usd,
@@ -138,11 +135,13 @@
       });
     }
     const addSeries = (id, label, subtitle, key, color, unit) => {
-      const series = data.series?.[key];
-      if (!series?.history?.length) return;
+      const series = data.series?.[key] || {};
+      const history = series.history || [];
       const longHistory = data.cross_asset?.histories?.[id] || [];
-      const longSource = data.cross_asset?.sources?.[id] || (longHistory.length >= 2 ? "Gate CFD 日线" : null);
-      instruments.push({id, label, subtitle, source: series.source || "公开源", tvSymbol: tradingViewSymbols[id], longSource, color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
+      const tvSymbol = tradingViewSymbols[id];
+      if (!tvSymbol && !history.length && !longHistory.length) return;
+      const longSource = tvSymbol ? "TradingView" : (data.cross_asset?.sources?.[id] || (longHistory.length >= 2 ? "公开日线" : null));
+      instruments.push({id, label, subtitle, source: tvSymbol ? "TradingView" : (series.source || "公开源"), tvSymbol, longSource, color, unit, value: series.value, change: null, history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
     };
     addSeries("gold", "黄金", "XAU/USD 现货", "SPOT_XAUUSD", "#bd861f", "USD/oz");
     addSeries("silver", "白银", "XAG/USD 现货", "SPOT_XAGUSD", "#718096", "USD/oz");
@@ -212,8 +211,7 @@
     });
     const src = `https://www.tradingview.com/widgetembed/?${params.toString()}`;
     const direct = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(instrument.tvSymbol)}`;
-    const metricLabel = metric === "volume" ? "成交量" : "价格与K线";
-    return `<div class="dm-tv-chart" role="region" aria-label="${escapeHtml(instrument.label)} TradingView实时图"><iframe title="${escapeHtml(instrument.label)} TradingView chart" src="${src}" loading="lazy" referrerpolicy="origin" allow="fullscreen"></iframe></div><div class="dm-interactive-chart-note">${metricLabel}由 TradingView 实时图提供；<a href="${direct}" target="_blank" rel="noopener">在 TradingView 打开</a>。持仓量/资金费率仍采用下方 Gate 公共接口。</div>`;
+    return `<div class="dm-tv-chart" role="region" aria-label="${escapeHtml(instrument.label)} TradingView实时图"><iframe title="${escapeHtml(instrument.label)} TradingView chart" src="${src}" loading="lazy" referrerpolicy="origin" allow="fullscreen"></iframe></div><div class="dm-interactive-chart-note">价格、K线与成交量由 TradingView 实时图提供；<a href="${direct}" target="_blank" rel="noopener">在 TradingView 打开</a>。本页面不再展示持仓量或独立成交量指标。</div>`;
   };
 
   const trendChart = (instrument, metric, period) => {
@@ -270,19 +268,14 @@
     const instruments = buildTrendInstruments(data);
     if (!instruments.length) return "";
     const initial = instruments.find((item) => item.id === "crypto-BTC") || instruments[0];
-    const metricButtons = (item, active) => [
-      ["price", "价格", true],
-      ["oi", "持仓量", item.oi?.length >= 2],
-      ["volume", "成交量", Boolean(item.tvSymbol) || item.volume?.length >= 2 || normalizeCandles(item.ohlcv).some((row) => Number.isFinite(row.volume))],
-    ].map(([key, label, enabled]) => `<button type="button" class="dm-trend-control ${active === key ? "active" : ""}" data-trend-metric="${key}" ${enabled ? "" : "disabled"}>${label}</button>`).join("");
     const assets = instruments.map((item) => `<button type="button" class="dm-trend-asset ${item.id === initial.id ? "active" : ""}" data-trend-asset="${item.id}"><span class="dm-trend-asset-dot" style="--dm-color:${item.color}"></span>${escapeHtml(item.label)}<small>${escapeHtml(item.subtitle)}</small></button>`).join("");
     const periods = [["1D", "1日"], ["1W", "1周"], ["1M", "1月"], ["ALL", "全部"]].map(([key, label], index) => `<button type="button" class="dm-trend-control ${index === 0 ? "active" : ""}" data-trend-period="${key}">${label}</button>`).join("");
-    return `<section class="dm-interactive-trends" id="dynamic-trends" data-trend-selected="${initial.id}" data-trend-period="1D" data-trend-metric="price">
-      <div class="dm-subhead"><div><span>Interactive chart · CoinGlass-style controls</span><h3>价格、持仓量与成交量</h3></div><time>数据按实际时间戳显示 · 15 分钟刷新</time></div>
-      <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
-      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${initial.tvSymbol ? "TradingView 实时图" : escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
+    return `<section class="dm-interactive-trends" id="dynamic-trends" data-trend-selected="${initial.id}" data-trend-period="1D">
+      <div class="dm-subhead"><div><span>Interactive chart · TradingView data</span><h3>TradingView 价格与K线</h3></div><time>图表实时加载 · 下方含成交量面板</time></div>
+      <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
+      <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">TradingView 实时图 · 价格/K线/成交量</span><small id="dmTrendWindow">1日 · TradingView 实时图</small></div><b id="dmTrendValue">图表实时</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
-      <p class="dm-flow-note">价格、K线与成交量图均改用 TradingView 官方嵌入图，成交量不再读取 Gate。BTC/ETH 的持仓量与资金费率仍来自 Gate USDT-M 永续公共接口；TradingView 链接按标准品种映射，原链接全部指向 BTC 的情况不会被误用于其他资产。</p>
+      <p class="dm-flow-note">TradingView 图表直接显示价格、K线和成交量；页面已移除持仓量、成交量及资金费率的独立指标卡。1日、1周、1月和全部区间均由 TradingView 图表重新加载。自动规则结论仍仅使用标注日期的可审计公开时序，不把嵌入图当作未经授权的数值接口。</p>
     </section>`;
   };
 
@@ -291,28 +284,20 @@
     if (!panel) return;
     const instruments = buildTrendInstruments(data);
     const periodLabels = {"1D": "1日", "1W": "1周", "1M": "1月", "ALL": "全部"};
-    const state = {asset: panel.dataset.trendSelected || instruments[0]?.id, period: panel.dataset.trendPeriod || "1D", metric: panel.dataset.trendMetric || "price"};
+    const state = {asset: panel.dataset.trendSelected || instruments[0]?.id, period: panel.dataset.trendPeriod || "1D"};
     const update = () => {
       const instrument = instruments.find((item) => item.id === state.asset) || instruments[0];
       if (!instrument) return;
-      const hasVolume = instrument.volume?.length >= 2 || normalizeCandles(instrument.ohlcv).some((row) => Number.isFinite(row.volume));
-      if (state.metric === "oi" && instrument.oi?.length < 2) state.metric = "price";
-      if (state.metric === "volume" && !hasVolume) state.metric = "price";
-      const rows = trendRows(instrument, state.metric, state.period);
+      const rows = trendRows(instrument, "price", state.period);
       panel.dataset.trendSelected = instrument.id;
       panel.dataset.trendPeriod = state.period;
-      panel.dataset.trendMetric = state.metric;
-      panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, state.metric, state.period);
+      panel.querySelector(".dm-interactive-chart").innerHTML = trendChart(instrument, "price", state.period);
       panel.querySelector("#dmTrendTitle").textContent = `${instrument.label} · ${instrument.subtitle}`;
-      const displaySource = (state.metric === "price" || state.metric === "volume") && instrument.tvSymbol
-        ? "TradingView 实时图"
-        : (state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source));
-      panel.querySelector("#dmTrendMeta").textContent = `${displaySource} · ${state.metric === "price" ? "价格" : state.metric === "oi" ? "持仓量" : "成交量"}`;
-      const windowText = ((state.metric === "price" || state.metric === "volume") && instrument.tvSymbol)
+      panel.querySelector("#dmTrendMeta").textContent = instrument.tvSymbol ? "TradingView 实时图 · 价格/K线/成交量" : `${state.period === "1D" ? instrument.source : (instrument.longSource || instrument.source)} · 价格`;
+      panel.querySelector("#dmTrendWindow").textContent = instrument.tvSymbol
         ? `${periodLabels[state.period] || state.period} · TradingView 实时图`
         : `${periodLabels[state.period] || state.period} · ${rows.length} 个观测${rows.length >= 2 ? ` · ${formatDate(rows[0].stamp)} – ${formatDate(rows.at(-1).stamp)}` : ""}`;
-      panel.querySelector("#dmTrendWindow").textContent = windowText;
-      panel.querySelector("#dmTrendValue").textContent = finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新";
+      panel.querySelector("#dmTrendValue").textContent = instrument.tvSymbol ? "图表实时" : (finite(instrument.value) ? `$${formatCompact(instrument.value, 2)}` : "待更新");
       panel.querySelectorAll("[data-trend-asset]").forEach((button) => {
         button.classList.toggle("active", button.dataset.trendAsset === state.asset);
         button.setAttribute("aria-pressed", button.dataset.trendAsset === state.asset ? "true" : "false");
@@ -321,19 +306,12 @@
         button.classList.toggle("active", button.dataset.trendPeriod === state.period);
         button.setAttribute("aria-pressed", button.dataset.trendPeriod === state.period ? "true" : "false");
       });
-      panel.querySelectorAll("[data-trend-metric]").forEach((button) => {
-        button.classList.toggle("active", button.dataset.trendMetric === state.metric);
-        if (button.dataset.trendMetric === "oi") button.disabled = instrument.oi?.length < 2;
-        if (button.dataset.trendMetric === "volume") button.disabled = !hasVolume;
-        button.setAttribute("aria-pressed", button.dataset.trendMetric === state.metric ? "true" : "false");
-      });
     };
     panel.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-trend-asset], button[data-trend-period], button[data-trend-metric]");
+      const button = event.target.closest("button[data-trend-asset], button[data-trend-period]");
       if (!button || button.disabled) return;
       if (button.dataset.trendAsset) state.asset = button.getAttribute("data-trend-asset");
       if (button.dataset.trendPeriod) state.period = button.getAttribute("data-trend-period");
-      if (button.dataset.trendMetric) state.metric = button.getAttribute("data-trend-metric");
       update();
     });
     update();
@@ -429,36 +407,6 @@
       <p class="dm-flow-note">${escapeHtml(item.definition_note || "Registered 为已签发仓单库存；Eligible 为符合规格但未签发仓单。")}</p>
     </article>`;
   };
-
-  const renderCryptoCard = (item, key, aggregate) => {
-    const oiChange = item.open_interest_change_24h_pct;
-    const funding = item.funding_rate_pct;
-    const priceChange = item.price_change_24h_pct;
-    const sourceBadge = String(item.provider || item.source || "").startsWith("Gate") ? "Gate" : (aggregate ? "CoinGlass" : "Binance");
-    return `<article class="dm-flow-card dm-crypto-card">
-      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${escapeHtml(key)} perpetual</span><h4>${escapeHtml(item.label || `${key} 永续合约`)}</h4></div><span class="dm-source">${sourceBadge}</span></div>
-      <div class="dm-flow-stats">
-        <div><span>持仓量 OI</span><strong>${formatUsd(item.open_interest_usd)}</strong><small class="${Number(oiChange) >= 0 ? "positive" : "negative"}">24h ${signed(oiChange, 2, "%")}</small></div>
-        <div><span>成交量 24h</span><strong>TradingView</strong><small>图表 Volume 面板</small></div>
-        <div><span>资金费率</span><strong>${signed(funding, 4, "%")}</strong><small>按最新观测</small></div>
-        <div><span>价格 24h</span><strong>${finite(item.price_usd) ? `$${formatCompact(item.price_usd, 2)}` : "待更新"}</strong><small class="${Number(priceChange) >= 0 ? "positive" : "negative"}">${signed(priceChange, 2, "%")}</small></div>
-      </div>
-      <div class="dm-flow-meta"><span>观测 ${formatGenerated(item.observed_at)}</span><span>${escapeHtml(item.scope || "")}</span></div>
-      <p class="dm-flow-note">${escapeHtml(item.note || "持仓量、成交量和资金费率均需结合交易所口径解读。")}</p>
-    </article>`;
-  };
-
-  const renderSpotCard = (item, key) => {
-    const range = finite(item.day_low) && finite(item.day_high) ? `${formatCompact(item.day_low, 2)} – ${formatCompact(item.day_high, 2)}` : "待更新";
-    const price = finite(item.price_usd) ? `$${formatCompact(item.price_usd, 2)}` : "待更新";
-    const changeClass = Number(item.price_change_24h_pct) >= 0 ? "positive" : "negative";
-    return `<article class="dm-flow-card dm-spot-card">
-      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${String(item.provider || item.source || "").startsWith("Gate") ? "Gate spot · 7×24" : "Coinbase spot · 7×24"}</span><h4>${escapeHtml(item.label || `${key} 现货`)}</h4></div><span class="dm-source">${escapeHtml(String(item.provider || item.source || "Gate").startsWith("Gate") ? "Gate" : "Coinbase")}</span></div>
-      <div class="dm-flow-stats"><div><span>现货价格</span><strong>${price}</strong><small class="${changeClass}">24h ${signed(item.price_change_24h_pct, 2, "%")}</small></div><div><span>24h 成交量</span><strong>TradingView</strong><small>图表 Volume 面板</small></div><div><span>24h 区间</span><strong>${range}</strong><small>低 – 高</small></div><div><span>最新观测</span><strong>${formatGenerated(item.observed_at)}</strong><small>柏林时间换算</small></div></div>
-      <p class="dm-flow-note">${escapeHtml(item.note || "Gate 现货市场 7×24 更新；不包含全市场聚合持仓量。")}</p>
-    </article>`;
-  };
-
 
   const renderCftcTrend = (data) => {
     const categories = ["生产商/贸易商", "掉期商", "管理资金", "其他报告商", "非报告商"];
@@ -629,26 +577,15 @@
   const renderFlowPositioning = (data) => {
     const flow = data.flow_positioning || {};
     const inventory = flow.cme_inventory?.metals || {};
-    const crypto = flow.crypto || {};
-    const cryptoAssets = crypto.assets || {};
-    const spotAssets = crypto.spot_assets || {};
     const inventoryCards = [inventory.gold, inventory.silver].filter(Boolean).map(renderInventoryCard).join("");
-    const cryptoCards = Object.entries(cryptoAssets).map(([key, item]) => renderCryptoCard(item, key, crypto.aggregated)).join("");
-    const spotCards = Object.entries(spotAssets).map(([key, item]) => renderSpotCard(item, key)).join("");
-    if (!inventoryCards && !cryptoCards && !spotCards && !Object.keys(data.series || {}).length) return "";
-    const exchange = crypto.exchange_totals || {};
-    const etf = crypto.etf || {};
-    const extras = (finite(exchange.open_interest_usd) || finite(exchange.volume_24h_usd) || finite(exchange.liquidation_24h_usd) || finite(etf.aum_usd))
-      ? `<div class="dm-flow-summary"><span>CoinGlass 市场合计（若已启用）</span><strong>OI ${formatUsd(exchange.open_interest_usd)} · 成交 ${formatUsd(exchange.volume_24h_usd)} · 清算 ${formatUsd(exchange.liquidation_24h_usd)}</strong><small>BTC ETF AUM ${formatUsd(etf.aum_usd)} · 持仓 ${finite(etf.btc_holdings) ? formatCompact(etf.btc_holdings, 0) + " BTC" : "待更新"}</small></div>`
-      : "";
-    const sourceNote = crypto.activation_note || (crypto.aggregated ? "CoinGlass 聚合永续 OI/资金费率已启用；现货价格/K线独立按 7×24 更新。" : "当前为 Gate 或 Binance 单交易所永续代理；配置 COINGLASS_API_KEY 后可切换多交易所聚合。" );
+    if (!inventoryCards && !Object.keys(data.series || {}).length) return "";
+    const updatedAt = flow.updated_at || data.generated_at;
     return `<section class="dm-flow" id="dynamic-flow">
-      <div class="dm-subhead"><div><span>Cross-asset confirmation · positioning</span><h3>跨资产关系与资金确认</h3></div><time>更新于 ${formatGenerated(flow.updated_at || crypto.checked_at || data.generated_at)}</time></div>
+      <div class="dm-subhead"><div><span>Cross-asset confirmation · official background</span><h3>跨资产关系与官方持仓背景</h3></div><time>更新于 ${formatGenerated(updatedAt)}</time></div>
       ${renderCrossAssetCorrelation(data)}
       ${renderCftcTrend(data)}
-      ${extras}
-      <details class="dm-flow-details"><summary>展开资金、持仓与库存原始明细</summary><div class="dm-flow-grid">${inventoryCards}${cryptoCards}${spotCards}</div></details>
-      <p class="dm-flow-note dm-flow-source-note"><strong>口径：</strong>${escapeHtml(sourceNote)} ${escapeHtml(flow.scope_note || "库存与衍生品指标是背景信号，不直接替代现货与 CFTC 结论。")}</p>
+      <details class="dm-flow-details"><summary>展开 CME 库存原始明细</summary><div class="dm-flow-grid">${inventoryCards || `<p class="dm-flow-note">CME 库存数据暂未同步。</p>`}</div></details>
+      <p class="dm-flow-note dm-flow-source-note"><strong>口径：</strong>价格、K线与成交量统一使用 TradingView 图表；页面不再展示加密货币持仓量、独立成交量或资金费率。CFTC 持仓与 CME 库存是官方背景数据，不替代 TradingView 行情，也不代表资金流本身。</p>
     </section>`;
   };
 
@@ -737,7 +674,7 @@
         <div class="dm-status-stat"><span>AI token</span><strong>${pipeline.ai_tokens_used || 0}</strong></div>
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
-      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>价格/K线/成交量图使用 TradingView 官方嵌入（BTC、ETH、黄金、白银、WTI、Brent）；Gate 公共接口提供加密货币持仓量/资金费率及 CFD 备用数据；宏观仍使用 FRED/ECB，CFTC 与库存使用官方源。所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
+      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>价格/K线/成交量图统一使用 TradingView 官方嵌入（BTC、ETH、黄金、白银、WTI、Brent）；页面不再展示 Gate 的持仓量、独立成交量或资金费率。自动规则结论仍使用标注日期的公开数值源，宏观使用 FRED/ECB，CFTC 与 CME 库存使用官方源；所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
       ${renderCloseAnalysis(data)}
       ${renderFlowPositioning(data)}

@@ -2461,7 +2461,7 @@ def build_daily_conclusion(
         "assets": assets,
         "next_event_text": event_text,
         "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存和加密衍生品指标作为风险背景展示；缺失因子不参与加权，不用 AI 补写。",
+        "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
     }
 
 
@@ -2472,7 +2472,6 @@ def signature(payload: dict[str, Any]) -> str:
         "cross_asset": [payload.get("cross_asset", {}).get("as_of"), payload.get("cross_asset", {}).get("gold_silver")],
         "flow_positioning": {
             "cme": {key: [item.get("report_date"), item.get("registered_oz"), item.get("total_oz")] for key, item in payload.get("flow_positioning", {}).get("cme_inventory", {}).get("metals", {}).items()},
-            "crypto": {key: [item.get("open_interest_usd"), item.get("volume_24h_usd"), item.get("funding_rate")] for key, item in payload.get("flow_positioning", {}).get("crypto", {}).get("assets", {}).items()},
         },
     }
     return hashlib.sha256(json.dumps(compact, sort_keys=True).encode()).hexdigest()[:16]
@@ -2625,18 +2624,6 @@ def main() -> int:
         for metal in ("gold", "silver"):
             statuses.append({"source": f"CME {metal} warehouse", "status": "cached" if metal in previous_metals else "failed", "date": previous_metals.get(metal, {}).get("report_date")})
 
-    previous_crypto = previous_flow.get("crypto", {})
-    try:
-        crypto = fetch_crypto_positioning()
-        crypto_status = "ok" if crypto.get("aggregated") or str(crypto.get("provider", "")).startswith("Gate") else "fallback"
-        statuses.append({"source": "Crypto OI / volume / funding", "status": crypto_status, "date": crypto.get("checked_at")})
-        crypto_checked_at = run_at
-    except Exception as error:
-        crypto = previous_crypto
-        crypto_checked_at = previous_pipeline.get("crypto_checked_at")
-        errors.append({"source": "Crypto positioning", "series": "BTC/ETH", "error": str(error)[:240]})
-        statuses.append({"source": "Crypto OI / volume / funding", "status": "fallback" if crypto.get("assets") else "failed", "date": crypto.get("checked_at")})
-
     previous_a_share = load_json(A_SHARE_PATH, {})
     try:
         a_share, a_share_errors = fetch_a_share_snapshot(previous_a_share)
@@ -2654,8 +2641,7 @@ def main() -> int:
     flow_positioning = {
         "updated_at": run_at,
         "cme_inventory": cme_inventory,
-        "crypto": crypto,
-        "scope_note": "库存与加密衍生品是风险/资金背景，不直接替代金银现货价格或 CFTC 周度持仓结论。",
+        "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
     }
 
     if not series and not cftc.get("positions"):
@@ -2708,7 +2694,6 @@ def main() -> int:
             "cftc_checked_at": cftc_checked_at,
             "calendar_checked_at": calendar_checked_at,
             "inventory_checked_at": inventory_checked_at,
-            "crypto_checked_at": crypto_checked_at,
             "cross_asset_checked_at": cross_asset_checked_at,
             "a_share_checked_at": a_share.get("checked_at"),
             "source_count": len(statuses),
