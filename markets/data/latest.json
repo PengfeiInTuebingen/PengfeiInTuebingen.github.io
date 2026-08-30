@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-08-30T20:03:45Z",
+    "checked_at": "2026-08-30T22:45:26Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 +27.6 亿（5日/市值 0.14%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -8,9 +8,9 @@
         "tone": "neutral"
       },
       {
-        "body": "半导体 5日净额 -164.6 亿；半导体材料 5日/市值 -0.23%。资金流只修正结构可信度，不能替代个股价格与广度确认。",
+        "body": "半导体记录值为 -164.6 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
         "title": "科技资金状态",
-        "tone": "negative"
+        "tone": "neutral"
       },
       {
         "body": "板块绿灯不等于个股买点；个股代码、复权口径、OHLCV 和正式证伪位齐备后，才可进入人工评估。",
@@ -18,7 +18,7 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "LIVE",
+    "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
       "证券: sector not found",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 8
+      "history_live_count": 7
     },
     "index_flows": [
       {
@@ -391,10 +391,10 @@
       },
       {
         "code": "BK1036",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -164.588,
         "five_day_to_cap_pct": -0.11,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -2.05,
@@ -427,7 +427,7 @@
             "main_net_flow_billion_cny": -128.301
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 14.92,
         "name": "半导体",
         "today_billion_cny": -128.301,
@@ -493,18 +493,18 @@
     ],
     "snapshot_date": "2026-08-31",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 7/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
     "watchlist": [
       {
-        "actionability": "FREEZE_BUY",
+        "actionability": "NON_ACTIONABLE",
         "missing": "股票代码、复权口径、收盘价、个股成交额/RVOL、正式证伪位",
         "name": "太极实业",
         "reason": "所属半导体板块5日净额 -164.6 亿；接回资金绿灯不满足，不能仅凭价格反弹接回。",
         "sector": "半导体",
-        "status": "RED_STRONG",
+        "status": "UNKNOWN",
         "symbol": null
       },
       {
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-08-30T20:03:45Z",
+    "checked_at": "2026-08-30T22:45:26Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5181,15 +5181,15 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-08-28T20:45:00Z",
+    "as_of": "2026-08-30T22:45:00Z",
     "assets": {
       "gold": {
         "drivers": [
           {
-            "direction": "压制",
-            "fact": "黄金 UTC 日内 -3.17%",
+            "direction": "中性",
+            "fact": "黄金 UTC 日内 -0.03%",
             "name": "黄金日内动量",
-            "raw": -1.0,
+            "raw": 0.0,
             "weight": 0.23
           },
           {
@@ -5228,18 +5228,18 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 -2，对黄金中性等待。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +21，对黄金温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": -2,
-        "stance": "中性等待"
+        "score": 21,
+        "stance": "温和支持"
       },
       "silver": {
         "drivers": [
           {
-            "direction": "压制",
-            "fact": "白银 UTC 日内 -4.34%",
+            "direction": "中性",
+            "fact": "白银 UTC 日内 -0.02%",
             "name": "白银日内动量",
-            "raw": -1.0,
+            "raw": 0.0,
             "weight": 0.23
           },
           {
@@ -5285,10 +5285,10 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +4，对白银中性等待。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +27，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 4,
-        "stance": "中性等待"
+        "score": 27,
+        "stance": "温和支持"
       },
       "yen": {
         "drivers": [
@@ -5327,13 +5327,13 @@
         "stance": "明显压制"
       }
     },
-    "date": "2026-08-30",
-    "headline": "黄金中性等待；白银中性等待；日元明显压制。",
+    "date": "2026-08-31",
+    "headline": "黄金温和支持；白银温和支持；日元明显压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：08-31 08:29 CPI 环比",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金中性等待；白银中性等待；日元明显压制。下一事件：08-31 08:29 CPI 环比。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和支持；白银温和支持；日元明显压制。下一事件：08-31 08:29 CPI 环比。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5358,11 +5358,11 @@
       "value": 3.3039
     },
     "GOLD_SILVER_RATIO": {
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
-      "value": 67.1482
+      "value": 67.2215
     },
     "M2_YOY": {
       "date": "2026-08-03",
@@ -5421,32 +5421,32 @@
       "value": -0.107
     },
     "XAG_15M": {
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.0
+      "value": -0.0512
     },
     "XAG_SESSION": {
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -4.3412
+      "value": -0.0241
     },
     "XAU_15M": {
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.0
+      "value": 0.0579
     },
     "XAU_SESSION": {
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -3.1652
+      "value": -0.0287
     },
     "YIELD_10Y2Y": {
       "date": "2026-08-27",
@@ -5561,9 +5561,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-08-30T20:03:42Z"
+    "updated_at": "2026-08-30T22:45:23Z"
   },
-  "generated_at": "2026-08-30T20:03:42Z",
+  "generated_at": "2026-08-30T22:45:23Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5617,10 +5617,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-08-30T20:03:45Z",
+    "a_share_checked_at": "2026-08-30T22:45:26Z",
     "ai_tokens_used": 0,
     "cached_count": 30,
-    "calendar_checked_at": "2026-08-30T20:03:42Z",
+    "calendar_checked_at": "2026-08-30T22:45:23Z",
     "cftc_checked_at": "2026-08-30T17:34:48Z",
     "cross_asset_checked_at": "2026-08-30T13:27:17Z",
     "error_count": 3,
@@ -5641,11 +5641,11 @@
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 0,
+    "fallback_count": 1,
     "inventory_checked_at": "2026-08-30T17:34:48Z",
     "macro_checked_at": "2026-08-30T17:34:48Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-08-30T20:15:00Z",
+    "next_scheduled_at": "2026-08-30T23:00:00Z",
     "run_interval_minutes": 15,
     "source_count": 35,
     "statuses": [
@@ -5780,12 +5780,12 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-28T20:45:00Z",
+        "date": "2026-08-30T22:45:00Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-08-28T20:45:00Z",
+        "date": "2026-08-30T22:45:00Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
@@ -5795,7 +5795,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-30T20:03:45Z",
+        "date": "2026-08-30T22:45:26Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -5810,12 +5810,12 @@
         "status": "cached"
       },
       {
-        "date": "2026-08-30T20:03:45Z",
+        "date": "2026-08-30T22:45:26Z",
         "source": "A股指数/板块资金流",
-        "status": "ok"
+        "status": "fallback"
       },
       {
-        "date": "2026-08-27",
+        "date": "2026-08-30",
         "source": "XAU/USD close morphology",
         "status": "ok"
       },
@@ -5826,38 +5826,38 @@
       }
     ],
     "success_count": 35,
-    "updated_count": 5
+    "updated_count": 4
   },
   "post_close_analysis": {
-    "as_of": "2026-08-27",
+    "as_of": "2026-08-30",
     "basis": "优先 Gate XAUUSD CFD 日线；接口不可用时使用公开 XAU/USD 或 COMEX GC=F 日线代理；成交量由源端提供时才展示",
     "daily_bar": {
-      "close": 4455.08,
-      "date": "2026-08-27",
-      "high": 4631.71,
-      "low": 4445.44,
-      "open": 4603.14,
+      "close": 4459.6,
+      "date": "2026-08-30",
+      "high": 4466.08,
+      "low": 4427.2,
+      "open": 4432.64,
       "volume": null
     },
     "data_quality": "使用公开 XAU/USD 日线；若源端尚未发布新完整收盘日线，则保留最近已验证日线。",
     "levels": {
       "deep_support": 4200,
-      "midpoint": 4538.57,
+      "midpoint": 4446.64,
       "prior_high": 4697,
-      "resistance_1": 4603.14,
-      "resistance_2": 4631.71,
-      "support_1": 4445.44,
-      "support_2": 4410.8
+      "resistance_1": 4432.64,
+      "resistance_2": 4466.08,
+      "support_1": 4427.2,
+      "support_2": 4431.01
     },
     "metrics": {
-      "body": 148.06,
-      "body_pct": 79.5,
-      "close_location_pct": 5.2,
-      "lower_wick": 9.64,
-      "previous_close": 4601.79,
-      "range": 186.27,
-      "sma20": 4410.8,
-      "upper_wick": 28.57
+      "body": 26.96,
+      "body_pct": 69.3,
+      "close_location_pct": 83.3,
+      "lower_wick": 5.44,
+      "previous_close": 4455.08,
+      "range": 38.88,
+      "sma20": 4431.01,
+      "upper_wick": 6.48
     },
     "oil": {
       "as_of": "2026-08-27",
@@ -5869,9 +5869,9 @@
       "wti_change": -0.107
     },
     "pattern": {
-      "bias": "短线转弱，等待支撑确认",
+      "bias": "短线偏强",
       "confirmation": "连续日收盘跌破支撑，或反弹重新站回开盘区后再定方向",
-      "label": "长实体阴线 / 近低位收盘"
+      "label": "长实体阳线"
     },
     "scenarios": [
       {
@@ -5902,9 +5902,9 @@
     "silver": {
       "label": "白银 XAG/USD",
       "note": "白银既受贵金属联动支持，也对实际利率和工业周期更敏感；跌破自身支撑时不与黄金强行合并。",
-      "session_change": -4.3412,
+      "session_change": -0.0241,
       "stance": "高波动，等待跟随确认",
-      "value": 66.347
+      "value": 66.313
     },
     "source": "Gate CFD XAUUSD daily OHLC",
     "source_url": [
@@ -11923,7 +11923,7 @@
     },
     "SPOT_XAGUSD": {
       "category": "贵金属",
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "history": [
         [
           "2026-08-27T19:45:00Z",
@@ -12312,26 +12312,42 @@
         [
           "2026-08-28T20:45:00Z",
           66.347
+        ],
+        [
+          "2026-08-30T22:00:00Z",
+          66.329
+        ],
+        [
+          "2026-08-30T22:15:00Z",
+          66.378
+        ],
+        [
+          "2026-08-30T22:30:00Z",
+          66.334
+        ],
+        [
+          "2026-08-30T22:45:00Z",
+          66.313
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-08-28T20:45:00Z",
+      "observed_at": "2026-08-30T22:45:00Z",
       "previous": 66.347,
-      "previous_date": "2026-08-28T20:30:00Z",
+      "previous_date": "2026-08-30T22:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAGUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 66.347,
+      "value": 66.313,
       "venue": "Gate TradFi CFD"
     },
     "SPOT_XAUUSD": {
       "category": "贵金属",
-      "date": "2026-08-28",
+      "date": "2026-08-30",
       "history": [
         [
           "2026-08-27T19:45:00Z",
@@ -12720,21 +12736,37 @@
         [
           "2026-08-28T20:45:00Z",
           4455.08
+        ],
+        [
+          "2026-08-30T22:00:00Z",
+          4458.94
+        ],
+        [
+          "2026-08-30T22:15:00Z",
+          4459.69
+        ],
+        [
+          "2026-08-30T22:30:00Z",
+          4457.83
+        ],
+        [
+          "2026-08-30T22:45:00Z",
+          4457.66
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-08-28T20:45:00Z",
+      "observed_at": "2026-08-30T22:45:00Z",
       "previous": 4455.08,
-      "previous_date": "2026-08-28T20:30:00Z",
+      "previous_date": "2026-08-30T22:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAUUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 4455.08,
+      "value": 4457.66,
       "venue": "Gate TradFi CFD"
     },
     "T10YIE": {
@@ -14976,5 +15008,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "197fcffec98ff372"
+  "snapshot_id": "56e4798225d721c5"
 }
