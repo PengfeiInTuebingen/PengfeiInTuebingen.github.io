@@ -4,6 +4,7 @@
   if (!mount) return;
 
   const rawEndpoint = "https://raw.githubusercontent.com/PengfeiInTuebingen/PengfeiInTuebingen.github.io/gh-pages/markets/data/latest.json";
+  const apiEndpoint = "https://api.github.com/repos/PengfeiInTuebingen/PengfeiInTuebingen.github.io/contents/markets/data/latest.json?ref=gh-pages";
   const relativeEndpoint = loaderScript?.dataset.dataUrl || "./data/latest.json";
   const production = location.hostname === "pengfeiintuebingen.github.io";
   let currentData = null;
@@ -574,7 +575,8 @@
     const bucket = force ? Date.now() : Math.floor(Date.now() / 300000);
     const cacheKey = `v=${bucket}`;
     const relative = `${relativeEndpoint}${relativeEndpoint.includes("?") ? "&" : "?"}${cacheKey}`;
-    return production ? [`${rawEndpoint}?${cacheKey}`, relative] : [relative, `${rawEndpoint}?${cacheKey}`];
+    const api = `${apiEndpoint}&${cacheKey}`;
+    return production ? [api, relative, `${rawEndpoint}?${cacheKey}`] : [relative, api, `${rawEndpoint}?${cacheKey}`];
   };
 
   const fetchFirst = async (urls) => {
@@ -583,7 +585,11 @@
       try {
         const response = await fetch(url, {cache: "no-store"});
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-        const data = await response.json();
+        let data = await response.json();
+        if (url.startsWith("https://api.github.com/") && data.content) {
+          const bytes = Uint8Array.from(atob(data.content.replace(/\s/g, "")), (char) => char.charCodeAt(0));
+          data = JSON.parse(new TextDecoder().decode(bytes));
+        }
         if (data.schema_version !== 1 || !data.series) throw new Error("invalid schema");
         return data;
       } catch (error) {
