@@ -558,6 +558,170 @@ def fetch_coinbase_spot_assets() -> tuple[dict[str, Any], list[str]]:
             errors.append(f"{symbol}: {str(error)[:180]}")
     return assets, errors
 
+
+def _gate_first_row(payload: Any) -> dict[str, Any]:
+    """Return the first object from a Gate public endpoint response."""
+    if isinstance(payload, list) and payload and isinstance(payload[0], dict):
+        return payload[0]
+    if isinstance(payload, dict):
+        return payload
+    return {}
+
+
+def _parse_gate_spot_candles(rows: Any) -> tuple[list[dict[str, Any]], list[list[Any]]]:
+    """Parse Gate spot candlesticks: [t, quote volume, close, high, low, open, base volume, ...]."""
+    ohlcv_history: list[dict[str, Any]] = []
+    volume_history: list[list[Any]] = []
+    if not isinstance(rows, list):
+        return ohlcv_history, volume_history
+    for row in rows:
+        if not isinstance(row, list) or len(row) < 7:
+            continue
+        timestamp = number(row[0])
+        if timestamp is None:
+            continue
+        stamp = _milliseconds_iso(timestamp * 1000 if timestamp < 10_000_000_000 else timestamp)
+        opened, high, low, close = (number(row[index]) for index in (5, 3, 4, 2))
+        quote_volume = number(row[1])
+        if not stamp or None in (opened, high, low, close):
+            continue
+        candle = {
+            "time": stamp, "open": opened, "high": high, "low": low,
+            "close": close, "volume_usd": round_value(quote_volume, 2) if quote_volume is not None else None,
+        }
+        ohlcv_history.append(candle)
+        if quote_volume is not None:
+            volume_history.append([stamp, round_value(quote_volume, 2)])
+    ohlcv_history.sort(key=lambda item: item["time"])
+    volume_history.sort(key=lambda item: item[0])
+    return ohlcv_history, volume_history
+
+
+def _parse_gate_open_interest(rows: Any) -> list[list[Any]]:
+    history: list[list[Any]] = []
+    if not isinstance(rows, list):
+        return history
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        timestamp = number(row.get("time"))
+        value = number(row.get("open_interest_usd"))
+        if timestamp is None or value is None:
+            continue
+        stamp = _milliseconds_iso(timestamp * 1000 if timestamp < 10_000_000_000 else timestamp)
+        if stamp:
+            history.append([stamp, round_value(value, 2)])
+    return sorted(history, key=lambda item: item[0])
+
+
+def fetch_gate_crypto_asset(symbol: str) -> dict[str, Any]:
+    """Fetch Gate spot price/volume and Gate USDT-M perpetual OI/funding."""
+    symbol = symbol.upper()
+    pair = f"{symbol}_USDT"
+    spot_ticker = _gate_first_row(request_json(f"{GATE_CFD_BASE}/spot/tickers?currency_pair={pair}"))
+    current = number(spot_ticker.get("last"))
+    if current is None:
+        raise ValueError(f"Gate {pair} spot ticker is incomplete")
+
+    short_rows = request_json(f"{GATE_CFD_BASE}/spot/candlesticks?{urllib.parse.urlencode({'currency_pair': pair, 'interval': '15m', 'limit': 97})}")
+    short_ohlcv, short_volume = _parse_gate_spot_candles(short_rows)
+    if len(short_ohlcv) < 2:
+        raise ValueError(f"Gate {pair} spot candles are too short")
+    try:
+        long_rows = request_json(f"{GATE_CFD_BASE}/spot/candlesticks?{urllib.parse.urlencode({'currency_pair': pair, 'interval': '6h', 'limit': 180})}")
+        long_ohlcv, long_volume = _parse_gate_spot_candles(long_rows)
+    except Exception:
+        long_ohlcv, long_volume = [], []
+
+    futures_ticker: dict[str, Any] = {}
+    try:
+        futures_ticker = _gate_first_row(request_json(f"{GATE_CFD_BASE}/futures/usdt/tickers?contract={pair}"))
+    except Exception:
+        pass
+    stats_rows: Any = []
+    oi_history: list[list[Any]] = []
+    try:
+        stats_rows = request_json(f"{GATE_CFD_BASE}/futures/usdt/contract_stats?{urllib.parse.urlencode({'contract': pair, 'interval': '4h', 'limit': 200})}")
+        oi_history = _parse_gate_open_interest(stats_rows)
+    except Exception:
+        pass
+    # Gate's futures ticker ``total_size`` is contract units, not USD. Only
+    # use the explicit USD field from contract_stats so the UI never labels
+    # a contract count as dollar open interest.
+    oi_latest = oi_history[-1][1] if oi_history else None
+    oi_change = None
+    if oi_history and oi_latest:
+        latest_time = parse_timestamp(oi_history[-1][0])
+        baseline = next(
+            (row for row in reversed(oi_history[:-1])
+             if latest_time and parse_timestamp(row[0])
+             and latest_time - parse_timestamp(row[0]) >= timedelta(hours=20)),
+            oi_history[0],
+        )
+        baseline_value = number(baseline[1])
+        if baseline_value not in (None, 0):
+            oi_change = (oi_latest / baseline_value - 1) * 100
+    funding = number(futures_ticker.get("funding_rate"))
+    if funding is None and isinstance(stats_rows, list) and stats_rows and isinstance(stats_rows[-1], dict):
+        funding = number(stats_rows[-1].get("last_funding_rate"))
+    quote_volume = number(spot_ticker.get("quote_volume"))
+    base_volume = number(spot_ticker.get("base_volume"))
+    if quote_volume is None and base_volume is not None:
+        quote_volume = base_volume * current
+    change = number(spot_ticker.get("change_percentage"))
+    return {
+        "symbol": symbol, "product": pair,
+        "label": f"{symbol} Gate 现货 / 永续",
+        "provider": "Gate public spot + USDT-M futures API",
+        "scope": "Gate 单一交易所现货 + 永续",
+        "aggregated": False,
+        "price_usd": round_value(current, 6),
+        "price_change_24h_pct": round_value(change, 4),
+        "volume_24h_usd": round_value(quote_volume, 2),
+        "day_low": number(spot_ticker.get("low_24h")), "day_high": number(spot_ticker.get("high_24h")),
+        "open_interest_usd": round_value(oi_latest, 2),
+        "open_interest_change_24h_pct": round_value(oi_change, 4),
+        "funding_rate": round_value(funding, 8),
+        "funding_rate_pct": round_value(funding * 100 if funding is not None else None, 5),
+        "observed_at": short_ohlcv[-1]["time"],
+        "oi_history": oi_history[-97:], "oi_history_long": oi_history,
+        "volume_history": short_volume[-97:], "volume_history_long": long_volume[-180:] or short_volume[-180:],
+        "ohlcv_history": short_ohlcv[-97:], "ohlcv_history_long": long_ohlcv[-180:] or short_ohlcv[-97:],
+        "source": "Gate spot + Gate USDT-M futures public API",
+        "source_url": "https://www.gate.com/docs/developers/apiv4/en/futures/",
+        "note": "Gate 单一交易所现货与永续口径；持仓量和资金费率不等于全市场聚合，适合观察方向与变化。",
+    }
+
+
+def fetch_gate_positioning() -> dict[str, Any]:
+    assets: dict[str, Any] = {}
+    errors: list[str] = []
+    for symbol in ("BTC", "ETH"):
+        try:
+            assets[symbol] = fetch_gate_crypto_asset(symbol)
+        except Exception as error:
+            errors.append(f"{symbol}: {str(error)[:180]}")
+    if not assets:
+        raise RuntimeError("Gate public crypto feeds unavailable: " + "; ".join(errors))
+    spot_fields = {
+        "symbol", "product", "label", "provider", "price_usd", "price_change_24h_pct",
+        "volume_24h_usd", "day_low", "day_high", "observed_at", "ohlcv_history",
+        "ohlcv_history_long", "volume_history", "volume_history_long", "source", "source_url", "note",
+    }
+    spot_assets = {symbol: {key: value for key, value in asset.items() if key in spot_fields} for symbol, asset in assets.items()}
+    return {
+        "checked_at": utc_now(),
+        "provider": "Gate public spot + USDT-M futures API",
+        "scope": "Gate 单一交易所现货 + 永续",
+        "aggregated": False,
+        "assets": assets,
+        "spot_assets": spot_assets,
+        "spot_provider": "Gate public spot API",
+        "exchange_totals": {}, "etf": {},
+        "activation_note": "BTC/ETH 价格与成交量优先使用 Gate 现货；持仓量与资金费率优先使用 Gate USDT-M 永续。Gate 是单一交易所口径，不等于全市场聚合。",
+        "errors": errors,
+    }
+
 def fetch_binance_positioning() -> dict[str, Any]:
     assets = {}
     errors = []
@@ -724,16 +888,26 @@ def fetch_coinglass_positioning(api_key: str) -> dict[str, Any]:
 
 
 def fetch_crypto_positioning() -> dict[str, Any]:
+    """Use Gate as the primary public crypto market source, with explicit fallbacks."""
+    gate_error: Exception | None = None
+    try:
+        return fetch_gate_positioning()
+    except Exception as error:
+        gate_error = error
+
     api_key = os.environ.get("COINGLASS_API_KEY", "").strip()
     if api_key:
         try:
-            return fetch_coinglass_positioning(api_key)
-        except Exception as error:
-            fallback = fetch_binance_positioning()
-            fallback["activation_note"] = f"CoinGlass API 暂时失败，已降级为 Binance 单交易所代理；错误：{str(error)[:180]}"
-            fallback["coinglass_error"] = str(error)[:240]
+            fallback = fetch_coinglass_positioning(api_key)
+            fallback["activation_note"] = f"Gate 公共接口暂时失败，已降级为 CoinGlass 聚合 + Coinbase 现货；错误：{str(gate_error)[:180]}"
+            fallback["gate_error"] = str(gate_error)[:240]
             return fallback
-    return fetch_binance_positioning()
+        except Exception:
+            pass
+    fallback = fetch_binance_positioning()
+    fallback["activation_note"] = f"Gate 公共接口暂时失败，已降级为 Binance 永续 + Coinbase 现货；错误：{str(gate_error)[:180]}"
+    fallback["gate_error"] = str(gate_error)[:240]
+    return fallback
 
 
 def eastmoney_get(path: str, params: dict[str, Any], *, historical: bool = False) -> dict[str, Any]:
@@ -1179,28 +1353,68 @@ def append_intraday_history(previous: dict[str, Any] | None, observed_at: str, v
     return recent[-700:]
 
 
+
+
+def _fetch_gate_cfd_intraday_bars(symbol: str, kline_type: str = "15m", limit: int = 97) -> list[dict[str, Any]]:
+    """Fetch recent Gate TradFi CFD candles for a live dashboard window."""
+    symbol = symbol.upper()
+    if symbol not in {"XAUUSD", "XAGUSD", "XTIUSD", "XBRUSD"}:
+        raise ValueError(f"unsupported Gate CFD symbol {symbol}")
+    query = urllib.parse.urlencode({"kline_type": kline_type, "limit": limit})
+    payload = request_json(f"{GATE_CFD_BASE}/tradfi/symbols/{symbol}/klines?{query}")
+    data = payload.get("data") if isinstance(payload, dict) else payload
+    raw_rows = data.get("list") if isinstance(data, dict) else data
+    rows: list[dict[str, Any]] = []
+    for item in raw_rows or []:
+        if not isinstance(item, dict):
+            continue
+        timestamp = number(item.get("t"))
+        opened, high, low, close = (number(item.get(key)) for key in ("o", "h", "l", "c"))
+        if timestamp is None or None in (opened, high, low, close):
+            continue
+        stamp = _milliseconds_iso(timestamp * 1000 if timestamp < 10_000_000_000 else timestamp)
+        if stamp:
+            rows.append({"time": stamp, "open": opened, "high": high, "low": low, "close": close})
+    rows.sort(key=lambda item: item["time"])
+    if len(rows) < 2:
+        raise ValueError(f"Gate {symbol} {kline_type} candles are too short")
+    return rows
+
+
 def fetch_metal_spot(symbol: str, previous: dict[str, Any] | None) -> dict[str, Any]:
     symbol = symbol.upper()
     if symbol not in {"XAU", "XAG"}:
         raise ValueError(f"unsupported metal symbol {symbol}")
-    source = "Gold-API.com"
-    source_url = f"https://gold-api.com/{symbol.lower()}"
-    quote_basis = "公开聚合现货指示中间价（非可成交报价）"
+    gate_symbol = f"{symbol}USD"
+    source = "Gate CFD public API"
+    source_url = f"{GATE_CFD_BASE}/tradfi/symbols/{gate_symbol}/klines?kline_type=15m&limit=97"
+    quote_basis = "Gate TradFi CFD 15分钟参考价（非可成交现货报价）"
     stale = False
+    gate_bars: list[dict[str, Any]] = []
     try:
-        raw = request_json(f"{GOLD_API_URL}/{symbol}")
-        price = number(raw.get("price"))
-        observed_at = raw.get("updatedAt")
-    except Exception as primary_error:
-        fallback = request_json(XAUS_FALLBACK_URL)
-        price = number(fallback.get("spot_usd_oz") if symbol == "XAU" else fallback.get("silver_usd_oz"))
-        observed_at = fallback.get("price_as_of") or fallback.get("updated_at")
-        stale = bool(fallback.get("stale"))
-        source = "XAUS.com fallback"
-        source_url = "https://xaus.com/api/"
+        gate_bars = _fetch_gate_cfd_intraday_bars(gate_symbol)
+        latest = gate_bars[-1]
+        price = latest["close"]
+        observed_at = latest["time"]
+    except Exception as gate_error:
+        # Preserve a public fallback if Gate's CFD edge is temporarily closed.
+        source = "Gold-API.com fallback"
+        source_url = f"https://gold-api.com/{symbol.lower()}"
         quote_basis = "公开聚合现货指示中间价（回退源，非可成交报价）"
-        if price is None:
-            raise RuntimeError(f"{symbol} primary failed ({primary_error}); fallback returned no price")
+        try:
+            raw = request_json(f"{GOLD_API_URL}/{symbol}")
+            price = number(raw.get("price"))
+            observed_at = raw.get("updatedAt")
+        except Exception as primary_error:
+            fallback = request_json(XAUS_FALLBACK_URL)
+            price = number(fallback.get("spot_usd_oz") if symbol == "XAU" else fallback.get("silver_usd_oz"))
+            observed_at = fallback.get("price_as_of") or fallback.get("updated_at")
+            stale = bool(fallback.get("stale"))
+            source = "XAUS.com fallback"
+            source_url = "https://xaus.com/api/"
+            quote_basis = "公开聚合现货指示中间价（回退源，非可成交报价）"
+            if price is None:
+                raise RuntimeError(f"{symbol} Gate failed ({gate_error}); fallback failed ({primary_error})")
     if price is None or observed_at is None:
         raise ValueError(f"{symbol}: missing price or observation timestamp")
     lower, upper = (100.0, 50_000.0) if symbol == "XAU" else (1.0, 1_000.0)
@@ -1211,28 +1425,25 @@ def fetch_metal_spot(symbol: str, previous: dict[str, Any] | None) -> dict[str, 
         raise ValueError(f"{symbol}: invalid observation timestamp {observed_at}")
     observed_at = observed.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     previous_value = number((previous or {}).get("value"))
-    if previous_value is None:
-        previous_value = price
-    history = append_intraday_history(previous, observed_at, price)
+    if previous_value is None or (previous and str(previous.get("source", "")).startswith("Gate") is False):
+        previous_value = gate_bars[-2]["close"] if len(gate_bars) > 1 else price
+    if gate_bars:
+        base_history = previous if previous and str(previous.get("source", "")).startswith("Gate") else {"history": []}
+        history = list(base_history.get("history", []))
+        for bar in gate_bars:
+            history = append_intraday_history({"history": history}, bar["time"], bar["close"])
+    else:
+        history = append_intraday_history(previous, observed_at, price)
     label = "黄金现货 XAU/USD" if symbol == "XAU" else "白银现货 XAG/USD"
+    previous_stamp = gate_bars[-2]["time"] if len(gate_bars) > 1 else ((previous or {}).get("observed_at") or observed_at)
     return {
-        "id": f"SPOT_{symbol}USD",
-        "label": label,
-        "value": round_value(price, 6),
-        "previous": round_value(previous_value, 6),
-        "date": observed_at[:10],
-        "previous_date": (previous or {}).get("observed_at") or observed_at,
-        "observed_at": observed_at,
-        "unit": "USD/金衡盎司",
-        "category": "贵金属",
-        "instrument": f"{symbol}/USD spot",
-        "venue": "OTC composite",
-        "quote_basis": quote_basis,
-        "tradable": False,
-        "stale": stale,
-        "source": source,
-        "source_url": source_url,
-        "history": history,
+        "id": f"SPOT_{symbol}USD", "label": label,
+        "value": round_value(price, 6), "previous": round_value(previous_value, 6),
+        "date": observed_at[:10], "previous_date": previous_stamp,
+        "observed_at": observed_at, "unit": "USD/金衡盎司", "category": "贵金属",
+        "instrument": f"{symbol}/USD spot", "venue": "Gate TradFi CFD",
+        "quote_basis": quote_basis, "tradable": False, "stale": stale,
+        "source": source, "source_url": source_url, "history": history,
     }
 
 
@@ -1340,15 +1551,14 @@ def _fetch_yahoo_silver_daily_bars() -> list[dict[str, Any]]:
 
 
 def _fetch_gate_cfd_daily_bars(symbol: str) -> list[dict[str, Any]]:
-    """Fetch public Gate TradFi CFD daily OHLC for XAUUSD/XAGUSD.
+    """Fetch public Gate TradFi CFD daily OHLC for metals and crude oil.
 
     Gate labels these instruments as CFD symbols rather than exchange-traded
-    futures.  We use the daily OHLC only for the long-window chart and cross-
-    asset statistics; the live 15-minute quote remains the existing OTC spot
-    feed, so the two roles are not mixed.
+    futures. We use the daily OHLC for long-window charts and cross-asset
+    statistics; the series is a CFD reference price, not an executable quote.
     """
     symbol = symbol.upper()
-    if symbol not in {"XAUUSD", "XAGUSD"}:
+    if symbol not in {"XAUUSD", "XAGUSD", "XTIUSD", "XBRUSD"}:
         raise ValueError(f"unsupported Gate CFD symbol {symbol}")
     query = urllib.parse.urlencode({"kline_type": "1d", "limit": 120})
     payload = request_json(f"{GATE_CFD_BASE}/tradfi/symbols/{symbol}/klines?{query}")
@@ -1377,6 +1587,30 @@ def _fetch_gate_cfd_daily_bars(symbol: str) -> list[dict[str, Any]]:
 
 def _fetch_gate_gold_daily_bars() -> list[dict[str, Any]]:
     return _fetch_gate_cfd_daily_bars("XAUUSD")
+
+
+def _gate_cfd_series(symbol: str, series_id: str, label: str, unit: str = "美元/桶") -> dict[str, Any]:
+    bars = _fetch_gate_cfd_daily_bars(symbol)
+    latest = bars[-1]
+    previous = bars[-2] if len(bars) > 1 else None
+    close = number(latest.get("close"))
+    previous_close = number(previous.get("close")) if previous else None
+    change = (close / previous_close - 1) * 100 if close is not None and previous_close not in (None, 0) else None
+    return {
+        "id": series_id,
+        "label": label,
+        "value": round_value(close, 6),
+        "previous": round_value(previous_close, 6),
+        "change": round_value(change, 4),
+        "unit": unit,
+        "category": "能源" if series_id.startswith("DCOIL") else "资产",
+        "date": latest.get("date"),
+        "observed_at": f"{latest.get('date')}T23:59:00Z" if latest.get("date") else None,
+        "history": [[item["date"], item["close"]] for item in bars if number(item.get("close")) is not None],
+        "source": f"Gate CFD {symbol} daily OHLC",
+        "source_url": f"{GATE_CFD_BASE}/tradfi/symbols/{symbol}/klines?kline_type=1d&limit=120",
+        "note": "Gate TradFi CFD 参考价；不是交易所可成交的现货或期货报价。",
+    }
 
 
 def _fetch_gold_daily_bars_with_source() -> tuple[list[dict[str, Any]], str]:
@@ -1508,12 +1742,15 @@ def build_post_close_analysis(
     analysis = json.loads(json.dumps(previous, ensure_ascii=False)) if previous else _post_close_seed()
     analysis["update_status"] = "cached"
     bars: list[dict[str, Any]] = []
+    daily_source = "公开 XAU/USD 日线"
     try:
-        bars = fetch_gold_daily_bars()
+        bars, daily_source = _fetch_gold_daily_bars_with_source()
     except Exception:
         bars = []
     previous_date = str(analysis.get("as_of") or "")
-    if bars and bars[-1]["date"] >= previous_date:
+    # Gate is the requested primary source; its latest completed CFD bar may
+    # be one session behind a cached third-party snapshot after a weekend.
+    if bars and (bars[-1]["date"] >= previous_date or daily_source.startswith("Gate CFD")):
         bar = bars[-1]
         bar_range = max(0.0, bar["high"] - bar["low"])
         body = abs(bar["close"] - bar["open"])
@@ -1547,9 +1784,9 @@ def build_post_close_analysis(
         analysis.update({
             "as_of": bar["date"],
             "update_status": "ok",
-            "source": "goldprice.dev spot / Yahoo Finance GC=F proxy",
-            "source_url": [GOLD_DAILY_BARS_URL, YAHOO_GOLD_CHART_URL, "https://www.fxempire.com/commodities"],
-            "basis": "优先 XAU/USD spot 日线；接口不可用时使用 COMEX GC=F 日线代理；成交量由源端提供时才展示",
+            "source": daily_source,
+            "source_url": [f"{GATE_CFD_BASE}/tradfi/symbols/XAUUSD/klines?kline_type=1d&limit=120", GOLD_DAILY_BARS_URL, YAHOO_GOLD_CHART_URL],
+            "basis": "优先 Gate XAUUSD CFD 日线；接口不可用时使用公开 XAU/USD 或 COMEX GC=F 日线代理；成交量由源端提供时才展示",
             "daily_bar": bar,
             "metrics": {
                 "body": round(body, 2), "range": round(bar_range, 2),
@@ -1997,8 +2234,8 @@ def build_derived(series: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]
         "CORE_PCE_YOY": derived_metric("美国核心 PCE 同比", yoy(series.get("PCEPILFE")), "%", latest_date("PCEPILFE"), "FRED"),
         "SP500_DAILY": derived_metric("标普 500 日变动", percent_change(series.get("SP500")), "%", latest_date("SP500"), "FRED"),
         "NASDAQ_DAILY": derived_metric("纳斯达克日变动", percent_change(series.get("NASDAQCOM")), "%", latest_date("NASDAQCOM"), "FRED"),
-        "BRENT_DAILY": derived_metric("Brent 原油日变动", percent_change(series.get("DCOILBRENTEU")), "%", latest_date("DCOILBRENTEU"), "FRED"),
-        "WTI_DAILY": derived_metric("WTI 原油日变动", percent_change(series.get("DCOILWTICO")), "%", latest_date("DCOILWTICO"), "FRED"),
+        "BRENT_DAILY": derived_metric("Brent 原油日变动", percent_change(series.get("DCOILBRENTEU")), "%", latest_date("DCOILBRENTEU"), series.get("DCOILBRENTEU", {}).get("source", "Gate CFD/FRED")),
+        "WTI_DAILY": derived_metric("WTI 原油日变动", percent_change(series.get("DCOILWTICO")), "%", latest_date("DCOILWTICO"), series.get("DCOILWTICO", {}).get("source", "Gate CFD/FRED")),
         "USDJPY_DAILY": derived_metric("USD/JPY 日变动", percent_change(series.get("FX_USDJPY")), "%", latest_date("FX_USDJPY"), "ECB"),
         "XAU_15M": derived_metric("黄金较上次快照", percent_change(series.get("SPOT_XAUUSD")), "%", latest_date("SPOT_XAUUSD"), "Gold-API"),
         "XAG_15M": derived_metric("白银较上次快照", percent_change(series.get("SPOT_XAGUSD")), "%", latest_date("SPOT_XAGUSD"), "Gold-API"),
@@ -2251,8 +2488,12 @@ def main() -> int:
     statuses: list[dict[str, Any]] = []
     run_at = utc_now()
 
+    gate_oil_ids = ("DCOILBRENTEU", "DCOILWTICO")
     macro_due = cadence_due(previous_pipeline.get("macro_checked_at"), MACRO_REFRESH_HOURS) or any(
         series_id not in previous_series for series_id in (*FRED_SERIES.keys(), "FX_USDJPY")
+    ) or any(
+        not str(previous_series.get(series_id, {}).get("source", "")).startswith("Gate CFD")
+        for series_id in gate_oil_ids
     )
     if macro_due:
         macro_checked_at = run_at
@@ -2265,6 +2506,15 @@ def main() -> int:
                     series[series_id] = previous_series[series_id]
                 errors.append({"source": "FRED", "series": series_id, "error": str(error)[:240]})
                 statuses.append({"source": f"FRED {series_id}", "status": "fallback" if series_id in series else "failed"})
+        for series_id, symbol, label in (("DCOILBRENTEU", "XBRUSD", "Brent 原油"), ("DCOILWTICO", "XTIUSD", "WTI 原油")):
+            try:
+                series[series_id] = _gate_cfd_series(symbol, series_id, label)
+                statuses.append({"source": f"Gate CFD {symbol}", "status": "ok", "date": series[series_id].get("date")})
+            except Exception as error:
+                # Keep the FRED observation above as an explicit fallback when
+                # Gate's CFD market is closed or its public edge is unavailable.
+                errors.append({"source": "Gate CFD", "series": series_id, "error": str(error)[:240]})
+                statuses.append({"source": f"Gate CFD {symbol}", "status": "fallback" if series_id in series else "failed", "date": series.get(series_id, {}).get("date")})
         try:
             series["FX_USDJPY"] = fetch_ecb_usdjpy()
             statuses.append({"source": "ECB FX", "status": "ok", "date": series["FX_USDJPY"]["date"]})
@@ -2378,7 +2628,7 @@ def main() -> int:
     previous_crypto = previous_flow.get("crypto", {})
     try:
         crypto = fetch_crypto_positioning()
-        crypto_status = "ok" if crypto.get("aggregated") else "fallback"
+        crypto_status = "ok" if crypto.get("aggregated") or str(crypto.get("provider", "")).startswith("Gate") else "fallback"
         statuses.append({"source": "Crypto OI / volume / funding", "status": crypto_status, "date": crypto.get("checked_at")})
         crypto_checked_at = run_at
     except Exception as error:

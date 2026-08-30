@@ -781,7 +781,7 @@
       <div class="container">
         <div class="source-panel">
           <h3>数据口径与来源</h3>
-          <p>基础技术图表保留 2026-08-25 的研究快照；动态中枢每 15 分钟检查金银与 Binance 公共合约 OI/成交量/资金费率，CME 金银库存按 6 小时重试，FRED、ECB、CFTC 与财经日历按自身发布频率缓存。CoinGlass 需通过 GitHub Secret 启用；现货参考价不是券商可成交报价，单交易所代理也不等于全市场聚合。</p>
+          <p>基础技术图表保留 2026-08-25 的研究快照；动态中枢每 15 分钟检查 Gate 现货/永续与贵金属 CFD，CME 金银库存按 6 小时重试，FRED、ECB、CFTC 与财经日历按自身发布频率缓存。Gate 单一交易所数据不等于全市场聚合；CFD 与现货参考价也不是券商可成交报价。</p>
           <div class="source-links">
             <a href="https://www.bea.gov/news/schedule/full" target="_blank" rel="noreferrer">BEA 发布日程</a>
             <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm" target="_blank" rel="noreferrer">Fed 7月声明</a>
@@ -791,8 +791,8 @@
             <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noreferrer">CFTC COT</a>
             <a href="https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html" target="_blank" rel="noreferrer">CME 仓单/库存</a>
             <a href="https://docs.coinglass.com/reference/getting-started-with-your-api" target="_blank" rel="noreferrer">CoinGlass API 文档</a>
-            <a href="https://github.com/gate/gateapi-python/blob/master/docs/CFDApi.md" target="_blank" rel="noreferrer">Gate CFD 日线 API</a>
-            <a href="https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api" target="_blank" rel="noreferrer">Binance 合约 API</a>
+            <a href="https://github.com/gate/gateapi-python/blob/master/docs/CFDApi.md" target="_blank" rel="noreferrer">Gate CFD API</a>
+            <a href="https://www.gate.com/docs/developers/apiv4/en/futures/" target="_blank" rel="noreferrer">Gate 现货/合约 API</a>
             <a href="https://finance.yahoo.com/markets/commodities/articles/gold-pulls-back-three-month-093355050.html" target="_blank" rel="noreferrer">现货公开快照</a>
           </div>
         </div>
@@ -808,7 +808,7 @@
   </footer>
 
   <script src="./assets/decision-pyramid.js"></script>
-  <script src="./assets/dynamic-market.js?v=20260830-gate-cfd-long-window-4" data-data-url="./data/latest.json"></script>
+  <script src="./assets/dynamic-market.js?v=20260830-gate-all-markets-5" data-data-url="./data/latest.json"></script>
   <script>
     const root = document.documentElement;
     const themeButton = document.getElementById("themeToggle");

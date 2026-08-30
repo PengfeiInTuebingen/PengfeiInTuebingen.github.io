@@ -107,9 +107,10 @@
       if (!source) continue;
       const ohlcv = spot?.ohlcv_history?.length >= 2 ? spot.ohlcv_history : (futures?.ohlcv_history || []);
       const ohlcvLong = spot?.ohlcv_history_long?.length >= 2 ? spot.ohlcv_history_long : (futures?.ohlcv_history_long || []);
+      const gateSource = String(source.provider || source.source || "").startsWith("Gate");
       const longSource = spot?.ohlcv_history_long?.length >= 2
-        ? "Coinbase 6小时K线"
-        : (futures?.ohlcv_history_long?.length >= 2 ? "Binance 1小时K线" : null);
+        ? (gateSource ? "Gate 6小时K线" : "Coinbase 6小时K线")
+        : (futures?.ohlcv_history_long?.length >= 2 ? (gateSource ? "Gate 6小时K线" : "Binance 1小时K线") : null);
       const oi = futures?.oi_history || [];
       const oiLong = futures?.oi_history_long?.length >= 2 ? futures.oi_history_long : oi;
       const volume = spot?.volume_history?.length ? spot.volume_history : (futures?.volume_history || []);
@@ -118,8 +119,8 @@
       instruments.push({
         id: `crypto-${symbol}`,
         label: symbol,
-        subtitle: spot ? "Coinbase 现货" : "Binance 永续",
-        source: spot ? "Coinbase" : (futures.aggregated ? "CoinGlass OI · Binance价格" : "Binance"),
+        subtitle: gateSource ? "Gate 现货 / 永续" : (spot ? "Coinbase 现货" : "Binance 永续"),
+        source: source.source || (gateSource ? "Gate" : (spot ? "Coinbase" : (futures.aggregated ? "CoinGlass OI · Binance价格" : "Binance"))),
         color: symbol === "BTC" ? "#0f8b78" : "#6274c5",
         unit: "USD",
         value: spot?.price_usd ?? futures?.price_usd,
@@ -239,7 +240,7 @@
       <div class="dm-trend-toolbar"><div class="dm-trend-asset-list">${assets}</div><div class="dm-trend-control-group" aria-label="指标切换">${metricButtons(initial, "price")}</div><div class="dm-trend-control-group" aria-label="时间周期">${periods}</div></div>
       <div class="dm-interactive-head"><div><strong id="dmTrendTitle">${escapeHtml(initial.label)} · ${escapeHtml(initial.subtitle)}</strong><span id="dmTrendMeta">${escapeHtml(initial.source)} · 价格</span><small id="dmTrendWindow">1日 · ${trendRows(initial, "price", "1D").length} 个观测</small></div><b id="dmTrendValue">${finite(initial.value) ? `$${formatCompact(initial.value, initial.unit === "USD" ? 2 : 2)}` : "待更新"}</b></div>
       <div class="dm-interactive-chart">${trendChart(initial, "price", "1D")}</div>
-      <p class="dm-flow-note">CoinGlass 聚合权限启用时，持仓量/成交量使用多交易所聚合；否则显示 Binance 永续代理。金银 1日为公开现货快照，1周/1月使用 Gate CFD 日线 OHLC（CFD 代理，不等于交易所可成交报价）。</p>
+      <p class="dm-flow-note">BTC/ETH 行情优先使用 Gate 现货与 Gate USDT-M 永续公共接口；持仓量/资金费率为单一交易所口径。若 Gate 暂时不可用，标题会标注回退源。黄金、白银、Brent、WTI 的 1周/1月使用 Gate CFD 日线 OHLC（CFD 参考价，不等于交易所可成交报价）。</p>
     </section>`;
   };
 
@@ -386,8 +387,9 @@
     const oiChange = item.open_interest_change_24h_pct;
     const funding = item.funding_rate_pct;
     const priceChange = item.price_change_24h_pct;
+    const sourceBadge = String(item.provider || item.source || "").startsWith("Gate") ? "Gate" : (aggregate ? "CoinGlass" : "Binance");
     return `<article class="dm-flow-card dm-crypto-card">
-      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${escapeHtml(key)} perpetual</span><h4>${escapeHtml(item.label || `${key} 永续合约`)}</h4></div><span class="dm-source">${aggregate ? "CoinGlass" : "Binance"}</span></div>
+      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${escapeHtml(key)} perpetual</span><h4>${escapeHtml(item.label || `${key} 永续合约`)}</h4></div><span class="dm-source">${sourceBadge}</span></div>
       <div class="dm-flow-stats">
         <div><span>持仓量 OI</span><strong>${formatUsd(item.open_interest_usd)}</strong><small class="${Number(oiChange) >= 0 ? "positive" : "negative"}">24h ${signed(oiChange, 2, "%")}</small></div>
         <div><span>成交量 24h</span><strong>${formatUsd(item.volume_24h_usd)}</strong><small>USDT 合约</small></div>
@@ -404,9 +406,9 @@
     const price = finite(item.price_usd) ? `$${formatCompact(item.price_usd, 2)}` : "待更新";
     const changeClass = Number(item.price_change_24h_pct) >= 0 ? "positive" : "negative";
     return `<article class="dm-flow-card dm-spot-card">
-      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">Coinbase spot · 7×24</span><h4>${escapeHtml(item.label || `${key} Coinbase 现货`)}</h4></div><span class="dm-source">Coinbase</span></div>
+      <div class="dm-flow-card-head"><div><span class="dm-flow-kicker">${String(item.provider || item.source || "").startsWith("Gate") ? "Gate spot · 7×24" : "Coinbase spot · 7×24"}</span><h4>${escapeHtml(item.label || `${key} 现货`)}</h4></div><span class="dm-source">${escapeHtml(String(item.provider || item.source || "Gate").startsWith("Gate") ? "Gate" : "Coinbase")}</span></div>
       <div class="dm-flow-stats"><div><span>现货价格</span><strong>${price}</strong><small class="${changeClass}">24h ${signed(item.price_change_24h_pct, 2, "%")}</small></div><div><span>24h 成交额估算</span><strong>${formatUsd(item.volume_24h_usd)}</strong><small>USD 现货</small></div><div><span>24h 区间</span><strong>${range}</strong><small>低 – 高</small></div><div><span>最新观测</span><strong>${formatGenerated(item.observed_at)}</strong><small>柏林时间换算</small></div></div>
-      <p class="dm-flow-note">${escapeHtml(item.note || "Coinbase 现货市场 7×24 更新；不包含永续持仓量。")}</p>
+      <p class="dm-flow-note">${escapeHtml(item.note || "Gate 现货市场 7×24 更新；不包含全市场聚合持仓量。")}</p>
     </article>`;
   };
 
@@ -592,7 +594,7 @@
     const extras = (finite(exchange.open_interest_usd) || finite(exchange.volume_24h_usd) || finite(exchange.liquidation_24h_usd) || finite(etf.aum_usd))
       ? `<div class="dm-flow-summary"><span>CoinGlass 市场合计（若已启用）</span><strong>OI ${formatUsd(exchange.open_interest_usd)} · 成交 ${formatUsd(exchange.volume_24h_usd)} · 清算 ${formatUsd(exchange.liquidation_24h_usd)}</strong><small>BTC ETF AUM ${formatUsd(etf.aum_usd)} · 持仓 ${finite(etf.btc_holdings) ? formatCompact(etf.btc_holdings, 0) + " BTC" : "待更新"}</small></div>`
       : "";
-    const sourceNote = crypto.aggregated ? "CoinGlass 聚合永续 OI/资金费率已启用；Coinbase 现货价格/K线独立按 7×24 更新。" : "当前为 Binance USDⓈ-M 单交易所永续代理 + Coinbase 7×24 现货；配置 COINGLASS_API_KEY 后自动切换多交易所聚合。";
+    const sourceNote = crypto.activation_note || (crypto.aggregated ? "CoinGlass 聚合永续 OI/资金费率已启用；现货价格/K线独立按 7×24 更新。" : "当前为 Gate 或 Binance 单交易所永续代理；配置 COINGLASS_API_KEY 后可切换多交易所聚合。" );
     return `<section class="dm-flow" id="dynamic-flow">
       <div class="dm-subhead"><div><span>Cross-asset confirmation · positioning</span><h3>跨资产关系与资金确认</h3></div><time>更新于 ${formatGenerated(flow.updated_at || crypto.checked_at || data.generated_at)}</time></div>
       ${renderCrossAssetCorrelation(data)}
@@ -688,7 +690,7 @@
         <div class="dm-status-stat"><span>AI token</span><strong>${pipeline.ai_tokens_used || 0}</strong></div>
         <button class="dm-refresh" id="dmRefresh" type="button">重新读取</button>
       </div>
-      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>金银 1日公开现货 API、1周/1月 Gate CFD 日线；BTC/ETH 现货 Coinbase 7×24；永续 OI/资金费率 Binance 或 CoinGlass；宏观 FRED/ECB；库存 CME。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
+      ${errorNote}${renderTopBriefing(data)}<p class="dm-source-line"><strong>动态来源：</strong>BTC/ETH 现货与永续优先使用 Gate 公共接口；黄金、白银、Brent、WTI 长周期优先使用 Gate CFD 日线；宏观仍使用 FRED/ECB，CFTC 与库存使用官方源。页面不读取 IBKR 实时行情，所有结论均显示各自观测日期。</p><div class="dm-grid">${cardMarkup}</div>
       ${renderDailyTrends(data)}
       ${renderCloseAnalysis(data)}
       ${renderFlowPositioning(data)}
