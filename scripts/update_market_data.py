@@ -40,6 +40,7 @@ FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 ECB_URL = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
 CFTC_DISAGG_URL = "https://www.cftc.gov/dea/newcot/c_disagg.txt"
 CFTC_TFF_URL = "https://www.cftc.gov/dea/newcot/FinComWk.txt"
+CFTC_SOURCE_API_URL = "https://publicreporting.cftc.gov/resource/72hh-3qpy.json"
 GOLD_API_URL = "https://api.gold-api.com/price"
 XAUS_FALLBACK_URL = "https://xaus.com/api/v1/spot?compact=1"
 GOLD_DAILY_BARS_URL = "https://api.goldprice.dev/v1/bars"
@@ -55,6 +56,7 @@ CME_WAREHOUSE_URLS = {
 }
 COINGLASS_API_BASE = "https://open-api-v4.coinglass.com/api"
 BINANCE_FUTURES_BASE = "https://fapi.binance.com"
+COINBASE_EXCHANGE_BASE = "https://api.exchange.coinbase.com"
 EASTMONEY_QUOTE_BASES = (
     "https://push2.eastmoney.com/webguest/api/qt",
     "https://82.push2.eastmoney.com/webguest/api/qt",
@@ -418,6 +420,65 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     }
 
 
+
+def fetch_coinbase_spot_asset(symbol: str) -> dict[str, Any]:
+    """Fetch 24/7 Coinbase spot statistics and Berlin-day 15-minute candles."""
+    product = f"{symbol}-USD"
+    stats = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/stats")
+    current = number(stats.get("last"))
+    opened = number(stats.get("open"))
+    if current is None or opened in (None, 0):
+        raise ValueError(f"Coinbase {product} quote is incomplete")
+    start_ms, end_ms = _berlin_midnight_bounds_ms()
+    start = datetime.fromtimestamp(start_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
+    end = datetime.fromtimestamp(end_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
+    query = urllib.parse.urlencode({"granularity": 900, "start": start, "end": end})
+    candles = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/candles?{query}")
+    if not isinstance(candles, list):
+        raise ValueError(f"Coinbase {product} candles are empty")
+    ohlcv_history, volume_history = [], []
+    for row in candles:
+        if not isinstance(row, list) or len(row) < 6:
+            continue
+        stamp_value = number(row[0])
+        stamp = _milliseconds_iso(stamp_value * 1000 if stamp_value is not None and stamp_value < 10_000_000_000 else stamp_value)
+        low, high, row_open, close, base_volume = (number(row[index]) for index in (1, 2, 3, 4, 5))
+        if not stamp or None in (low, high, row_open, close):
+            continue
+        volume_usd = base_volume * close if base_volume is not None else None
+        candle = {"time": stamp, "open": row_open, "high": high, "low": low, "close": close, "volume_usd": volume_usd}
+        ohlcv_history.append(candle)
+        if volume_usd is not None:
+            volume_history.append([stamp, round_value(volume_usd, 2)])
+    ohlcv_history.sort(key=lambda item: item["time"])
+    volume_history.sort(key=lambda item: item[0])
+    if len(ohlcv_history) < 2:
+        raise ValueError(f"Coinbase {product} candles are too short")
+    base_volume_24h = number(stats.get("volume"))
+    return {
+        "symbol": symbol,
+        "product": product,
+        "label": f"{symbol} Coinbase 现货",
+        "price_usd": round_value(current, 6),
+        "price_change_24h_pct": round_value((current / opened - 1) * 100, 4),
+        "volume_24h_usd": round_value(base_volume_24h * current if base_volume_24h is not None else None, 2),
+        "day_low": number(stats.get("low")), "day_high": number(stats.get("high")),
+        "observed_at": ohlcv_history[-1]["time"],
+        "ohlcv_history": ohlcv_history[-97:], "volume_history": volume_history[-97:],
+        "source": "Coinbase Exchange public API", "source_url": "https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles",
+        "note": "Coinbase USD 现货市场 7×24 更新；不包含永续合约持仓量与资金费率。",
+    }
+
+
+def fetch_coinbase_spot_assets() -> tuple[dict[str, Any], list[str]]:
+    assets, errors = {}, []
+    for symbol in ("BTC", "ETH"):
+        try:
+            assets[symbol] = fetch_coinbase_spot_asset(symbol)
+        except Exception as error:
+            errors.append(f"{symbol}: {str(error)[:180]}")
+    return assets, errors
+
 def fetch_binance_positioning() -> dict[str, Any]:
     assets = {}
     errors = []
@@ -426,17 +487,21 @@ def fetch_binance_positioning() -> dict[str, Any]:
             assets[symbol] = fetch_binance_crypto_asset(symbol)
         except Exception as error:
             errors.append(f"{symbol}: {str(error)[:180]}")
-    if not assets:
-        raise RuntimeError("Binance public positioning unavailable: " + "; ".join(errors))
+    spot_assets, spot_errors = fetch_coinbase_spot_assets()
+    errors.extend(f"Coinbase spot {error}" for error in spot_errors)
+    if not assets and not spot_assets:
+        raise RuntimeError("Binance/Coinbase public crypto feeds unavailable: " + "; ".join(errors))
     return {
         "checked_at": utc_now(),
-        "provider": "Binance USDⓈ-M public fallback",
+        "provider": "Binance USDⓈ-M + Coinbase spot public APIs",
         "scope": "single-venue",
         "aggregated": False,
         "assets": assets,
+        "spot_assets": spot_assets,
+        "spot_provider": "Coinbase Exchange public API",
         "exchange_totals": {},
         "etf": {},
-        "activation_note": "设置 GitHub Actions Secret COINGLASS_API_KEY 后启用 CoinGlass 多交易所聚合；当前值仅作单交易所代理。",
+        "activation_note": "Coinbase 现货用于 7×24 价格/K线；设置 COINGLASS_API_KEY 后另启用多交易所永续 OI/资金费率聚合。",
         "errors": errors,
     }
 
@@ -560,16 +625,19 @@ def fetch_coinglass_positioning(api_key: str) -> dict[str, Any]:
             etf = {key: round_value(value, 2) for key, value in etf_totals.items()}
     except Exception:
         etf = {}
+    spot_assets, spot_errors = fetch_coinbase_spot_assets()
     return {
         "checked_at": utc_now(),
-        "provider": "CoinGlass API v4",
-        "scope": "multi-venue aggregate",
+        "provider": "CoinGlass aggregate + Coinbase spot public APIs",
+        "scope": "multi-venue aggregate + 24/7 spot",
         "aggregated": True,
         "assets": assets,
+        "spot_assets": spot_assets,
+        "spot_provider": "Coinbase Exchange public API",
         "exchange_totals": exchange_totals,
         "etf": etf,
-        "activation_note": "CoinGlass 聚合已启用；成交量/价格字段注明 Binance 代理，避免把不同口径混为全市场数据。",
-        "errors": [],
+        "activation_note": "CoinGlass 聚合永续 OI/资金费率；Coinbase 现货价格/K线为 7×24 独立口径。",
+        "errors": [f"Coinbase spot {error}" for error in spot_errors],
     }
 
 
@@ -1367,6 +1435,99 @@ def fetch_cftc() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     }, missing
 
 
+def fetch_cftc_source_breakdown() -> dict[str, Any]:
+    """Fetch weekly gold/silver positioning split by CFTC trader category.
+
+    This public Socrata dataset is disaggregated futures-only COT data. It is
+    separate from ``fetch_cftc`` so the cross-asset screen and the grouped
+    source-of-position bars can retain their own clearly labelled fields.
+    """
+    fields = [
+        "report_date_as_yyyy_mm_dd", "contract_market_name", "open_interest_all",
+        "prod_merc_positions_long", "prod_merc_positions_short",
+        "swap_positions_long_all", "swap__positions_short_all",
+        "m_money_positions_long_all", "m_money_positions_short_all",
+        "other_rept_positions_long", "other_rept_positions_short",
+        "nonrept_positions_long_all", "nonrept_positions_short_all",
+        "change_in_prod_merc_long", "change_in_prod_merc_short",
+        "change_in_swap_long_all", "change_in_swap_short_all",
+        "change_in_m_money_long_all", "change_in_m_money_short_all",
+        "change_in_other_rept_long", "change_in_other_rept_short",
+        "change_in_nonrept_long_all", "change_in_nonrept_short_all",
+    ]
+    params = {
+        "$select": ",".join(fields),
+        "$where": "contract_market_name in ('GOLD','SILVER')",
+        "$order": "report_date_as_yyyy_mm_dd DESC",
+        "$limit": 80,
+    }
+    payload = request_json(f"{CFTC_SOURCE_API_URL}?{urllib.parse.urlencode(params)}")
+    if not isinstance(payload, list):
+        raise ValueError("CFTC source breakdown did not return a list")
+
+    category_specs = (
+        ("producer_merchant", "生产商/贸易商", "prod_merc_positions_long", "prod_merc_positions_short", "change_in_prod_merc_long", "change_in_prod_merc_short"),
+        ("swap_dealers", "做市商/掉期商", "swap_positions_long_all", "swap__positions_short_all", "change_in_swap_long_all", "change_in_swap_short_all"),
+        ("managed_money", "管理基金", "m_money_positions_long_all", "m_money_positions_short_all", "change_in_m_money_long_all", "change_in_m_money_short_all"),
+        ("other_reportables", "其他报告机构", "other_rept_positions_long", "other_rept_positions_short", "change_in_other_rept_long", "change_in_other_rept_short"),
+        ("non_reportables", "非报告持仓", "nonrept_positions_long_all", "nonrept_positions_short_all", "change_in_nonrept_long_all", "change_in_nonrept_short_all"),
+    )
+    grouped: dict[str, list[dict[str, Any]]] = {"GOLD": [], "SILVER": []}
+    for raw in payload:
+        contract = str(raw.get("contract_market_name") or "").upper()
+        if contract not in grouped:
+            continue
+        date_value = str(raw.get("report_date_as_yyyy_mm_dd") or "")[:10]
+        oi = number(raw.get("open_interest_all"))
+        if not date_value or oi is None or oi <= 0:
+            continue
+        sources: dict[str, dict[str, Any]] = {}
+        for key, label, long_key, short_key, long_change_key, short_change_key in category_specs:
+            long_pos = number(raw.get(long_key))
+            short_pos = number(raw.get(short_key))
+            if long_pos is None or short_pos is None:
+                continue
+            net = int(round(long_pos - short_pos))
+            long_change = number(raw.get(long_change_key))
+            short_change = number(raw.get(short_change_key))
+            weekly_change = None if long_change is None or short_change is None else int(round(long_change - short_change))
+            sources[key] = {
+                "label": label,
+                "net": net,
+                "weekly_change": weekly_change,
+                "ratio_pct": round_value(100 * net / oi, 3),
+            }
+        if len(sources) < 3:
+            continue
+        grouped[contract].append({
+            "report_date": date_value,
+            "open_interest": int(round(oi)),
+            "sources": sources,
+        })
+
+    metals: dict[str, dict[str, Any]] = {}
+    for contract, label in (("GOLD", "黄金"), ("SILVER", "白银")):
+        history = sorted(grouped[contract], key=lambda item: item["report_date"])[-16:]
+        if not history:
+            raise ValueError(f"CFTC source breakdown missing {contract}")
+        metals[contract.lower()] = {
+            "label": label,
+            "contract_name": contract,
+            "latest": history[-1],
+            "history": history,
+        }
+    report_dates = [item["latest"]["report_date"] for item in metals.values()]
+    return {
+        "checked_at": utc_now(),
+        "report_date": max(report_dates) if report_dates else None,
+        "source": "CFTC Disaggregated Futures Only",
+        "source_url": CFTC_SOURCE_API_URL,
+        "unit": "张合约",
+        "definition_note": "净持仓 = 多头 − 空头；周变化 = 本周净持仓 − 上周净持仓。仓位统计周二、通常周五发布；非报告持仓不等于全部散户。",
+        "metals": metals,
+    }
+
+
 def translate_event(title: str, country: str) -> str:
     lowered = title.lower()
     translations = [
@@ -1874,6 +2035,7 @@ def signature(payload: dict[str, Any]) -> str:
     compact = {
         "series": {key: [item.get("date"), item.get("value")] for key, item in payload.get("series", {}).items()},
         "cftc": [payload.get("cftc", {}).get("report_date"), [[item["name"], item["contracts"]] for item in payload.get("cftc", {}).get("positions", [])]],
+        "cftc_source_breakdown": payload.get("cftc_source_breakdown", {}).get("report_date"),
         "flow_positioning": {
             "cme": {key: [item.get("report_date"), item.get("registered_oz"), item.get("total_oz")] for key, item in payload.get("flow_positioning", {}).get("cme_inventory", {}).get("metals", {}).items()},
             "crypto": {key: [item.get("open_interest_usd"), item.get("volume_24h_usd"), item.get("funding_rate")] for key, item in payload.get("flow_positioning", {}).get("crypto", {}).get("assets", {}).items()},
@@ -1963,6 +2125,23 @@ def main() -> int:
         cftc = previous.get("cftc", {"positions": [], "dynamic_count": 0, "target_count": 10})
         cftc_checked_at = previous_pipeline.get("cftc_checked_at")
         statuses.append({"source": "CFTC", "status": "cached", "date": cftc.get("report_date")})
+
+    previous_cftc_sources = previous.get("cftc_source_breakdown", {})
+    cftc_sources_due = cadence_due(previous_pipeline.get("cftc_sources_checked_at"), CFTC_REFRESH_HOURS) or not previous_cftc_sources.get("metals")
+    if cftc_sources_due:
+        try:
+            cftc_source_breakdown = fetch_cftc_source_breakdown()
+            cftc_sources_checked_at = run_at
+            statuses.append({"source": "CFTC source breakdown", "status": "ok", "date": cftc_source_breakdown.get("report_date")})
+        except Exception as error:
+            cftc_source_breakdown = previous_cftc_sources
+            cftc_sources_checked_at = previous_pipeline.get("cftc_sources_checked_at")
+            errors.append({"source": "CFTC Socrata", "series": "GOLD/SILVER trader categories", "error": str(error)[:240]})
+            statuses.append({"source": "CFTC source breakdown", "status": "fallback" if cftc_source_breakdown.get("metals") else "failed", "date": cftc_source_breakdown.get("report_date")})
+    else:
+        cftc_source_breakdown = previous_cftc_sources
+        cftc_sources_checked_at = previous_pipeline.get("cftc_sources_checked_at")
+        statuses.append({"source": "CFTC source breakdown", "status": "cached", "date": cftc_source_breakdown.get("report_date")})
 
     previous_calendar = previous.get("calendar", {})
     calendar_due = cadence_due(previous_pipeline.get("calendar_checked_at"), CALENDAR_REFRESH_HOURS) or not previous_calendar.get("events")
@@ -2076,6 +2255,7 @@ def main() -> int:
             "next_scheduled_at": next_update.isoformat().replace("+00:00", "Z"),
             "macro_checked_at": macro_checked_at,
             "cftc_checked_at": cftc_checked_at,
+            "cftc_sources_checked_at": cftc_sources_checked_at,
             "calendar_checked_at": calendar_checked_at,
             "inventory_checked_at": inventory_checked_at,
             "crypto_checked_at": crypto_checked_at,
@@ -2092,6 +2272,7 @@ def main() -> int:
         "series": series,
         "derived": derived,
         "cftc": cftc,
+        "cftc_source_breakdown": cftc_source_breakdown,
         "calendar": calendar,
         "flow_positioning": flow_positioning,
         "post_close_analysis": post_close_analysis,
@@ -2125,6 +2306,7 @@ def main() -> int:
         "metal_quotes": sum(key in series for key in ("SPOT_XAUUSD", "SPOT_XAGUSD")),
         "calendar_events": len(calendar.get("events", [])),
         "cftc_positions": cftc.get("dynamic_count", 0),
+        "cftc_source_breakdown": bool(cftc_source_breakdown.get("metals")),
         "success": payload["pipeline"]["success_count"],
         "updated": payload["pipeline"]["updated_count"],
         "cached": payload["pipeline"]["cached_count"],

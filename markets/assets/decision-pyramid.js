@@ -6,13 +6,6 @@
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;"
   })[char]);
 
-  const events = [
-    ["8/26 · 14:30 CEST", "美国 GDP 二估、企业利润与 7 月 PCE", "高影响", "实际利率、美元与贵金属的共同跳空窗口", "#c64752"],
-    ["8/26 · 美股盘后", "英伟达财报", "高影响", "验证 AI 资本开支与半导体景气斜率", "#b97c1f"],
-    ["8/28", "美联储主席讲话", "高影响", "重估降息路径、通胀容忍度与长端供给风险", "#276aa1"],
-    ["8/28", "CFTC COT 周报更新", "验证项", "确认贵金属净多与美债净空是否继续扩张", "#168c78"]
-  ];
-
   const layers = [
     {
       code: "L1", title: "流动性", weight: 30, color: "#276aa1", signal: "边际收紧", score: 65,
@@ -29,7 +22,7 @@
     {
       code: "L3", title: "通胀水平", weight: 20, color: "#c64752", signal: "粘性 / 风险偏上", score: 72,
       contribution: "黄金 +11.0｜白银 +9.0",
-      metrics: [["美国总 PCE", "3.7%"], ["10Y 盈亏平衡", "2.32%"], ["10Y 实际利率", "2.40%"], ["下一验证", "8/26 · 7月PCE"]],
+      metrics: [["美国总 PCE", "3.7%"], ["10Y 盈亏平衡", "2.32%"], ["10Y 实际利率", "2.40%"], ["下一验证", "自动财经日历"]],
       asof: "本期口径：BEA/FRED；PCE 为 2026-06 数据"
     },
     {
@@ -41,8 +34,8 @@
     {
       code: "L5", title: "资金情绪", weight: 7, color: "#b84d82", signal: "偏多但需验证", score: 62,
       contribution: "黄金 +1.4｜白银 +1.1",
-      metrics: [["VIX", "15.13"], ["美国 HY OAS", "2.70%"], ["白银管理资金净多", "+11,695 张"], ["跨资产 CFTC", "16 类资产"]],
-      asof: "VIX/OAS 为本期；CFTC 白银与截面报告日 2026-08-18"
+      metrics: [["VIX", "加载后更新"], ["美国 HY OAS", "加载后更新"], ["白银管理资金净多", "动态加载"], ["跨资产 CFTC", "动态加载"]],
+      asof: "VIX/OAS 与 CFTC 均由最新数据包更新"
     },
     {
       code: "L6", title: "政策与地缘", weight: 3, color: "#168c78", signal: "风险溢价支撑", score: 67,
@@ -50,15 +43,6 @@
       metrics: [["美联储目标区间", "3.50–3.75%"], ["日本政策利率", "1.00%"], ["长债买回", "流动性干预"], ["地缘风险", "中东 / 伊朗"]],
       asof: "本期政策与事件监测口径，非量化预测"
     }
-  ];
-
-  const cftc = [
-    ["铜", 26.7, 1.1, 79200], ["黄金", 26.0, 0.8, 145900], ["铂金", 11.0, -1.7, 6900],
-    ["氢氧化锂", 9.0, 0.7, 1600], ["白银", 7.8, 0.1, 10800], ["低硫柴油", 6.0, 0.7, 16500],
-    ["布伦特原油", 2.2, -0.4, 7700], ["高硫燃料油", 0.1, 0.0, 0], ["铝", -0.4, 0.4, -200],
-    ["钴", -3.0, 0.9, -400], ["美债30Y", -16.0, 1.5, -359400], ["日元", -17.0, -3.8, -73600],
-    ["纳斯达克100", -17.5, 8.8, -63400], ["美债2Y", -27.3, 2.6, -1255800],
-    ["钯金", -27.5, -2.6, -5400], ["美债10Y", -32.4, -0.7, -2172300]
   ];
 
   const catalog = {
@@ -136,22 +120,22 @@
       ["比特币", "Market", "日度", "catalog", "替代流动性资产"]
     ],
     L5: [
-      ["CFTC 黄金持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
+      ["CFTC 黄金持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
       ["CFTC 白银持仓", "CFTC COT", "周度", "connected", "本期已引用"],
-      ["CFTC 铂金持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 钯金持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 铜持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 钴持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 氢氧化锂持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 铝持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 布伦特原油持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 低硫柴油持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 高硫燃料油持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 日元持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 纳斯达克100持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 美债30Y持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 美债2Y持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
-      ["CFTC 美债10Y持仓", "CFTC COT", "周度", "snapshot", "报告日 2026-08-18"],
+      ["CFTC 铂金持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 钯金持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 铜持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 钴持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 氢氧化锂持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 铝持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 布伦特原油持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 低硫柴油持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 高硫燃料油持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 日元持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 纳斯达克100持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 美债30Y持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 美债2Y持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
+      ["CFTC 美债10Y持仓", "CFTC COT", "周度", "catalog", "CFTC 官方周报；动态接入"],
       ["VIX 恐慌指数", "CBOE / FRED", "日度", "connected", "本期已引用"],
       ["美股保证金融资", "FINRA", "月度", "catalog", "杠杆情绪"],
       ["韩国融资余额", "KRX", "日度", "catalog", "区域杠杆"],
@@ -185,18 +169,6 @@
     catalog: ["监测目录", "catalog"], event: ["事件监测", "event"]
   };
 
-  const fmtContracts = (value) => {
-    if (value === 0) return "约 0 张";
-    const sign = value > 0 ? "+" : "−";
-    return `${sign}${Math.abs(value).toLocaleString("zh-CN")} 张`;
-  };
-
-  const eventHtml = events.map(([date, title, impact, note, color]) => `
-    <article class="dp-event" style="--dp-event-color:${color}">
-      <div class="dp-event-date"><span>${date}</span><span class="dp-impact">${impact}</span></div>
-      <h3>${title}</h3><p>${note}</p>
-    </article>`).join("");
-
   const layersHtml = layers.map((layer) => `
     <article class="dp-layer-card" style="--dp-layer:${layer.color};--dp-score:${layer.score}%">
       <div class="dp-layer-head">
@@ -208,16 +180,6 @@
       <div class="dp-metrics">${layer.metrics.map(([name, value]) => `<div class="dp-metric"><span>${name}</span><strong>${value}</strong></div>`).join("")}</div>
       <p class="dp-asof">${layer.asof}</p>
     </article>`).join("");
-
-  const barsHtml = cftc.map(([name, ratio, weekly]) => `
-    <div class="dp-bar-row" title="${name}：净持仓/OI 约 ${ratio > 0 ? "+" : ""}${ratio}%，周变动 ${weekly > 0 ? "+" : ""}${weekly}pct">
-      <span class="dp-bar-label">${name} <small>(${weekly > 0 ? "+" : ""}${weekly})</small></span>
-      <span class="dp-bar-track"><i class="dp-bar ${ratio >= 0 ? "positive" : "negative"}" style="--dp-width:${Math.min(50, Math.abs(ratio) * 1.55)}%"></i></span>
-      <span class="dp-bar-value">${ratio > 0 ? "+" : ""}${ratio}%</span>
-    </div>`).join("");
-
-  const positionHtml = (positive) => cftc.filter((item) => positive ? item[3] >= 0 : item[3] < 0)
-    .map(([name, , , contracts]) => `<div class="dp-position-row ${positive ? "long" : "short"}"><span>${name}</span><strong>${fmtContracts(contracts)}</strong></div>`).join("");
 
   const groupsHtml = Object.entries(catalog).map(([code, rows], index) => {
     const [title, weight, color] = meta[code];
@@ -236,12 +198,7 @@
 
   mount.className = "dp-extension";
   mount.innerHTML = `
-    <section class="dp-section dp-anchor" id="calendar">
-      <div class="container">
-        <div class="section-head"><div><div class="section-kicker">L0 · Macro calendar</div><h2>未来事件与数据验证窗口</h2></div><p class="section-note">先判断“什么时候可能改写价格”，再读取六层信号。所有时间均以页面报告时点为准。</p></div>
-        <div class="dp-calendar-grid">${eventHtml}</div>
-      </div>
-    </section>
+    <!-- The calendar is rendered dynamically by dynamic-market.js. -->
 
     <section class="dp-section dp-anchor" id="indicators">
       <div class="container">
@@ -251,30 +208,7 @@
       </div>
     </section>
 
-    <section class="dp-section dp-anchor" id="cftc-cross-asset">
-      <div class="container">
-        <div class="section-head"><div><div class="section-kicker">L5 · CFTC positioning</div><h2>16 类资产的管理资金多空截面</h2></div><p class="section-note">比例为净持仓 ÷ 未平仓合约；括号为周度比例变化。红色为净多，绿色为净空。</p></div>
-        <div class="dp-callout"><span>◎</span><div><strong>截面信号：</strong>最看多铜（净持仓/OI 约 +26.7%），最看空美债 10Y（约 −32.4%）。多头集中于贵金属、铜与成品油，空头集中于美债久期与日元，形成“多黄金 / 空久期”的拥挤组合。</div></div>
-        <div class="dp-cftc-summary">
-          <div class="dp-summary-card"><span>最大净多合约数</span><strong>黄金 +145,900 张</strong></div>
-          <div class="dp-summary-card"><span>最大净空合约数</span><strong>美债 10Y −2,172,300 张</strong></div>
-          <div class="dp-summary-card"><span>数据时点</span><strong>报告日 2026-08-18</strong></div>
-        </div>
-        <div class="dp-cftc-layout">
-          <article class="dp-chart-panel">
-            <div class="dp-panel-head"><div><h3>标准化净持仓分布</h3><p>比例与周变动按用户图表读取，因图片刻度限制使用“约数”。</p></div><div class="dp-legend"><span><i style="background:#c64752"></i>净多</span><span><i style="background:#0d9b73"></i>净空</span></div></div>
-            <div class="dp-bars">${barsHtml}</div><div class="dp-chart-axis"><span>−32%</span><span>0</span><span>+32%</span></div>
-          </article>
-          <article class="dp-table-panel">
-            <div class="dp-panel-head"><div><h3>合约数快照</h3><p>合约数按截图逐项转录，不代表实时仓位。</p></div></div>
-            <div class="dp-position-columns">
-              <div class="dp-position-block"><h4>净多阵营</h4><div class="dp-position-list">${positionHtml(true)}</div></div>
-              <div class="dp-position-block short"><h4>净空阵营</h4><div class="dp-position-list">${positionHtml(false)}</div></div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
+    <!-- CFTC source breakdown is rendered by dynamic-market.js from the latest official data bundle. -->
 
     <section class="dp-section dp-anchor" id="data-library">
       <div class="container">
