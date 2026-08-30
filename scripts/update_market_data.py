@@ -377,6 +377,46 @@ def _berlin_midnight_bounds_ms() -> tuple[int, int]:
     return int(midnight.astimezone(timezone.utc).timestamp() * 1000), int(now.astimezone(timezone.utc).timestamp() * 1000)
 
 
+def _parse_binance_kline_rows(rows: Any) -> tuple[list[list[Any]], list[dict[str, Any]]]:
+    volume_history: list[list[Any]] = []
+    ohlcv_history: list[dict[str, Any]] = []
+    if not isinstance(rows, list):
+        return volume_history, ohlcv_history
+    for row in rows:
+        if not isinstance(row, list) or len(row) < 8:
+            continue
+        stamp = _milliseconds_iso(row[0])
+        quote_volume = number(row[7])
+        if stamp and quote_volume is not None:
+            volume_history.append([stamp, round_value(quote_volume, 2)])
+        if stamp and len(row) >= 6 and None not in (number(row[1]), number(row[2]), number(row[3]), number(row[4])):
+            ohlcv_history.append({
+                "time": stamp,
+                "open": round_value(number(row[1]), 6),
+                "high": round_value(number(row[2]), 6),
+                "low": round_value(number(row[3]), 6),
+                "close": round_value(number(row[4]), 6),
+                "volume_usd": round_value(quote_volume, 2) if quote_volume is not None else None,
+            })
+    volume_history.sort(key=lambda item: item[0])
+    ohlcv_history.sort(key=lambda item: item["time"])
+    return volume_history, ohlcv_history
+
+
+def _parse_binance_oi_rows(rows: Any) -> list[list[Any]]:
+    history: list[list[Any]] = []
+    if not isinstance(rows, list):
+        return history
+    for item in rows:
+        if not isinstance(item, dict):
+            continue
+        timestamp = _milliseconds_iso(item.get("timestamp"))
+        value = number(item.get("sumOpenInterestValue"))
+        if timestamp and value is not None:
+            history.append([timestamp, round_value(value, 2)])
+    return sorted(history, key=lambda item: item[0])
+
+
 def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     pair = f"{symbol}USDT"
     ticker = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/ticker/24hr?symbol={pair}")
@@ -385,33 +425,25 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
     premium = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/premiumIndex?symbol={pair}")
     if not isinstance(oi_rows, list) or not oi_rows:
         raise ValueError(f"Binance {pair} open interest history is empty")
-    history = []
-    for item in oi_rows:
-        timestamp = _milliseconds_iso(item.get("timestamp"))
-        value = number(item.get("sumOpenInterestValue"))
-        if timestamp and value is not None:
-            history.append([timestamp, round_value(value, 2)])
+    history = _parse_binance_oi_rows(oi_rows)
     if not history:
         raise ValueError(f"Binance {pair} open interest values are empty")
-    volume_history = []
-    ohlcv_history = []
-    if isinstance(kline_rows, list):
-        for row in kline_rows:
-            if not isinstance(row, list) or len(row) < 8:
-                continue
-            stamp = _milliseconds_iso(row[0])
-            quote_volume = number(row[7])
-            if stamp and quote_volume is not None:
-                volume_history.append([stamp, round_value(quote_volume, 2)])
-            if stamp and len(row) >= 6 and None not in (number(row[1]), number(row[2]), number(row[3]), number(row[4])):
-                ohlcv_history.append({
-                    "time": stamp,
-                    "open": round_value(number(row[1]), 6),
-                    "high": round_value(number(row[2]), 6),
-                    "low": round_value(number(row[3]), 6),
-                    "close": round_value(number(row[4]), 6),
-                    "volume_usd": round_value(quote_volume, 2) if quote_volume is not None else None,
-                })
+
+    # Keep a short 15-minute window for the intraday view, and fetch a separate
+    # six-hour/one-hour-compatible window so 1W and 1M genuinely span different
+    # observations.  Long-window failures are non-fatal: the short window still
+    # provides a usable live quote.
+    try:
+        oi_long_rows = request_json(f"{BINANCE_FUTURES_BASE}/futures/data/openInterestHist?symbol={pair}&period=4h&limit=200")
+        oi_history_long = _parse_binance_oi_rows(oi_long_rows)
+    except Exception:
+        oi_history_long = []
+    try:
+        kline_long_rows = request_json(f"{BINANCE_FUTURES_BASE}/fapi/v1/klines?symbol={pair}&interval=1h&limit=720")
+    except Exception:
+        kline_long_rows = []
+    volume_history, ohlcv_history = _parse_binance_kline_rows(kline_rows)
+    volume_history_long, ohlcv_history_long = _parse_binance_kline_rows(kline_long_rows)
     current_oi = history[-1][1]
     first_oi = history[0][1]
     funding = number(premium.get("lastFundingRate"))
@@ -431,8 +463,11 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
         "next_funding_at": _milliseconds_iso(premium.get("nextFundingTime")),
         "observed_at": history[-1][0],
         "oi_history": history[-97:],
+        "oi_history_long": oi_history_long[-200:],
         "volume_history": volume_history[-97:],
+        "volume_history_long": volume_history_long[-720:],
         "ohlcv_history": ohlcv_history[-97:],
+        "ohlcv_history_long": ohlcv_history_long[-720:],
         "source": "Binance USDⓈ-M public API",
         "source_url": "https://developers.binance.com/en/docs/derivatives/usds-margined-futures/market-data/rest-api",
         "note": "单一交易所公开代理值；不等于全市场持仓量、成交量或资金费率聚合。",
@@ -440,23 +475,12 @@ def fetch_binance_crypto_asset(symbol: str) -> dict[str, Any]:
 
 
 
-def fetch_coinbase_spot_asset(symbol: str) -> dict[str, Any]:
-    """Fetch 24/7 Coinbase spot statistics and Berlin-day 15-minute candles."""
-    product = f"{symbol}-USD"
-    stats = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/stats")
-    current = number(stats.get("last"))
-    opened = number(stats.get("open"))
-    if current is None or opened in (None, 0):
-        raise ValueError(f"Coinbase {product} quote is incomplete")
-    start_ms, end_ms = _berlin_midnight_bounds_ms()
-    start = datetime.fromtimestamp(start_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
-    end = datetime.fromtimestamp(end_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
-    query = urllib.parse.urlencode({"granularity": 900, "start": start, "end": end})
-    candles = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/candles?{query}")
-    if not isinstance(candles, list):
-        raise ValueError(f"Coinbase {product} candles are empty")
-    ohlcv_history, volume_history = [], []
-    for row in candles:
+def _parse_coinbase_candles(rows: Any) -> tuple[list[dict[str, Any]], list[list[Any]]]:
+    ohlcv_history: list[dict[str, Any]] = []
+    volume_history: list[list[Any]] = []
+    if not isinstance(rows, list):
+        return ohlcv_history, volume_history
+    for row in rows:
         if not isinstance(row, list) or len(row) < 6:
             continue
         stamp_value = number(row[0])
@@ -471,8 +495,42 @@ def fetch_coinbase_spot_asset(symbol: str) -> dict[str, Any]:
             volume_history.append([stamp, round_value(volume_usd, 2)])
     ohlcv_history.sort(key=lambda item: item["time"])
     volume_history.sort(key=lambda item: item[0])
+    return ohlcv_history, volume_history
+
+
+def fetch_coinbase_spot_asset(symbol: str) -> dict[str, Any]:
+    """Fetch 24/7 Coinbase spot statistics plus short and long chart windows."""
+    product = f"{symbol}-USD"
+    stats = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/stats")
+    current = number(stats.get("last"))
+    opened = number(stats.get("open"))
+    if current is None or opened in (None, 0):
+        raise ValueError(f"Coinbase {product} quote is incomplete")
+
+    start_ms, end_ms = _berlin_midnight_bounds_ms()
+    start = datetime.fromtimestamp(start_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
+    end = datetime.fromtimestamp(end_ms / 1000, timezone.utc).isoformat().replace("+00:00", "Z")
+    short_query = urllib.parse.urlencode({"granularity": 900, "start": start, "end": end})
+    candles = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/candles?{short_query}")
+    ohlcv_history, volume_history = _parse_coinbase_candles(candles)
     if len(ohlcv_history) < 2:
         raise ValueError(f"Coinbase {product} candles are too short")
+
+    # Coinbase caps a candles response at 300 rows. Six-hour bars cover a full
+    # month while preserving enough points for visibly distinct 1W/1M windows.
+    long_end = datetime.now(timezone.utc)
+    long_start = long_end - timedelta(days=31)
+    long_query = urllib.parse.urlencode({
+        "granularity": 21600,
+        "start": long_start.isoformat().replace("+00:00", "Z"),
+        "end": long_end.isoformat().replace("+00:00", "Z"),
+    })
+    try:
+        long_candles = request_json(f"{COINBASE_EXCHANGE_BASE}/products/{product}/candles?{long_query}")
+        ohlcv_history_long, volume_history_long = _parse_coinbase_candles(long_candles)
+    except Exception:
+        ohlcv_history_long, volume_history_long = [], []
+
     base_volume_24h = number(stats.get("volume"))
     return {
         "symbol": symbol,
@@ -484,6 +542,7 @@ def fetch_coinbase_spot_asset(symbol: str) -> dict[str, Any]:
         "day_low": number(stats.get("low")), "day_high": number(stats.get("high")),
         "observed_at": ohlcv_history[-1]["time"],
         "ohlcv_history": ohlcv_history[-97:], "volume_history": volume_history[-97:],
+        "ohlcv_history_long": ohlcv_history_long[-180:], "volume_history_long": volume_history_long[-180:],
         "source": "Coinbase Exchange public API", "source_url": "https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles",
         "note": "Coinbase USD 现货市场 7×24 更新；不包含永续合约持仓量与资金费率。",
     }
@@ -562,8 +621,8 @@ def _coinglass_close(item: dict[str, Any], keys: tuple[str, ...]) -> float | Non
 
 
 def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
-    oi = _coinglass_rows(coinglass_json("futures/open-interest/aggregated-history", {"symbol": symbol, "interval": "4h", "limit": 7, "unit": "usd"}, api_key))
-    funding = _coinglass_rows(coinglass_json("futures/funding-rate/oi-weight-history", {"symbol": symbol, "interval": "4h", "limit": 7}, api_key))
+    oi = _coinglass_rows(coinglass_json("futures/open-interest/aggregated-history", {"symbol": symbol, "interval": "4h", "limit": 200, "unit": "usd"}, api_key))
+    funding = _coinglass_rows(coinglass_json("futures/funding-rate/oi-weight-history", {"symbol": symbol, "interval": "4h", "limit": 200}, api_key))
     oi_history = []
     for item in oi:
         stamp = _coinglass_time(item)
@@ -608,9 +667,12 @@ def fetch_coinglass_crypto_asset(symbol: str, api_key: str) -> dict[str, Any]:
         "funding_rate_pct": round_value(funding_value * 100 if funding_value is not None else None, 5),
         "next_funding_at": proxy.get("next_funding_at"),
         "observed_at": latest[0],
-        "oi_history": oi_history,
+        "oi_history": oi_history[-97:],
+        "oi_history_long": oi_history,
         "volume_history": proxy.get("volume_history", []),
+        "volume_history_long": proxy.get("volume_history_long", []),
         "ohlcv_history": ohlcv_history[-200:],
+        "ohlcv_history_long": proxy.get("ohlcv_history_long", []),
         "source": "CoinGlass API v4",
         "source_url": "https://docs.coinglass.com/reference/getting-started-with-your-api",
         "note": "持仓量与资金费率为 CoinGlass 多交易所聚合；价格与成交量为 Binance USDⓈ-M 公开代理。",

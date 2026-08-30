@@ -106,9 +106,12 @@
       const source = spot || futures;
       if (!source) continue;
       const ohlcv = spot?.ohlcv_history?.length >= 2 ? spot.ohlcv_history : (futures?.ohlcv_history || []);
+      const ohlcvLong = spot?.ohlcv_history_long?.length >= 2 ? spot.ohlcv_history_long : (futures?.ohlcv_history_long || []);
       const oi = futures?.oi_history || [];
+      const oiLong = futures?.oi_history_long?.length >= 2 ? futures.oi_history_long : oi;
       const volume = spot?.volume_history?.length ? spot.volume_history : (futures?.volume_history || []);
-      if (!ohlcv.length && !oi.length && !volume.length) continue;
+      const volumeLong = spot?.volume_history_long?.length >= 2 ? spot.volume_history_long : (futures?.volume_history_long || volume);
+      if (!ohlcv.length && !ohlcvLong.length && !oi.length && !volume.length) continue;
       instruments.push({
         id: `crypto-${symbol}`,
         label: symbol,
@@ -118,13 +121,14 @@
         unit: "USD",
         value: spot?.price_usd ?? futures?.price_usd,
         change: spot?.price_change_24h_pct ?? futures?.price_change_24h_pct,
-        ohlcv, oi, volume,
+        ohlcv, ohlcvLong, oi, oiLong, volume, volumeLong,
       });
     }
     const addSeries = (id, label, subtitle, key, color, unit) => {
       const series = data.series?.[key];
       if (!series?.history?.length) return;
-      instruments.push({id, label, subtitle, source: series.source || "公开源", color, unit, value: series.value, change: null, history: series.history, ohlcv: [], oi: [], volume: []});
+      const longHistory = data.cross_asset?.histories?.[id] || [];
+      instruments.push({id, label, subtitle, source: series.source || "公开源", color, unit, value: series.value, change: null, history: series.history, longHistory, ohlcv: [], ohlcvLong: [], oi: [], oiLong: [], volume: [], volumeLong: []});
     };
     addSeries("gold", "黄金", "XAU/USD 现货", "SPOT_XAUUSD", "#bd861f", "USD/oz");
     addSeries("silver", "白银", "XAG/USD 现货", "SPOT_XAGUSD", "#718096", "USD/oz");
@@ -134,18 +138,22 @@
   };
 
   const trendRows = (instrument, metric, period) => {
+    const longWindow = period !== "1D";
     let rows;
     if (metric === "price") {
-      const candles = normalizeCandles(instrument.ohlcv);
+      const candles = normalizeCandles(longWindow && instrument.ohlcvLong?.length >= 2 ? instrument.ohlcvLong : instrument.ohlcv);
+      const history = longWindow && instrument.longHistory?.length >= 2 ? instrument.longHistory : instrument.history;
       rows = candles.length >= 2
         ? candles.map((item) => ({...item, value: item.close}))
-        : (instrument.history || []).map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value));
+        : (history || []).map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value));
     } else if (metric === "oi") {
-      rows = (instrument.oi || []).map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value));
+      const history = longWindow && instrument.oiLong?.length >= 2 ? instrument.oiLong : instrument.oi;
+      rows = (history || []).map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value));
     } else {
-      const candles = normalizeCandles(instrument.ohlcv);
-      rows = instrument.volume?.length
-        ? instrument.volume.map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value))
+      const candles = normalizeCandles(longWindow && instrument.ohlcvLong?.length >= 2 ? instrument.ohlcvLong : instrument.ohlcv);
+      const history = longWindow && instrument.volumeLong?.length >= 2 ? instrument.volumeLong : instrument.volume;
+      rows = history?.length
+        ? history.map((item) => ({stamp: item[0], value: Number(item[1])})).filter((item) => Number.isFinite(item.value))
         : candles.map((item) => ({stamp: item.stamp, value: item.volume})).filter((item) => Number.isFinite(item.value));
     }
     rows = rows.filter((item) => item.stamp);
@@ -513,15 +521,21 @@
       changes.set(definition.id, dailyChangeMap(history, definition.mode));
     });
     const storedGoldSilver = data.cross_asset?.gold_silver;
-    const goldSilver = storedGoldSilver && Object.prototype.hasOwnProperty.call(storedGoldSilver, "value")
-      ? {value: storedGoldSilver.value, n: storedGoldSilver.n || 0}
-      : pairCorrelation(changes.get("gold"), changes.get("silver"));
+    const computedGoldSilver = pairCorrelation(changes.get("gold"), changes.get("silver"));
+    const goldSilver = storedGoldSilver && Number.isFinite(Number(storedGoldSilver.value))
+      ? {value: Number(storedGoldSilver.value), n: Number(storedGoldSilver.n) || 0}
+      : computedGoldSilver;
+    const goldSampleCount = changes.get("gold")?.size || 0;
+    const silverSampleCount = changes.get("silver")?.size || 0;
+    const sampleFloor = Number(data.cross_asset?.sample_floor) || 5;
+    const sampleReady = goldSampleCount >= sampleFloor && silverSampleCount >= sampleFloor;
     const drivers = definitions.filter((definition) => !["gold", "silver"].includes(definition.id));
     const cells = (rowDefinition) => drivers.map((column) => {
       const stored = data.cross_asset?.matrix?.[rowDefinition.id]?.[column.id];
-      const result = stored && Object.prototype.hasOwnProperty.call(stored, "value")
-        ? {value: stored.value, n: stored.n || 0}
-        : pairCorrelation(changes.get(rowDefinition.id), changes.get(column.id));
+      const computed = pairCorrelation(changes.get(rowDefinition.id), changes.get(column.id));
+      const result = stored && Number.isFinite(Number(stored.value))
+        ? {value: Number(stored.value), n: Number(stored.n) || 0}
+        : computed;
       const value = result.value;
       const intensity = value === null ? 0 : Math.min(.72, .14 + Math.abs(value) * .58);
       const background = value === null ? "transparent" : value >= 0 ? `rgba(22,140,120,${intensity})` : `rgba(189,74,83,${intensity})`;
@@ -545,12 +559,16 @@
       `<span><b>原油背景</b>${oilMove !== null ? `WTI 日变动 ${signed(oilMove * 100, 2, "%")}；油价上行会抬升通胀预期，也可能强化利率压力。` : "等待共同观测"}</span>`,
     ].join("");
     const observed = [data.series?.SPOT_XAUUSD?.observed_at, data.series?.DFII10?.date, data.series?.DCOILWTICO?.date].filter(Boolean).sort().at(-1) || data.generated_at;
+    const sampleNotice = sampleReady
+      ? ""
+      : `<div class="dm-correlation-warning"><strong>历史样本尚未就绪：</strong>黄金 ${goldSampleCount} 个日变动、白银 ${silverSampleCount} 个日变动；至少需要 ${sampleFloor} 个共同交易日。样本补齐前仅显示“—”，不把短窗口误认为长期相关性。</div>`;
     return `<section class="dm-correlation" id="cross-asset-correlation">
       <div class="dm-subhead"><div><span>Cross-asset relationships · rolling daily changes</span><h3>黄金、白银与宏观驱动的相关性</h3></div><time>截至 ${escapeHtml(formatDate(data.cross_asset?.as_of || observed))} · 最多 90 个共同观测日</time></div>
       <div class="dm-correlation-callout"><strong>先看方向，再看系数：</strong>表格是共同日期的 Pearson 相关系数；价格/指数使用日收益率，利率使用日变动。正值代表同向，负值代表反向；n 是实际共同观测数，样本不足时不显示系数。</div>
+      ${sampleNotice}
       <div class="dm-correlation-table-wrap"><table class="dm-correlation-table"><thead><tr><th scope="col">对象 ↓ / 驱动 →</th>${header}</tr></thead><tbody>${row(definitions[0])}${row(definitions[1])}</tbody></table></div>
       <div class="dm-correlation-read">${readItems}</div>
-      <p class="dm-flow-note">这是统计上的同步关系，不等于因果关系。金银公开现货历史正在按 15 分钟快照累积；在共同交易日达到 5 个之前，页面会显示样本累积中而不是编造相关系数。观测时间：${escapeHtml(formatGenerated(data.generated_at))}。</p>
+      <p class="dm-flow-note">这是统计上的同步关系，不等于因果关系。黄金/白银的长期图表与相关性使用独立的日线历史；1日图仍使用 15 分钟现货快照。观测时间：${escapeHtml(formatGenerated(data.generated_at))}。</p>
     </section>`;
   };
 
