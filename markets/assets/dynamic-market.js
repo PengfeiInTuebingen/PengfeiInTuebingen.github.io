@@ -416,7 +416,7 @@
       .map(([label, history]) => [label, history.filter((item) => item?.date && item.categories && categories.every((category) => Number.isFinite(Number(item.categories[category])))).slice(-10)])
       .filter(([, history]) => history.length >= 2);
     if (!metals.length) {
-      return `<section class="dm-cftc-trend" id="cftc-cross-asset"><div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>资金来源与持仓结构</h3></div><time>历史样本待首次同步</time></div><div class="dm-cftc-empty">CFTC 历史数据暂未完整读取；不会用插值或截图值代替真实持仓。</div></section>`;
+      return `<section class="dm-cftc-trend" id="cftc-cross-asset"><div class="dm-subhead"><div><span>Positioning · official CFTC · TradingView price context</span><h3>资金来源与持仓结构 · CFTC 官方</h3></div><time>历史样本待首次同步</time></div><div class="dm-cftc-empty">CFTC 历史数据暂未完整读取；不会用插值或截图值代替真实持仓。</div></section>`;
     }
     const chart = (label, rows) => {
       const values = rows.flatMap((item) => categories.map((category) => Number(item.categories[category])));
@@ -454,11 +454,11 @@
     const latestDate = allDates.at(-1);
     const legend = categories.map((category) => `<span><i style="--dm-color:${colors[category]}"></i>${escapeHtml(category)}</span>`).join("");
     return `<section class="dm-cftc-trend" id="cftc-cross-asset">
-      <div class="dm-subhead"><div><span>Positioning · official CFTC</span><h3>资金来源与持仓结构 · 分组柱状图</h3></div><time>报告截至 ${escapeHtml(latestDate)} · 近 10 次周报</time></div>
-      <div class="dm-cftc-callout"><strong>一簇 = 一次 CFTC 周报：</strong>每种颜色代表一个持仓来源，正值为净多、负值为净空。图中是合约净持仓，不是美元资金流；黄金和白银各自使用独立纵轴。</div>
+      <div class="dm-subhead"><div><span>Positioning · official CFTC · TradingView price context</span><h3>资金来源与持仓结构 · CFTC 官方</h3></div><time>报告截至 ${escapeHtml(latestDate)} · 近 10 次周报</time></div>
+      <div class="dm-cftc-callout"><strong>行情图唯一使用 TradingView；柱状图只呈现官方持仓：</strong>一簇 = 一次 CFTC 周报，每种颜色代表一个持仓来源，正值为净多、负值为净空。图中是合约净持仓，不是美元资金流；黄金和白银各自使用独立纵轴。</div>
       <div class="dm-cftc-bar-grid">${metals.map(([label, rows]) => chart(label, rows)).join("")}</div>
       <div class="dm-cftc-legend">${legend}</div>
-      <p class="dm-flow-note">生产商/贸易商、掉期商、管理资金、其他报告商与非报告商均按 CFTC Disaggregated Futures-and-Options Combined 的多头减空头计算；不把净持仓/OI 与合约张数混为一谈。数据源：<a href="${escapeHtml(data.cftc?.history_source_url || data.cftc?.source_url || "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm")}" target="_blank" rel="noopener">CFTC 官方历史文件 ↗</a></p>
+      <p class="dm-flow-note">生产商/贸易商、掉期商、管理资金、其他报告商与非报告商均按 CFTC Disaggregated Futures-and-Options Combined 的多头减空头计算；不把净持仓/OI 与合约张数混为一谈；价格和成交量请回到 TradingView 图表查看。数据源：<a href="${escapeHtml(data.cftc?.history_source_url || data.cftc?.source_url || "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm")}" target="_blank" rel="noopener">CFTC 官方历史文件 ↗</a></p>
     </section>`;
   };
 
@@ -565,12 +565,12 @@
       ? ""
       : `<div class="dm-correlation-warning"><strong>历史样本尚未就绪：</strong>黄金 ${goldSampleCount} 个日变动、白银 ${silverSampleCount} 个日变动；至少需要 ${sampleFloor} 个共同交易日。样本补齐前仅显示“—”，不把短窗口误认为长期相关性。</div>`;
     return `<section class="dm-correlation" id="cross-asset-correlation">
-      <div class="dm-subhead"><div><span>Cross-asset relationships · rolling daily changes</span><h3>黄金、白银与宏观驱动的相关性</h3></div><time>截至 ${escapeHtml(formatDate(data.cross_asset?.as_of || observed))} · 最多 90 个共同观测日</time></div>
-      <div class="dm-correlation-callout"><strong>先看方向，再看系数：</strong>表格是共同日期的 Pearson 相关系数；价格/指数使用日收益率，利率使用日变动。正值代表同向，负值代表反向；n 是实际共同观测数，样本不足时不显示系数。</div>
+      <div class="dm-subhead"><div><span>Cross-asset relationships · TradingView price context</span><h3>黄金、白银与宏观驱动的相关性</h3></div><time>截至 ${escapeHtml(formatDate(data.cross_asset?.as_of || observed))} · 最多 90 个共同观测日</time></div>
+      <div class="dm-correlation-callout"><strong>行情图唯一使用 TradingView；本表只做统计确认：</strong>表格是共同日期的 Pearson 相关系数；价格/指数使用日收益率，利率使用日变动。正值代表同向，负值代表反向；n 是实际共同观测数，样本不足时不显示系数。</div>
       ${sampleNotice}
       <div class="dm-correlation-table-wrap"><table class="dm-correlation-table"><thead><tr><th scope="col">对象 ↓ / 驱动 →</th>${header}</tr></thead><tbody>${row(definitions[0])}${row(definitions[1])}</tbody></table></div>
       <div class="dm-correlation-read">${readItems}</div>
-      <p class="dm-flow-note">这是统计上的同步关系，不等于因果关系。黄金/白银的长期图表与相关性使用独立的日线历史；1日图仍使用 15 分钟现货快照。观测时间：${escapeHtml(formatGenerated(data.generated_at))}。</p>
+      <p class="dm-flow-note">这是统计上的同步关系，不等于因果关系。相关性使用带日期的共同日线数值；价格、K线和成交量行情图统一回到上方 TradingView 区块，不在本表重复绘制。观测时间：${escapeHtml(formatGenerated(data.generated_at))}。</p>
     </section>`;
   };
 
