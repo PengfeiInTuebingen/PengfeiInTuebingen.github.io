@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-05T05:23:46Z",
+    "checked_at": "2026-09-05T09:14:43Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -50.3 亿（5日/市值 -0.26%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 2
+      "history_live_count": 5
     },
     "index_flows": [
       {
@@ -202,10 +202,10 @@
       },
       {
         "code": "BK1340",
-        "continuity": "UNKNOWN",
+        "continuity": "RED_STRONG",
         "five_day_billion_cny": -98.867,
         "five_day_to_cap_pct": -0.389,
-        "flow_data_status": "PARTIAL",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 3.55,
@@ -238,7 +238,7 @@
             "main_net_flow_billion_cny": -9.677
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "持续流出，强度偏高",
         "market_cap_trillion_cny": 2.545,
         "name": "印制电路板",
         "today_billion_cny": -9.677,
@@ -259,10 +259,10 @@
       },
       {
         "code": "BK1200",
-        "continuity": "UNKNOWN",
+        "continuity": "RED_STRONG",
         "five_day_billion_cny": -142.532,
         "five_day_to_cap_pct": -0.193,
-        "flow_data_status": "PARTIAL",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 0.19,
@@ -295,7 +295,7 @@
             "main_net_flow_billion_cny": -18.166
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "持续流出，强度偏高",
         "market_cap_trillion_cny": 7.383,
         "name": "电力设备",
         "today_billion_cny": -18.166,
@@ -303,10 +303,10 @@
       },
       {
         "code": "BK0448",
-        "continuity": "UNKNOWN",
+        "continuity": "RED_STRONG",
         "five_day_billion_cny": -192.365,
         "five_day_to_cap_pct": -0.472,
-        "flow_data_status": "PARTIAL",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 1.51,
@@ -339,7 +339,7 @@
             "main_net_flow_billion_cny": -31.778
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "持续流出，强度偏高",
         "market_cap_trillion_cny": 4.077,
         "name": "通信设备",
         "today_billion_cny": -31.778,
@@ -493,7 +493,7 @@
     ],
     "snapshot_date": "2026-09-05",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 2/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 5/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-05T05:23:46Z",
+    "checked_at": "2026-09-05T09:14:43Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5214,10 +5214,10 @@
             "weight": 0.14
           },
           {
-            "direction": "支持",
-            "fact": "纳斯达克较前值 +1.40%",
+            "direction": "压制",
+            "fact": "纳斯达克较前值 -0.29%",
             "name": "纳斯达克风险偏好",
-            "raw": 1.0,
+            "raw": -1.0,
             "weight": 0.14
           },
           {
@@ -5242,10 +5242,10 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +18，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 -10，对白银温和压制。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 18,
-        "stance": "温和支持"
+        "score": -10,
+        "stance": "温和压制"
       },
       "yen": {
         "drivers": [
@@ -5285,12 +5285,12 @@
       }
     },
     "date": "2026-09-05",
-    "headline": "黄金温和压制；白银温和支持；日元明显压制。",
+    "headline": "黄金温和压制；白银温和压制；日元明显压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：09-10 14:15 欧元区 · ECB monetary-policy decision",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金温和压制；白银温和支持；日元明显压制。下一事件：09-10 14:15 欧元区 · ECB monetary-policy decision。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和压制；白银温和压制；日元明显压制。下一事件：09-10 14:15 欧元区 · ECB monetary-policy decision。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5329,11 +5329,11 @@
       "value": 5.3005
     },
     "NASDAQ_DAILY": {
-      "date": "2026-09-03",
+      "date": "2026-09-04",
       "label": "纳斯达克日变动",
       "source": "FRED",
       "unit": "%",
-      "value": 1.3969
+      "value": -0.2899
     },
     "PAYROLL_CHANGE": {
       "date": "2026-08-01",
@@ -5415,7 +5415,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-09-05T00:49:15Z",
+      "checked_at": "2026-09-05T09:14:30Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5578,9 +5578,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-05T05:23:43Z"
+    "updated_at": "2026-09-05T09:14:30Z"
   },
-  "generated_at": "2026-09-05T05:23:43Z",
+  "generated_at": "2026-09-05T09:14:30Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5612,7 +5612,7 @@
     "L4": {
       "automated": true,
       "metrics": {
-        "SPX / NDX": "-0.38% / 1.40%",
+        "SPX / NDX": "-0.38% / -0.29%",
         "USD/JPY": "156.25",
         "美债 10Y": "4.770%",
         "美债 30Y": "5.250%"
@@ -5634,10 +5634,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-05T05:23:46Z",
+    "a_share_checked_at": "2026-09-05T09:14:43Z",
     "ai_tokens_used": 0,
-    "cached_count": 30,
-    "calendar_checked_at": "2026-09-05T05:23:43Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-09-05T09:14:30Z",
     "cftc_checked_at": "2026-09-05T00:49:15Z",
     "cross_asset_checked_at": "2026-09-04T20:56:53Z",
     "error_count": 3,
@@ -5659,142 +5659,152 @@
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-09-05T00:49:15Z",
-    "macro_checked_at": "2026-09-05T00:49:15Z",
+    "inventory_checked_at": "2026-09-05T09:14:30Z",
+    "macro_checked_at": "2026-09-05T09:14:30Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-05T05:30:00Z",
+    "next_scheduled_at": "2026-09-05T09:15:00Z",
     "run_interval_minutes": 15,
-    "source_count": 35,
+    "source_count": 37,
     "statuses": [
       {
         "date": "2026-09-02",
         "source": "FRED WALCL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "FRED RRPONTSYD",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-02",
         "source": "FRED WDTGAL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED TOTRESNS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-03",
         "source": "FRED WM2NS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED DGS2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED DGS10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED DGS30",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED DFII10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "FRED T10YIE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED DFF",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED VIXCLS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-03",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "FRED SP500",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-03",
+        "date": "2026-09-04",
         "source": "FRED NASDAQCOM",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-28",
         "source": "FRED DTWEXBGS",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-03",
+        "date": "2026-09-01",
         "source": "FRED DCOILBRENTEU",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-03",
+        "date": "2026-09-01",
         "source": "FRED DCOILWTICO",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PAYEMS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED UNRATE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED JTSJOL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED CPIAUCSL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "cached"
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-03",
+        "source": "Gate CFD XBRUSD",
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-03",
+        "source": "Gate CFD XTIUSD",
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "ECB FX",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04T20:45:00Z",
@@ -5812,22 +5822,22 @@
         "status": "cached"
       },
       {
-        "date": "2026-09-05T05:23:46Z",
+        "date": "2026-09-05T09:14:43Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "CME gold warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "CME silver warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-05T05:23:46Z",
+        "date": "2026-09-05T09:14:43Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -5842,8 +5852,8 @@
         "status": "cached"
       }
     ],
-    "success_count": 35,
-    "updated_count": 4
+    "success_count": 37,
+    "updated_count": 34
   },
   "post_close_analysis": {
     "as_of": "2026-09-03",
@@ -10264,12 +10274,8 @@
     },
     "NASDAQCOM": {
       "category": "资产",
-      "date": "2026-09-03",
+      "date": "2026-09-04",
       "history": [
-        [
-          "2026-04-28",
-          24663.8
-        ],
         [
           "2026-04-29",
           24673.24
@@ -10625,16 +10631,20 @@
         [
           "2026-09-03",
           26584.06
+        ],
+        [
+          "2026-09-04",
+          26506.99
         ]
       ],
       "id": "NASDAQCOM",
       "label": "纳斯达克综合",
-      "previous": 26217.83,
-      "previous_date": "2026-09-02",
+      "previous": 26584.06,
+      "previous_date": "2026-09-03",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/NASDAQCOM",
       "unit": "指数",
-      "value": 26584.06
+      "value": 26506.99
     },
     "PAYEMS": {
       "category": "周期",
@@ -17909,5 +17919,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "4f8dc732321bf38a"
+  "snapshot_id": "ddc1b4a66c9b1fdd"
 }
