@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CFTC 持仓与 EIA 美国原油库存研究">
+  <title>持仓与原油库存｜市场研究</title>
+  <link rel="stylesheet" href="../assets/positioning-research.css">
+</head>
+<body>
+  <header class="topbar"><div class="wrap topbar-inner"><a class="brand" href="../" aria-label="返回市场首页"><span class="brand-mark">M</span><span>Market Brief</span></a><nav><a href="../">← 市场首页</a><button class="theme-btn" id="themeToggle" type="button" aria-label="切换深色模式">◐</button></nav></div></header>
+  <main class="wrap">
+    <section class="hero"><p class="eyebrow">POSITIONING · INVENTORY</p><h1>持仓与原油库存</h1><p class="lede">把期货持仓和美国能源库存放在同一张研究桌上：先看数据状态、口径与变化，再形成自己的判断。</p><div class="meta" id="statusLine">正在读取研究数据…</div></section>
+    <section class="panel"><div class="section-head"><div><p class="kicker">CFTC · CROSS-ASSET</p><h2>跨资产净持仓</h2></div><p class="hint">净持仓 ÷ 未平仓量（%）</p></div><div class="tabs" id="sectorTabs" role="tablist" aria-label="资产类别"></div><div class="legend"><span><i class="long"></i>净多</span><span><i class="short"></i>净空</span><span class="zero-note">0 为多空分界</span></div><div id="boardList" class="board-list" aria-live="polite"><div class="skeleton"></div></div></section>
+    <section class="panel detail-panel" id="productDetail"><div class="section-head"><div><p class="kicker">PRODUCT DETAIL</p><h2>选择一个品种</h2></div><p class="hint">点击上方品种查看五类持仓</p></div><div class="empty">每一根条形都使用该品种的报告口径；空值显示为“未知”，不会当作 0。</div></section>
+    <section class="panel"><div class="section-head"><div><p class="kicker">EIA · WEEKLY BALANCE</p><h2>美国原油库存</h2></div><p class="hint" id="eiaDate">单周变化 · 百万桶</p></div><div id="inventoryList" class="inventory-grid"><div class="skeleton"></div></div><div id="balanceCards" class="balance-grid"></div><div class="notes" id="eiaNotes"></div></section>
+    <footer><span>数据更新频率：每 12 小时检查；CFTC 报告通常周五发布，数据对应周二。研究框架快照：2026-08-25。</span><span><a id="cftcSource" href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC 官方来源 ↗</a> · <a id="eiaSource" href="https://www.eia.gov/petroleum/supply/weekly/" target="_blank" rel="noopener">EIA 官方来源 ↗</a> · <a href="https://www.workbuddy.link/p/sZtveaphmOb61FGYSLnLy4" target="_blank" rel="noopener">研究参考 ↗</a></span></footer>
+  </main>
+  <script src="../assets/positioning-research.js"></script>
+</body>
+</html>
