@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-12T05:07:09Z",
+    "checked_at": "2026-09-12T09:23:03Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 +1.5 亿（5日/市值 0.01%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-12T05:07:09Z",
+    "checked_at": "2026-09-12T09:23:03Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5214,10 +5214,10 @@
             "weight": 0.14
           },
           {
-            "direction": "压制",
-            "fact": "纳斯达克较前值 -0.65%",
+            "direction": "支持",
+            "fact": "纳斯达克较前值 +0.96%",
             "name": "纳斯达克风险偏好",
-            "raw": -1.0,
+            "raw": 1.0,
             "weight": 0.14
           },
           {
@@ -5242,10 +5242,10 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +14，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +42，对白银明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 14,
-        "stance": "温和支持"
+        "score": 42,
+        "stance": "明显支持"
       },
       "yen": {
         "drivers": [
@@ -5285,12 +5285,12 @@
       }
     },
     "date": "2026-09-12",
-    "headline": "黄金中性等待；白银温和支持；日元温和压制。",
+    "headline": "黄金中性等待；白银明显支持；日元温和压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：09-12 10:00 欧元区 · ECB President Lagarde Speaks",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金中性等待；白银温和支持；日元温和压制。下一事件：09-12 10:00 欧元区 · ECB President Lagarde Speaks。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金中性等待；白银明显支持；日元温和压制。下一事件：09-12 10:00 欧元区 · ECB President Lagarde Speaks。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5329,11 +5329,11 @@
       "value": 5.3005
     },
     "NASDAQ_DAILY": {
-      "date": "2026-09-10",
+      "date": "2026-09-11",
       "label": "纳斯达克日变动",
       "source": "FRED",
       "unit": "%",
-      "value": -0.6537
+      "value": 0.9636
     },
     "PAYROLL_CHANGE": {
       "date": "2026-08-01",
@@ -5415,7 +5415,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-09-12T00:31:48Z",
+      "checked_at": "2026-09-12T09:22:45Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5626,9 +5626,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-12T05:07:06Z"
+    "updated_at": "2026-09-12T09:22:45Z"
   },
-  "generated_at": "2026-09-12T05:07:06Z",
+  "generated_at": "2026-09-12T09:22:45Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5660,7 +5660,7 @@
     "L4": {
       "automated": true,
       "metrics": {
-        "SPX / NDX": "0.86% / -0.65%",
+        "SPX / NDX": "0.86% / 0.96%",
         "USD/JPY": "154.04",
         "美债 10Y": "4.950%",
         "美债 30Y": "5.370%"
@@ -5682,10 +5682,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-12T05:07:09Z",
+    "a_share_checked_at": "2026-09-12T09:23:03Z",
     "ai_tokens_used": 0,
-    "cached_count": 29,
-    "calendar_checked_at": "2026-09-12T05:07:06Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-09-12T09:22:45Z",
     "cftc_checked_at": "2026-09-12T05:07:06Z",
     "cross_asset_checked_at": "2026-09-12T00:31:48Z",
     "error_count": 3,
@@ -5707,142 +5707,152 @@
       }
     ],
     "fallback_count": 0,
-    "inventory_checked_at": "2026-09-12T00:31:48Z",
-    "macro_checked_at": "2026-09-12T00:31:48Z",
+    "inventory_checked_at": "2026-09-12T09:22:45Z",
+    "macro_checked_at": "2026-09-12T09:22:45Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-12T05:15:00Z",
+    "next_scheduled_at": "2026-09-12T09:30:00Z",
     "run_interval_minutes": 15,
-    "source_count": 35,
+    "source_count": 37,
     "statuses": [
       {
         "date": "2026-09-09",
         "source": "FRED WALCL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED RRPONTSYD",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-09",
         "source": "FRED WDTGAL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED TOTRESNS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-03",
         "source": "FRED WM2NS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS30",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DFII10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED T10YIE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DFF",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED VIXCLS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED SP500",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-10",
+        "date": "2026-09-11",
         "source": "FRED NASDAQCOM",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "FRED DTWEXBGS",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-10",
+        "date": "2026-09-09",
         "source": "FRED DCOILBRENTEU",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-10",
+        "date": "2026-09-09",
         "source": "FRED DCOILWTICO",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PAYEMS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED UNRATE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED JTSJOL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED CPIAUCSL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "cached"
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-10",
+        "source": "Gate CFD XBRUSD",
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-10",
+        "source": "Gate CFD XTIUSD",
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "ECB FX",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11T20:45:00Z",
@@ -5857,25 +5867,25 @@
       {
         "date": "2026-09-08",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-12T05:07:09Z",
+        "date": "2026-09-12T09:23:03Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "CME gold warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "CME silver warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-12T05:07:09Z",
+        "date": "2026-09-12T09:23:03Z",
         "source": "A股指数/板块资金流",
         "status": "ok"
       },
@@ -5890,8 +5900,8 @@
         "status": "cached"
       }
     ],
-    "success_count": 35,
-    "updated_count": 6
+    "success_count": 37,
+    "updated_count": 35
   },
   "post_close_analysis": {
     "as_of": "2026-09-10",
@@ -10316,12 +10326,8 @@
     },
     "NASDAQCOM": {
       "category": "资产",
-      "date": "2026-09-10",
+      "date": "2026-09-11",
       "history": [
-        [
-          "2026-05-04",
-          25067.8
-        ],
         [
           "2026-05-05",
           25326.13
@@ -10677,16 +10683,20 @@
         [
           "2026-09-10",
           26081.72
+        ],
+        [
+          "2026-09-11",
+          26333.04
         ]
       ],
       "id": "NASDAQCOM",
       "label": "纳斯达克综合",
-      "previous": 26253.34,
-      "previous_date": "2026-09-09",
+      "previous": 26081.72,
+      "previous_date": "2026-09-10",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/NASDAQCOM",
       "unit": "指数",
-      "value": 26081.72
+      "value": 26333.04
     },
     "PAYEMS": {
       "category": "周期",
@@ -17881,5 +17891,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "5aa058cb80881aae"
+  "snapshot_id": "290b1a47fbc362e7"
 }
