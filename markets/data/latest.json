@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-13T00:48:22Z",
+    "checked_at": "2026-09-13T05:45:09Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 +1.5 亿（5日/市值 0.01%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -18,7 +18,7 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "LIVE",
+    "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
       "证券: sector not found",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 8
+      "history_live_count": 7
     },
     "index_flows": [
       {
@@ -347,10 +347,10 @@
       },
       {
         "code": "BK1325",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -12.83,
         "five_day_to_cap_pct": -0.134,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": 3.83,
@@ -383,7 +383,7 @@
             "main_net_flow_billion_cny": -13.134
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 0.954,
         "name": "半导体材料",
         "today_billion_cny": -13.134,
@@ -493,7 +493,7 @@
     ],
     "snapshot_date": "2026-09-13",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 7/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -546,9 +546,35 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-13T00:48:22Z",
+    "checked_at": "2026-09-13T05:45:09Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
+      {
+        "country": "USD",
+        "forecast": "0.5%",
+        "id": "420023f6a4cf",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Core Retail Sales m/m",
+        "previous": "-0.3%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-16T12:30:00Z",
+        "title": "美国 · Core Retail Sales m/m"
+      },
+      {
+        "country": "USD",
+        "forecast": "0.8%",
+        "id": "3b2ab9ea79bf",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Retail Sales m/m",
+        "previous": "-0.6%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-16T12:30:00Z",
+        "title": "美国 · Retail Sales m/m"
+      },
       {
         "country": "USD",
         "forecast": "",
@@ -561,6 +587,97 @@
         "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
         "timestamp": "2026-09-16T18:00:00Z",
         "title": "美联储 FOMC 事件"
+      },
+      {
+        "country": "USD",
+        "forecast": "",
+        "id": "99114a3020cb",
+        "impact": "High",
+        "official": false,
+        "original_title": "Federal Funds Rate",
+        "previous": "3.75%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-16T18:00:00Z",
+        "title": "美国 · Federal Funds Rate"
+      },
+      {
+        "country": "USD",
+        "forecast": "",
+        "id": "c161ed498c7c",
+        "impact": "High",
+        "official": false,
+        "original_title": "FOMC Press Conference",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-16T18:30:00Z",
+        "title": "美联储 FOMC 事件"
+      },
+      {
+        "country": "USD",
+        "forecast": "28.9",
+        "id": "86f0a069a5b0",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Philly Fed Manufacturing Index",
+        "previous": "47.4",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-17T12:30:00Z",
+        "title": "美国 · Philly Fed Manufacturing Index"
+      },
+      {
+        "country": "USD",
+        "forecast": "209K",
+        "id": "d6c73230e52a",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Unemployment Claims",
+        "previous": "206K",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-17T12:30:00Z",
+        "title": "美国初请失业金"
+      },
+      {
+        "country": "JPY",
+        "forecast": "<1.25%",
+        "id": "24a829a49371",
+        "impact": "High",
+        "official": false,
+        "original_title": "BOJ Policy Rate",
+        "previous": "<1.00%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-18T02:30:00Z",
+        "title": "日本央行事件"
+      },
+      {
+        "country": "JPY",
+        "forecast": "",
+        "id": "1e055efa2020",
+        "impact": "High",
+        "official": false,
+        "original_title": "Monetary Policy Statement",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-18T02:30:00Z",
+        "title": "日本 · Monetary Policy Statement"
+      },
+      {
+        "country": "JPY",
+        "forecast": "",
+        "id": "b66562271fe0",
+        "impact": "High",
+        "official": false,
+        "original_title": "BOJ Press Conference",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-09-18T05:30:00Z",
+        "title": "日本央行事件"
       },
       {
         "country": "USD",
@@ -743,63 +860,24 @@
         "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
         "timestamp": "2026-12-17T13:15:00Z",
         "title": "欧元区 · ECB monetary-policy decision"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "5b96ea30fcf9",
-        "impact": "High",
-        "official": true,
-        "original_title": "GDP (Third Estimate), Industries, Corporate Profits, State GDP, and State Personal Income, 3rd Quarter 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-23T13:30:00Z",
-        "title": "美国 GDP 第三次估值"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "36424af3a9fa",
-        "impact": "High",
-        "official": true,
-        "original_title": "Personal Income and Outlays, November 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-23T13:30:00Z",
-        "title": "美国个人收入与支出（含 PCE）"
-      },
-      {
-        "country": "EUR",
-        "forecast": "",
-        "id": "d04b9f463bdd",
-        "impact": "High",
-        "official": true,
-        "original_title": "ECB monetary-policy decision",
-        "previous": "",
-        "source": "European Central Bank",
-        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-        "timestamp": "2027-02-04T13:15:00Z",
-        "title": "欧元区 · ECB monetary-policy decision"
       }
     ],
     "next_event": {
       "country": "USD",
-      "forecast": "",
-      "id": "71afb6d4a159",
-      "impact": "High",
-      "official": true,
-      "original_title": "FOMC interest-rate decision and statement",
-      "previous": "",
-      "source": "Federal Reserve",
-      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "timestamp": "2026-09-16T18:00:00Z",
-      "title": "美联储 FOMC 事件"
+      "forecast": "0.5%",
+      "id": "420023f6a4cf",
+      "impact": "Medium",
+      "official": false,
+      "original_title": "Core Retail Sales m/m",
+      "previous": "-0.3%",
+      "source": "Forex Factory public calendar feed",
+      "source_url": "https://www.forexfactory.com/calendar",
+      "timestamp": "2026-09-16T12:30:00Z",
+      "title": "美国 · Core Retail Sales m/m"
     },
     "source_statuses": [
       {
-        "events": 0,
+        "events": 11,
         "source": "Broad weekly feed",
         "status": "ok"
       },
@@ -5275,9 +5353,9 @@
     "headline": "黄金中性等待；白银明显支持；日元温和压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
-    "next_event_text": "下一事件：09-16 20:00 美联储 FOMC 事件",
+    "next_event_text": "下一事件：09-16 14:30 美国 · Core Retail Sales m/m",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金中性等待；白银明显支持；日元温和压制。下一事件：09-16 20:00 美联储 FOMC 事件。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金中性等待；白银明显支持；日元温和压制。下一事件：09-16 14:30 美国 · Core Retail Sales m/m。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5402,7 +5480,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-09-12T22:57:10Z",
+      "checked_at": "2026-09-13T05:44:54Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5613,9 +5691,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-13T00:48:19Z"
+    "updated_at": "2026-09-13T05:44:54Z"
   },
-  "generated_at": "2026-09-13T00:48:19Z",
+  "generated_at": "2026-09-13T05:44:54Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5669,10 +5747,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-13T00:48:22Z",
+    "a_share_checked_at": "2026-09-13T05:45:09Z",
     "ai_tokens_used": 0,
-    "cached_count": 29,
-    "calendar_checked_at": "2026-09-13T00:48:19Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-09-13T05:44:54Z",
     "cftc_checked_at": "2026-09-12T18:36:18Z",
     "cross_asset_checked_at": "2026-09-13T00:48:19Z",
     "error_count": 3,
@@ -5693,143 +5771,153 @@
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 0,
-    "inventory_checked_at": "2026-09-12T22:57:10Z",
-    "macro_checked_at": "2026-09-12T22:57:10Z",
+    "fallback_count": 1,
+    "inventory_checked_at": "2026-09-13T05:44:54Z",
+    "macro_checked_at": "2026-09-13T05:44:54Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-13T01:00:00Z",
+    "next_scheduled_at": "2026-09-13T05:45:00Z",
     "run_interval_minutes": 15,
-    "source_count": 35,
+    "source_count": 37,
     "statuses": [
       {
         "date": "2026-09-09",
         "source": "FRED WALCL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED RRPONTSYD",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-09",
         "source": "FRED WDTGAL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED TOTRESNS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-03",
         "source": "FRED WM2NS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DGS30",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DFII10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED T10YIE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED DFF",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED VIXCLS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-10",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED SP500",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "FRED NASDAQCOM",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-04",
         "source": "FRED DTWEXBGS",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-10",
+        "date": "2026-09-09",
         "source": "FRED DCOILBRENTEU",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-10",
+        "date": "2026-09-09",
         "source": "FRED DCOILWTICO",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PAYEMS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED UNRATE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED JTSJOL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED CPIAUCSL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "cached"
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-10",
+        "source": "Gate CFD XBRUSD",
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-10",
+        "source": "Gate CFD XTIUSD",
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "ECB FX",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11T20:45:00Z",
@@ -5847,24 +5935,24 @@
         "status": "cached"
       },
       {
-        "date": "2026-09-13T00:48:22Z",
+        "date": "2026-09-13T05:45:09Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "CME gold warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-11",
         "source": "CME silver warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-13T00:48:22Z",
+        "date": "2026-09-13T05:45:09Z",
         "source": "A股指数/板块资金流",
-        "status": "ok"
+        "status": "fallback"
       },
       {
         "date": "2026-09-10",
@@ -5874,11 +5962,11 @@
       {
         "date": "2026-09-11",
         "source": "Cross-asset correlation",
-        "status": "ok"
+        "status": "cached"
       }
     ],
-    "success_count": 35,
-    "updated_count": 6
+    "success_count": 37,
+    "updated_count": 34
   },
   "post_close_analysis": {
     "as_of": "2026-09-10",
