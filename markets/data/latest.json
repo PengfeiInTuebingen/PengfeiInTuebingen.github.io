@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-15T07:29:34Z",
+    "checked_at": "2026-09-15T12:51:56Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -53.8 亿（5日/市值 -0.29%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -18,7 +18,7 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "LIVE",
+    "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
       "证券: sector not found",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 8
+      "history_live_count": 6
     },
     "index_flows": [
       {
@@ -391,10 +391,10 @@
       },
       {
         "code": "BK1036",
-        "continuity": "ONE_DAY_SPIKE",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -203.116,
         "five_day_to_cap_pct": -0.145,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -0.42,
@@ -427,7 +427,7 @@
             "main_net_flow_billion_cny": 44.605
           }
         ],
-        "label": "单日流入，5日未确认",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 14.011,
         "name": "半导体",
         "today_billion_cny": 44.605,
@@ -435,10 +435,10 @@
       },
       {
         "code": "BK1283",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -28.777,
         "five_day_to_cap_pct": -0.018,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": 0.14,
@@ -471,7 +471,7 @@
             "main_net_flow_billion_cny": -17.073
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 16.199,
         "name": "银行",
         "today_billion_cny": -17.073,
@@ -493,7 +493,7 @@
     ],
     "snapshot_date": "2026-09-15",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 6/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-15T07:29:34Z",
+    "checked_at": "2026-09-15T12:51:56Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5177,15 +5177,15 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-09-15T07:15:00Z",
+    "as_of": "2026-09-15T12:45:00Z",
     "assets": {
       "gold": {
         "drivers": [
           {
-            "direction": "支持",
-            "fact": "黄金 UTC 日内 +0.12%",
+            "direction": "中性",
+            "fact": "黄金 UTC 日内 +0.02%",
             "name": "黄金日内动量",
-            "raw": 1.0,
+            "raw": 0.0,
             "weight": 0.23
           },
           {
@@ -5224,16 +5224,16 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 -8，对黄金中性等待。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 -31，对黄金温和压制。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": -8,
-        "stance": "中性等待"
+        "score": -31,
+        "stance": "温和压制"
       },
       "silver": {
         "drivers": [
           {
             "direction": "支持",
-            "fact": "白银 UTC 日内 +0.12%",
+            "fact": "白银 UTC 日内 +1.11%",
             "name": "白银日内动量",
             "raw": 1.0,
             "weight": 0.23
@@ -5324,12 +5324,12 @@
       }
     },
     "date": "2026-09-15",
-    "headline": "黄金中性等待；白银温和支持；日元明显压制。",
+    "headline": "黄金温和压制；白银温和支持；日元明显压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
     "next_event_text": "下一事件：09-16 14:30 美国 · Core Retail Sales m/m",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金中性等待；白银温和支持；日元明显压制。下一事件：09-16 14:30 美国 · Core Retail Sales m/m。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和压制；白银温和支持；日元明显压制。下一事件：09-16 14:30 美国 · Core Retail Sales m/m。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5358,7 +5358,7 @@
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
-      "value": 68.0365
+      "value": 67.2998
     },
     "M2_YOY": {
       "date": "2026-08-03",
@@ -5421,28 +5421,28 @@
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.2845
+      "value": 0.9891
     },
     "XAG_SESSION": {
       "date": "2026-09-15",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.1174
+      "value": 1.1077
     },
     "XAU_15M": {
       "date": "2026-09-15",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.196
+      "value": -0.1044
     },
     "XAU_SESSION": {
       "date": "2026-09-15",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": 0.1232
+      "value": 0.0187
     },
     "YIELD_10Y2Y": {
       "date": "2026-09-11",
@@ -5677,9 +5677,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-15T07:29:14Z"
+    "updated_at": "2026-09-15T12:51:53Z"
   },
-  "generated_at": "2026-09-15T07:29:14Z",
+  "generated_at": "2026-09-15T12:51:53Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5733,10 +5733,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-15T07:29:34Z",
+    "a_share_checked_at": "2026-09-15T12:51:56Z",
     "ai_tokens_used": 0,
-    "cached_count": 0,
-    "calendar_checked_at": "2026-09-15T07:29:14Z",
+    "cached_count": 30,
+    "calendar_checked_at": "2026-09-15T12:51:53Z",
     "cftc_checked_at": "2026-09-15T07:29:14Z",
     "cross_asset_checked_at": "2026-09-15T07:29:14Z",
     "error_count": 3,
@@ -5757,188 +5757,178 @@
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 0,
+    "fallback_count": 1,
     "inventory_checked_at": "2026-09-15T07:29:14Z",
     "macro_checked_at": "2026-09-15T07:29:14Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-15T07:30:00Z",
+    "next_scheduled_at": "2026-09-15T13:00:00Z",
     "run_interval_minutes": 15,
-    "source_count": 37,
+    "source_count": 35,
     "statuses": [
       {
         "date": "2026-09-09",
         "source": "FRED WALCL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "FRED RRPONTSYD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-09",
         "source": "FRED WDTGAL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED TOTRESNS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-03",
         "source": "FRED WM2NS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DGS2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DGS10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DGS30",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DFII10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "FRED T10YIE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DFF",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED VIXCLS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "FRED SP500",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "FRED NASDAQCOM",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-11",
         "source": "FRED DTWEXBGS",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-09",
+        "date": "2026-09-14",
         "source": "FRED DCOILBRENTEU",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-09",
+        "date": "2026-09-14",
         "source": "FRED DCOILWTICO",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PAYEMS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED UNRATE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED JTSJOL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED CPIAUCSL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "ok"
-      },
-      {
-        "date": "2026-09-14",
-        "source": "Gate CFD XBRUSD",
-        "status": "ok"
-      },
-      {
-        "date": "2026-09-14",
-        "source": "Gate CFD XTIUSD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "ECB FX",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-15T07:15:00Z",
+        "date": "2026-09-15T12:45:00Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-09-15T07:15:00Z",
+        "date": "2026-09-15T12:45:00Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
       {
         "date": "2026-09-08",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-15T07:29:34Z",
+        "date": "2026-09-15T12:51:56Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-09-14",
         "source": "CME gold warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-14",
         "source": "CME silver warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-09-15T07:29:34Z",
+        "date": "2026-09-15T12:51:56Z",
         "source": "A股指数/板块资金流",
-        "status": "ok"
+        "status": "fallback"
       },
       {
         "date": "2026-09-14",
@@ -5948,41 +5938,41 @@
       {
         "date": "2026-09-14",
         "source": "Cross-asset correlation",
-        "status": "ok"
+        "status": "cached"
       }
     ],
-    "success_count": 37,
-    "updated_count": 37
+    "success_count": 35,
+    "updated_count": 4
   },
   "post_close_analysis": {
     "as_of": "2026-09-14",
     "basis": "优先 Gate XAUUSD CFD 日线；接口不可用时使用公开 XAU/USD 或 COMEX GC=F 日线代理；成交量由源端提供时才展示",
     "daily_bar": {
-      "close": 4291.61,
+      "close": 4289.67,
       "date": "2026-09-14",
       "high": 4317.38,
-      "low": 4283.27,
+      "low": 4261.33,
       "open": 4300.51,
       "volume": null
     },
     "data_quality": "使用公开 XAU/USD 日线；若源端尚未发布新完整收盘日线，则保留最近已验证日线。",
     "levels": {
       "deep_support": 4200,
-      "midpoint": 4300.33,
+      "midpoint": 4289.35,
       "prior_high": 4697,
       "resistance_1": 4300.51,
       "resistance_2": 4317.38,
-      "support_1": 4283.27,
-      "support_2": 4454.8
+      "support_1": 4261.33,
+      "support_2": 4454.71
     },
     "metrics": {
-      "body": 8.9,
-      "body_pct": 26.1,
-      "close_location_pct": 24.5,
-      "lower_wick": 8.34,
+      "body": 10.84,
+      "body_pct": 19.3,
+      "close_location_pct": 50.6,
+      "lower_wick": 28.34,
       "previous_close": 4298.7,
-      "range": 34.11,
-      "sma20": 4454.8,
+      "range": 56.05,
+      "sma20": 4454.71,
       "upper_wick": 16.87
     },
     "oil": {
@@ -6028,9 +6018,9 @@
     "silver": {
       "label": "白银 XAG/USD",
       "note": "白银既受贵金属联动支持，也对实际利率和工业周期更敏感；跌破自身支撑时不与黄金强行合并。",
-      "session_change": 0.1174,
+      "session_change": 1.1077,
       "stance": "高波动，等待跟随确认",
-      "value": 63.087
+      "value": 63.711
     },
     "source": "Gate CFD XAUUSD daily OHLC",
     "source_url": [
@@ -12060,94 +12050,6 @@
       "date": "2026-09-15",
       "history": [
         [
-          "2026-09-08T07:30:00Z",
-          66.006
-        ],
-        [
-          "2026-09-08T07:45:00Z",
-          65.916
-        ],
-        [
-          "2026-09-08T08:00:00Z",
-          65.74
-        ],
-        [
-          "2026-09-08T08:15:00Z",
-          65.779
-        ],
-        [
-          "2026-09-08T08:30:00Z",
-          65.824
-        ],
-        [
-          "2026-09-08T08:45:00Z",
-          65.847
-        ],
-        [
-          "2026-09-08T09:00:00Z",
-          65.941
-        ],
-        [
-          "2026-09-08T09:15:00Z",
-          65.873
-        ],
-        [
-          "2026-09-08T09:30:00Z",
-          66.042
-        ],
-        [
-          "2026-09-08T09:45:00Z",
-          66.108
-        ],
-        [
-          "2026-09-08T10:00:00Z",
-          65.93
-        ],
-        [
-          "2026-09-08T10:15:00Z",
-          66.047
-        ],
-        [
-          "2026-09-08T10:30:00Z",
-          65.959
-        ],
-        [
-          "2026-09-08T10:45:00Z",
-          65.872
-        ],
-        [
-          "2026-09-08T11:00:00Z",
-          65.939
-        ],
-        [
-          "2026-09-08T11:15:00Z",
-          66.108
-        ],
-        [
-          "2026-09-08T11:30:00Z",
-          66.134
-        ],
-        [
-          "2026-09-08T11:45:00Z",
-          66.245
-        ],
-        [
-          "2026-09-08T12:00:00Z",
-          65.871
-        ],
-        [
-          "2026-09-08T12:15:00Z",
-          66.09
-        ],
-        [
-          "2026-09-08T12:30:00Z",
-          66.076
-        ],
-        [
-          "2026-09-08T12:45:00Z",
-          66.441
-        ],
-        [
           "2026-09-08T13:00:00Z",
           66.604
         ],
@@ -13897,116 +13799,116 @@
         ],
         [
           "2026-09-15T07:15:00Z",
-          63.087
+          63.078
+        ],
+        [
+          "2026-09-15T07:30:00Z",
+          62.867
+        ],
+        [
+          "2026-09-15T07:45:00Z",
+          62.804
+        ],
+        [
+          "2026-09-15T08:00:00Z",
+          62.739
+        ],
+        [
+          "2026-09-15T08:15:00Z",
+          62.844
+        ],
+        [
+          "2026-09-15T08:30:00Z",
+          62.758
+        ],
+        [
+          "2026-09-15T08:45:00Z",
+          62.775
+        ],
+        [
+          "2026-09-15T09:00:00Z",
+          62.802
+        ],
+        [
+          "2026-09-15T09:15:00Z",
+          62.809
+        ],
+        [
+          "2026-09-15T09:30:00Z",
+          62.926
+        ],
+        [
+          "2026-09-15T09:45:00Z",
+          63.05
+        ],
+        [
+          "2026-09-15T10:00:00Z",
+          63.105
+        ],
+        [
+          "2026-09-15T10:15:00Z",
+          63.073
+        ],
+        [
+          "2026-09-15T10:30:00Z",
+          63.058
+        ],
+        [
+          "2026-09-15T10:45:00Z",
+          63.157
+        ],
+        [
+          "2026-09-15T11:00:00Z",
+          63.167
+        ],
+        [
+          "2026-09-15T11:15:00Z",
+          63.17
+        ],
+        [
+          "2026-09-15T11:30:00Z",
+          63.193
+        ],
+        [
+          "2026-09-15T11:45:00Z",
+          63.27
+        ],
+        [
+          "2026-09-15T12:00:00Z",
+          63.184
+        ],
+        [
+          "2026-09-15T12:15:00Z",
+          63.24
+        ],
+        [
+          "2026-09-15T12:30:00Z",
+          63.44
+        ],
+        [
+          "2026-09-15T12:45:00Z",
+          63.711
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-09-15T07:15:00Z",
-      "previous": 63.267,
-      "previous_date": "2026-09-15T07:00:00Z",
+      "observed_at": "2026-09-15T12:45:00Z",
+      "previous": 63.087,
+      "previous_date": "2026-09-15T12:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAGUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 63.087,
+      "value": 63.711,
       "venue": "Gate TradFi CFD"
     },
     "SPOT_XAUUSD": {
       "category": "贵金属",
       "date": "2026-09-15",
       "history": [
-        [
-          "2026-09-08T07:30:00Z",
-          4395.66
-        ],
-        [
-          "2026-09-08T07:45:00Z",
-          4392.43
-        ],
-        [
-          "2026-09-08T08:00:00Z",
-          4390.48
-        ],
-        [
-          "2026-09-08T08:15:00Z",
-          4394.8
-        ],
-        [
-          "2026-09-08T08:30:00Z",
-          4392.85
-        ],
-        [
-          "2026-09-08T08:45:00Z",
-          4394.22
-        ],
-        [
-          "2026-09-08T09:00:00Z",
-          4397.43
-        ],
-        [
-          "2026-09-08T09:15:00Z",
-          4393.06
-        ],
-        [
-          "2026-09-08T09:30:00Z",
-          4401.48
-        ],
-        [
-          "2026-09-08T09:45:00Z",
-          4402.96
-        ],
-        [
-          "2026-09-08T10:00:00Z",
-          4396.39
-        ],
-        [
-          "2026-09-08T10:15:00Z",
-          4399.45
-        ],
-        [
-          "2026-09-08T10:30:00Z",
-          4397.15
-        ],
-        [
-          "2026-09-08T10:45:00Z",
-          4395.35
-        ],
-        [
-          "2026-09-08T11:00:00Z",
-          4395.16
-        ],
-        [
-          "2026-09-08T11:15:00Z",
-          4402.08
-        ],
-        [
-          "2026-09-08T11:30:00Z",
-          4403.58
-        ],
-        [
-          "2026-09-08T11:45:00Z",
-          4406.41
-        ],
-        [
-          "2026-09-08T12:00:00Z",
-          4391.99
-        ],
-        [
-          "2026-09-08T12:15:00Z",
-          4401.9
-        ],
-        [
-          "2026-09-08T12:30:00Z",
-          4396.63
-        ],
-        [
-          "2026-09-08T12:45:00Z",
-          4411.55
-        ],
         [
           "2026-09-08T13:00:00Z",
           4408.52
@@ -15757,22 +15659,110 @@
         ],
         [
           "2026-09-15T07:15:00Z",
-          4292.22
+          4292.05
+        ],
+        [
+          "2026-09-15T07:30:00Z",
+          4283.93
+        ],
+        [
+          "2026-09-15T07:45:00Z",
+          4280.66
+        ],
+        [
+          "2026-09-15T08:00:00Z",
+          4268.06
+        ],
+        [
+          "2026-09-15T08:15:00Z",
+          4273.18
+        ],
+        [
+          "2026-09-15T08:30:00Z",
+          4267.6
+        ],
+        [
+          "2026-09-15T08:45:00Z",
+          4262.45
+        ],
+        [
+          "2026-09-15T09:00:00Z",
+          4265.84
+        ],
+        [
+          "2026-09-15T09:15:00Z",
+          4267.04
+        ],
+        [
+          "2026-09-15T09:30:00Z",
+          4269.61
+        ],
+        [
+          "2026-09-15T09:45:00Z",
+          4268.28
+        ],
+        [
+          "2026-09-15T10:00:00Z",
+          4273.12
+        ],
+        [
+          "2026-09-15T10:15:00Z",
+          4274.58
+        ],
+        [
+          "2026-09-15T10:30:00Z",
+          4275.02
+        ],
+        [
+          "2026-09-15T10:45:00Z",
+          4281.55
+        ],
+        [
+          "2026-09-15T11:00:00Z",
+          4283.75
+        ],
+        [
+          "2026-09-15T11:15:00Z",
+          4283.4
+        ],
+        [
+          "2026-09-15T11:30:00Z",
+          4282.9
+        ],
+        [
+          "2026-09-15T11:45:00Z",
+          4284.67
+        ],
+        [
+          "2026-09-15T12:00:00Z",
+          4278.5
+        ],
+        [
+          "2026-09-15T12:15:00Z",
+          4277.95
+        ],
+        [
+          "2026-09-15T12:30:00Z",
+          4281.32
+        ],
+        [
+          "2026-09-15T12:45:00Z",
+          4287.74
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-09-15T07:15:00Z",
-      "previous": 4300.65,
-      "previous_date": "2026-09-15T07:00:00Z",
+      "observed_at": "2026-09-15T12:45:00Z",
+      "previous": 4292.22,
+      "previous_date": "2026-09-15T12:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAUUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 4292.22,
+      "value": 4287.74,
       "venue": "Gate TradFi CFD"
     },
     "T10YIE": {
@@ -18018,5 +18008,5 @@
       "value": 23207.7
     }
   },
-  "snapshot_id": "eb2ff86c03e69db2"
+  "snapshot_id": "4be9f1af58df1976"
 }
