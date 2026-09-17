@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-16T22:52:46Z",
+  "checked_at": "2026-09-17T01:10:46Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -53.3 亿（5日/市值 -0.29%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -22,7 +22,15 @@
   "errors": [
     "证券: sector not found",
     "酿酒: sector not found",
-    "有色金属/贵金属: sector not found"
+    "通信设备 history: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17754253",
+    "半导体材料 history: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17754252",
+    "半导体 history: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 18167009",
+    "银行 history: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 18167009",
+    "有色金属/贵金属: sector not found",
+    "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17754252",
+    "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 18167009",
+    "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17762215",
+    "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17762215"
   ],
   "evaluation_status": "PARTIAL",
   "framework": [
@@ -36,50 +44,50 @@
   "freshness": {
     "cached_sector_count": 3,
     "current_sector_count": 8,
-    "error_count": 3,
-    "history_live_count": 7
+    "error_count": 11,
+    "history_live_count": 4
   },
   "index_flows": [
     {
-      "change_pct": 0.71,
+      "change_pct": 0.0,
       "code": "000001",
-      "main_net_flow_billion_cny": 149.151,
+      "main_net_flow_billion_cny": null,
       "name": "上证指数",
-      "price": 3891.6,
+      "price": 3891.43,
       "secid": "1.000001",
-      "turnover_billion_cny": 8711.413
+      "turnover_billion_cny": 0.0
     },
     {
-      "change_pct": 4.14,
+      "change_pct": 0.0,
       "code": "000688",
-      "main_net_flow_billion_cny": 42.55,
+      "main_net_flow_billion_cny": null,
       "name": "科创50",
       "price": 1616.19,
       "secid": "1.000688",
-      "turnover_billion_cny": 954.623
+      "turnover_billion_cny": 0.0
     },
     {
-      "change_pct": 1.26,
+      "change_pct": 0.0,
       "code": "399001",
-      "main_net_flow_billion_cny": 156.389,
+      "main_net_flow_billion_cny": null,
       "name": "深证成指",
       "price": 13454.74,
       "secid": "0.399001",
-      "turnover_billion_cny": 9679.805
+      "turnover_billion_cny": 0.0
     },
     {
-      "change_pct": 1.96,
+      "change_pct": 0.0,
       "code": "399006",
-      "main_net_flow_billion_cny": 54.15,
+      "main_net_flow_billion_cny": null,
       "name": "创业板指",
       "price": 3311.47,
       "secid": "0.399006",
-      "turnover_billion_cny": 4649.745
+      "turnover_billion_cny": 0.0
     }
   ],
   "market": {
-    "main_net_flow_billion_cny": 402.24,
-    "structure_label": "指数主力流向净流入，结构仍需结合行业连续性",
+    "main_net_flow_billion_cny": null,
+    "structure_label": "指数主力流向偏弱或部分缺失",
     "turnover_trillion_cny": 1.839
   },
   "next_data_needed": [
@@ -259,7 +267,7 @@
     {
       "code": "BK1200",
       "continuity": "RED_STRONG",
-      "five_day_billion_cny": -137.509,
+      "five_day_billion_cny": -137.522,
       "five_day_to_cap_pct": -0.193,
       "flow_data_status": "LIVE",
       "history": [
@@ -267,7 +275,7 @@
           "change_pct": -1.24,
           "close": 5859.74,
           "date": "2026-09-10",
-          "main_net_flow_billion_cny": -24.744
+          "main_net_flow_billion_cny": -24.757
         },
         {
           "change_pct": -1.83,
@@ -295,17 +303,17 @@
         }
       ],
       "label": "持续流出，强度偏高",
-      "market_cap_trillion_cny": 7.124,
+      "market_cap_trillion_cny": 7.123,
       "name": "电力设备",
       "today_billion_cny": -43.809,
       "today_to_cap_pct": -0.061
     },
     {
       "code": "BK0448",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 19.097,
       "five_day_to_cap_pct": 0.043,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "PARTIAL",
       "history": [
         {
           "change_pct": -1.24,
@@ -338,7 +346,7 @@
           "main_net_flow_billion_cny": 106.339
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 4.478,
       "name": "通信设备",
       "today_billion_cny": 106.339,
@@ -346,10 +354,10 @@
     },
     {
       "code": "BK1325",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 42.819,
       "five_day_to_cap_pct": 0.408,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "PARTIAL",
       "history": [
         {
           "change_pct": -0.47,
@@ -382,7 +390,7 @@
           "main_net_flow_billion_cny": 39.361
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 1.049,
       "name": "半导体材料",
       "today_billion_cny": 39.361,
@@ -390,10 +398,10 @@
     },
     {
       "code": "BK1036",
-      "continuity": "ONE_DAY_SPIKE",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": -1.127,
       "five_day_to_cap_pct": -0.001,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "PARTIAL",
       "history": [
         {
           "change_pct": -0.71,
@@ -426,8 +434,8 @@
           "main_net_flow_billion_cny": 136.506
         }
       ],
-      "label": "单日流入，5日未确认",
-      "market_cap_trillion_cny": 14.555,
+      "label": "5日历史未完整返回，连续性不判定",
+      "market_cap_trillion_cny": 14.56,
       "name": "半导体",
       "today_billion_cny": 136.506,
       "today_to_cap_pct": 0.094
@@ -492,7 +500,7 @@
   ],
   "snapshot_date": "2026-09-17",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 7/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 4/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
