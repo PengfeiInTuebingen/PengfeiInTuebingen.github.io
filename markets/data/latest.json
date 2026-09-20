@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-19T23:35:24Z",
+    "checked_at": "2026-09-20T01:41:45Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -32.6 亿（5日/市值 -0.18%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -18,7 +18,7 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "PARTIAL",
+    "data_status": "LIVE",
     "data_type": "a_share_snapshot",
     "errors": [
       "证券: sector not found",
@@ -38,7 +38,7 @@
       "cached_sector_count": 3,
       "current_sector_count": 8,
       "error_count": 3,
-      "history_live_count": 6
+      "history_live_count": 8
     },
     "index_flows": [
       {
@@ -347,10 +347,10 @@
       },
       {
         "code": "BK1325",
-        "continuity": "UNKNOWN",
+        "continuity": "CONTINUOUS_GREEN",
         "five_day_billion_cny": 45.596,
         "five_day_to_cap_pct": 0.424,
-        "flow_data_status": "PARTIAL",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 2.36,
@@ -383,7 +383,7 @@
             "main_net_flow_billion_cny": 12.851
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "连续流入",
         "market_cap_trillion_cny": 1.076,
         "name": "半导体材料",
         "today_billion_cny": 12.851,
@@ -435,10 +435,10 @@
       },
       {
         "code": "BK1283",
-        "continuity": "UNKNOWN",
+        "continuity": "RED",
         "five_day_billion_cny": -42.825,
         "five_day_to_cap_pct": -0.027,
-        "flow_data_status": "PARTIAL",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 0.88,
@@ -471,7 +471,7 @@
             "main_net_flow_billion_cny": -2.382
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "连续流出",
         "market_cap_trillion_cny": 16.027,
         "name": "银行",
         "today_billion_cny": -2.382,
@@ -493,7 +493,7 @@
     ],
     "snapshot_date": "2026-09-20",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 6/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -546,7 +546,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-19T23:35:24Z",
+    "checked_at": "2026-09-20T01:41:45Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5673,9 +5673,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-19T23:35:20Z"
+    "updated_at": "2026-09-20T01:41:42Z"
   },
-  "generated_at": "2026-09-19T23:35:20Z",
+  "generated_at": "2026-09-20T01:41:42Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5729,10 +5729,10 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-19T23:35:24Z",
+    "a_share_checked_at": "2026-09-20T01:41:45Z",
     "ai_tokens_used": 0,
     "cached_count": 30,
-    "calendar_checked_at": "2026-09-19T23:35:20Z",
+    "calendar_checked_at": "2026-09-20T01:41:42Z",
     "cftc_checked_at": "2026-09-19T19:20:12Z",
     "cross_asset_checked_at": "2026-09-19T19:20:12Z",
     "error_count": 3,
@@ -5753,11 +5753,11 @@
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 1,
+    "fallback_count": 0,
     "inventory_checked_at": "2026-09-19T21:37:36Z",
     "macro_checked_at": "2026-09-19T21:37:36Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-19T23:45:00Z",
+    "next_scheduled_at": "2026-09-20T01:45:00Z",
     "run_interval_minutes": 15,
     "source_count": 35,
     "statuses": [
@@ -5907,7 +5907,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-09-19T23:35:24Z",
+        "date": "2026-09-20T01:41:45Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -5922,9 +5922,9 @@
         "status": "cached"
       },
       {
-        "date": "2026-09-19T23:35:24Z",
+        "date": "2026-09-20T01:41:45Z",
         "source": "A股指数/板块资金流",
-        "status": "fallback"
+        "status": "ok"
       },
       {
         "date": "2026-09-17",
@@ -5938,7 +5938,7 @@
       }
     ],
     "success_count": 35,
-    "updated_count": 4
+    "updated_count": 5
   },
   "post_close_analysis": {
     "as_of": "2026-09-17",
