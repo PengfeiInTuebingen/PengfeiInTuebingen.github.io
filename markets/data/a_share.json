@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-21T01:25:18Z",
+  "checked_at": "2026-09-21T06:53:10Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -32.6 亿（5日/市值 -0.18%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -22,7 +22,9 @@
   "errors": [
     "证券: sector not found",
     "酿酒: sector not found",
-    "有色金属/贵金属: sector not found"
+    "有色金属/贵金属: sector not found",
+    "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17762216",
+    "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Eastmoney response unavailable: {'rc': 100, 'rt': 1, 'svr': 17762216"
   ],
   "evaluation_status": "PARTIAL",
   "framework": [
@@ -36,51 +38,51 @@
   "freshness": {
     "cached_sector_count": 3,
     "current_sector_count": 8,
-    "error_count": 3,
+    "error_count": 5,
     "history_live_count": 8
   },
   "index_flows": [
     {
-      "change_pct": 0.21,
+      "change_pct": 0.95,
       "code": "000001",
-      "main_net_flow_billion_cny": 145.141,
+      "main_net_flow_billion_cny": null,
       "name": "上证指数",
-      "price": 3920.27,
+      "price": 3948.95,
       "secid": "1.000001",
-      "turnover_billion_cny": 83.372
+      "turnover_billion_cny": 9154.975
     },
     {
-      "change_pct": 1.0,
+      "change_pct": 0.19,
       "code": "000688",
-      "main_net_flow_billion_cny": 33.496,
+      "main_net_flow_billion_cny": null,
       "name": "科创50",
-      "price": 1669.2,
+      "price": 1655.69,
       "secid": "1.000688",
-      "turnover_billion_cny": 6.604
+      "turnover_billion_cny": 868.866
     },
     {
-      "change_pct": 0.55,
+      "change_pct": 0.59,
       "code": "399001",
       "main_net_flow_billion_cny": 247.137,
       "name": "深证成指",
-      "price": 13716.22,
+      "price": 13721.72,
       "secid": "0.399001",
-      "turnover_billion_cny": 103.078
+      "turnover_billion_cny": 10468.701
     },
     {
-      "change_pct": 0.93,
+      "change_pct": 0.72,
       "code": "399006",
       "main_net_flow_billion_cny": 83.121,
       "name": "创业板指",
-      "price": 3403.9,
+      "price": 3397.07,
       "secid": "0.399006",
-      "turnover_billion_cny": 46.042
+      "turnover_billion_cny": 5076.043
     }
   ],
   "market": {
-    "main_net_flow_billion_cny": 508.895,
+    "main_net_flow_billion_cny": null,
     "structure_label": "指数主力流向净流入，结构仍需结合行业连续性",
-    "turnover_trillion_cny": 0.019
+    "turnover_trillion_cny": 1.962
   },
   "next_data_needed": [
     "A股个股日内 OHLCV",
@@ -102,7 +104,7 @@
       "code": "BK1615",
       "continuity": "ONE_DAY_SPIKE",
       "five_day_billion_cny": -32.554,
-      "five_day_to_cap_pct": -0.177,
+      "five_day_to_cap_pct": -0.178,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -137,7 +139,7 @@
         }
       ],
       "label": "单日流入，5日未确认",
-      "market_cap_trillion_cny": 1.838,
+      "market_cap_trillion_cny": 1.831,
       "name": "铜",
       "today_billion_cny": 13.98,
       "today_to_cap_pct": 0.076
@@ -146,7 +148,7 @@
       "code": "BK1287",
       "continuity": "ONE_DAY_SPIKE",
       "five_day_billion_cny": -39.171,
-      "five_day_to_cap_pct": -0.135,
+      "five_day_to_cap_pct": -0.136,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -181,7 +183,7 @@
         }
       ],
       "label": "单日流入，5日未确认",
-      "market_cap_trillion_cny": 2.894,
+      "market_cap_trillion_cny": 2.874,
       "name": "工业金属",
       "today_billion_cny": 16.401,
       "today_to_cap_pct": 0.057
@@ -203,7 +205,7 @@
       "code": "BK1340",
       "continuity": "RED_STRONG",
       "five_day_billion_cny": -76.934,
-      "five_day_to_cap_pct": -0.265,
+      "five_day_to_cap_pct": -0.262,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -238,10 +240,10 @@
         }
       ],
       "label": "持续流出，强度偏高",
-      "market_cap_trillion_cny": 2.906,
+      "market_cap_trillion_cny": 2.94,
       "name": "印制电路板",
       "today_billion_cny": -41.169,
-      "today_to_cap_pct": -0.142
+      "today_to_cap_pct": -0.14
     },
     {
       "code": null,
@@ -295,7 +297,7 @@
         }
       ],
       "label": "单日流入，5日未确认",
-      "market_cap_trillion_cny": 7.225,
+      "market_cap_trillion_cny": 7.197,
       "name": "电力设备",
       "today_billion_cny": 33.119,
       "today_to_cap_pct": 0.046
@@ -339,7 +341,7 @@
         }
       ],
       "label": "连续流入",
-      "market_cap_trillion_cny": 4.655,
+      "market_cap_trillion_cny": 4.652,
       "name": "通信设备",
       "today_billion_cny": 46.282,
       "today_to_cap_pct": 0.099
@@ -348,7 +350,7 @@
       "code": "BK1325",
       "continuity": "CONTINUOUS_GREEN",
       "five_day_billion_cny": 45.596,
-      "five_day_to_cap_pct": 0.42,
+      "five_day_to_cap_pct": 0.428,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -383,16 +385,16 @@
         }
       ],
       "label": "连续流入",
-      "market_cap_trillion_cny": 1.086,
+      "market_cap_trillion_cny": 1.065,
       "name": "半导体材料",
       "today_billion_cny": 12.851,
-      "today_to_cap_pct": 0.118
+      "today_to_cap_pct": 0.121
     },
     {
       "code": "BK1036",
       "continuity": "CONTINUOUS_GREEN",
       "five_day_billion_cny": 244.767,
-      "five_day_to_cap_pct": 0.161,
+      "five_day_to_cap_pct": 0.162,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -427,16 +429,16 @@
         }
       ],
       "label": "连续流入",
-      "market_cap_trillion_cny": 15.196,
+      "market_cap_trillion_cny": 15.088,
       "name": "半导体",
       "today_billion_cny": 182.204,
-      "today_to_cap_pct": 0.12
+      "today_to_cap_pct": 0.121
     },
     {
       "code": "BK1283",
       "continuity": "RED",
       "five_day_billion_cny": -42.825,
-      "five_day_to_cap_pct": -0.027,
+      "five_day_to_cap_pct": -0.026,
       "flow_data_status": "LIVE",
       "history": [
         {
@@ -471,7 +473,7 @@
         }
       ],
       "label": "连续流出",
-      "market_cap_trillion_cny": 15.993,
+      "market_cap_trillion_cny": 16.164,
       "name": "银行",
       "today_billion_cny": -2.382,
       "today_to_cap_pct": -0.001
