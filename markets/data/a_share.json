@@ -1,13 +1,13 @@
 {
-  "checked_at": "2026-09-22T01:12:32Z",
+  "checked_at": "2026-09-22T06:18:48Z",
   "conclusions": [
     {
-      "body": "铜当前记录值为 -32.6 亿（5日/市值 -0.18%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
+      "body": "铜当前记录值为 -33.3 亿（5日/市值 -0.18%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
       "title": "资源流入连续性",
       "tone": "neutral"
     },
     {
-      "body": "半导体记录值为 +244.8 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
+      "body": "半导体记录值为 +266.0 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
       "title": "科技资金状态",
       "tone": "neutral"
     },
@@ -17,20 +17,11 @@
       "tone": "neutral"
     }
   ],
-  "data_status": "PARTIAL",
+  "data_status": "LIVE",
   "data_type": "a_share_snapshot",
   "errors": [
-    "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "铜: sector not found",
-    "工业金属: sector not found",
     "证券: sector not found",
-    "印制电路板: sector not found",
     "酿酒: sector not found",
-    "电力设备: sector not found",
-    "通信设备: sector not found",
-    "半导体材料: sector not found",
-    "半导体: sector not found",
-    "银行: sector not found",
     "有色金属/贵金属: sector not found"
   ],
   "evaluation_status": "PARTIAL",
@@ -43,53 +34,53 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 11,
-    "current_sector_count": 0,
-    "error_count": 12,
-    "history_live_count": 0
+    "cached_sector_count": 3,
+    "current_sector_count": 8,
+    "error_count": 3,
+    "history_live_count": 8
   },
   "index_flows": [
     {
-      "change_pct": 0.0,
+      "change_pct": 0.05,
       "code": "000001",
       "main_net_flow_billion_cny": 30.618,
       "name": "上证指数",
-      "price": 3949.87,
+      "price": 3951.84,
       "secid": "1.000001",
-      "turnover_billion_cny": 0.0
+      "turnover_billion_cny": 8741.513
     },
     {
-      "change_pct": 0.0,
+      "change_pct": 0.5,
       "code": "000688",
       "main_net_flow_billion_cny": -8.534,
       "name": "科创50",
-      "price": 1657.48,
+      "price": 1665.72,
       "secid": "1.000688",
-      "turnover_billion_cny": 0.0
+      "turnover_billion_cny": 992.21
     },
     {
-      "change_pct": 0.0,
+      "change_pct": 0.01,
       "code": "399001",
       "main_net_flow_billion_cny": 55.761,
       "name": "深证成指",
-      "price": 13730.02,
+      "price": 13731.1,
       "secid": "0.399001",
-      "turnover_billion_cny": 0.0
+      "turnover_billion_cny": 9703.485
     },
     {
-      "change_pct": 0.0,
+      "change_pct": 0.05,
       "code": "399006",
       "main_net_flow_billion_cny": 37.184,
       "name": "创业板指",
-      "price": 3399.59,
+      "price": 3401.37,
       "secid": "0.399006",
-      "turnover_billion_cny": 0.0
+      "turnover_billion_cny": 4690.53
     }
   ],
   "market": {
     "main_net_flow_billion_cny": 115.029,
     "structure_label": "指数主力流向净流入，结构仍需结合行业连续性",
-    "turnover_trillion_cny": 2.032
+    "turnover_trillion_cny": 1.844
   },
   "next_data_needed": [
     "A股个股日内 OHLCV",
@@ -109,17 +100,11 @@
   "sectors": [
     {
       "code": "BK1615",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": -32.554,
-      "five_day_to_cap_pct": -0.178,
-      "flow_data_status": "CACHED",
+      "continuity": "RED",
+      "five_day_billion_cny": -33.277,
+      "five_day_to_cap_pct": -0.18,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": -1.93,
-          "close": 3857.46,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": -9.279
-        },
         {
           "change_pct": -2.04,
           "close": 3778.93,
@@ -143,27 +128,27 @@
           "close": 3838.76,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 13.98
+        },
+        {
+          "change_pct": 0.32,
+          "close": 3851.2,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": -10.002
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 1.831,
+      "label": "连续流出",
+      "market_cap_trillion_cny": 1.848,
       "name": "铜",
-      "today_billion_cny": 13.98,
-      "today_to_cap_pct": 0.076
+      "today_billion_cny": -10.002,
+      "today_to_cap_pct": -0.054
     },
     {
       "code": "BK1287",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": -39.171,
-      "five_day_to_cap_pct": -0.136,
-      "flow_data_status": "CACHED",
+      "continuity": "RED",
+      "five_day_billion_cny": -40.559,
+      "five_day_to_cap_pct": -0.14,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": -0.7,
-          "close": 3262.41,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": -11.492
-        },
         {
           "change_pct": -1.26,
           "close": 3221.23,
@@ -187,13 +172,19 @@
           "close": 3267.58,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 16.401
+        },
+        {
+          "change_pct": 0.48,
+          "close": 3283.27,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": -12.88
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 2.874,
+      "label": "连续流出",
+      "market_cap_trillion_cny": 2.897,
       "name": "工业金属",
-      "today_billion_cny": 16.401,
-      "today_to_cap_pct": 0.057
+      "today_billion_cny": -12.88,
+      "today_to_cap_pct": -0.044
     },
     {
       "code": null,
@@ -210,10 +201,10 @@
     },
     {
       "code": "BK1340",
-      "continuity": "UNKNOWN",
+      "continuity": "ONE_DAY_SPIKE",
       "five_day_billion_cny": -75.653,
       "five_day_to_cap_pct": -0.257,
-      "flow_data_status": "CACHED",
+      "flow_data_status": "LIVE",
       "history": [
         {
           "change_pct": 0.63,
@@ -246,8 +237,8 @@
           "main_net_flow_billion_cny": 24.38
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 2.945,
+      "label": "单日流入，5日未确认",
+      "market_cap_trillion_cny": 2.947,
       "name": "印制电路板",
       "today_billion_cny": 24.38,
       "today_to_cap_pct": 0.083
@@ -267,17 +258,11 @@
     },
     {
       "code": "BK1200",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": -67.208,
-      "five_day_to_cap_pct": -0.093,
-      "flow_data_status": "CACHED",
+      "continuity": "RED",
+      "five_day_billion_cny": -88.611,
+      "five_day_to_cap_pct": -0.123,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": 0.58,
-          "close": 5786.19,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": 7.718
-        },
         {
           "change_pct": -0.58,
           "close": 5752.4,
@@ -301,27 +286,27 @@
           "close": 5929.23,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 33.119
+        },
+        {
+          "change_pct": 0.89,
+          "close": 5982.29,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": -13.685
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 7.197,
+      "label": "连续流出",
+      "market_cap_trillion_cny": 7.216,
       "name": "电力设备",
-      "today_billion_cny": 33.119,
-      "today_to_cap_pct": 0.046
+      "today_billion_cny": -13.685,
+      "today_to_cap_pct": -0.019
     },
     {
       "code": "BK0448",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": 45.161,
-      "five_day_to_cap_pct": 0.097,
-      "flow_data_status": "CACHED",
+      "continuity": "CONTINUOUS_GREEN",
+      "five_day_billion_cny": 143.766,
+      "five_day_to_cap_pct": 0.312,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": -0.69,
-          "close": 24094.08,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": -72.611
-        },
         {
           "change_pct": -0.83,
           "close": 23895.22,
@@ -345,27 +330,27 @@
           "close": 25161.93,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 46.282
+        },
+        {
+          "change_pct": 1.86,
+          "close": 25629.06,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": 25.994
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 4.655,
+      "label": "连续流入",
+      "market_cap_trillion_cny": 4.61,
       "name": "通信设备",
       "today_billion_cny": 25.994,
       "today_to_cap_pct": 0.056
     },
     {
       "code": "BK1325",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": 45.596,
-      "five_day_to_cap_pct": 0.428,
-      "flow_data_status": "CACHED",
+      "continuity": "MIXED",
+      "five_day_billion_cny": 34.872,
+      "five_day_to_cap_pct": 0.332,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": 2.36,
-          "close": 12488.67,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": 5.859
-        },
         {
           "change_pct": 1.81,
           "close": 12715.06,
@@ -389,27 +374,27 @@
           "close": 13867.41,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 12.851
+        },
+        {
+          "change_pct": -0.51,
+          "close": 13797.16,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": -4.865
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 1.065,
+      "label": "方向分裂，等待确认",
+      "market_cap_trillion_cny": 1.051,
       "name": "半导体材料",
-      "today_billion_cny": 12.851,
-      "today_to_cap_pct": 0.121
+      "today_billion_cny": -4.865,
+      "today_to_cap_pct": -0.046
     },
     {
       "code": "BK1036",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": 244.767,
-      "five_day_to_cap_pct": 0.162,
-      "flow_data_status": "CACHED",
+      "continuity": "MIXED",
+      "five_day_billion_cny": 265.992,
+      "five_day_to_cap_pct": 0.175,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": 0.48,
-          "close": 2596.24,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": -71.0
-        },
         {
           "change_pct": 1.34,
           "close": 2631.15,
@@ -433,27 +418,27 @@
           "close": 2869.78,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": 182.204
+        },
+        {
+          "change_pct": 0.2,
+          "close": 2875.41,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": -49.775
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 15.088,
+      "label": "方向分裂，等待确认",
+      "market_cap_trillion_cny": 15.201,
       "name": "半导体",
-      "today_billion_cny": 182.204,
-      "today_to_cap_pct": 0.121
+      "today_billion_cny": -49.775,
+      "today_to_cap_pct": -0.033
     },
     {
       "code": "BK1283",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": -42.825,
-      "five_day_to_cap_pct": -0.027,
-      "flow_data_status": "CACHED",
+      "continuity": "ONE_DAY_SPIKE",
+      "five_day_billion_cny": -26.241,
+      "five_day_to_cap_pct": -0.016,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": 0.88,
-          "close": 4436.85,
-          "date": "2026-09-14",
-          "main_net_flow_billion_cny": -8.466
-        },
         {
           "change_pct": -1.26,
           "close": 4380.92,
@@ -477,10 +462,16 @@
           "close": 4313.61,
           "date": "2026-09-18",
           "main_net_flow_billion_cny": -2.382
+        },
+        {
+          "change_pct": 0.21,
+          "close": 4322.66,
+          "date": "2026-09-21",
+          "main_net_flow_billion_cny": 8.118
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
-      "market_cap_trillion_cny": 16.159,
+      "label": "单日流入，5日未确认",
+      "market_cap_trillion_cny": 16.149,
       "name": "银行",
       "today_billion_cny": 8.118,
       "today_to_cap_pct": 0.005
@@ -501,7 +492,7 @@
   ],
   "snapshot_date": "2026-09-22",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
@@ -510,7 +501,7 @@
       "actionability": "NON_ACTIONABLE",
       "missing": "股票代码、复权口径、收盘价、个股成交额/RVOL、正式证伪位",
       "name": "太极实业",
-      "reason": "所属半导体板块5日净额 +244.8 亿；接回资金绿灯不满足，不能仅凭价格反弹接回。",
+      "reason": "所属半导体板块5日净额 +266.0 亿；接回资金绿灯不满足，不能仅凭价格反弹接回。",
       "sector": "半导体",
       "status": "UNKNOWN",
       "symbol": null
@@ -525,30 +516,30 @@
       "symbol": null
     },
     {
-      "actionability": "NON_ACTIONABLE",
+      "actionability": "FREEZE_BUY",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "紫金",
-      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "UNKNOWN",
+      "status": "RED",
       "symbol": null
     },
     {
-      "actionability": "NON_ACTIONABLE",
+      "actionability": "FREEZE_BUY",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "兴业",
-      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "UNKNOWN",
+      "status": "RED",
       "symbol": null
     },
     {
-      "actionability": "NON_ACTIONABLE",
+      "actionability": "FREEZE_BUY",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "中铝",
-      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "UNKNOWN",
+      "status": "RED",
       "symbol": null
     }
   ]
