@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-09-26T05:00:25Z",
+    "checked_at": "2026-09-26T09:52:49Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -22.1 亿（5日/市值 -0.12%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -21,7 +21,8 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
-      "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+      "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+      "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "铜: sector not found",
       "工业金属: sector not found",
       "证券: sector not found",
@@ -29,10 +30,9 @@
       "酿酒: sector not found",
       "电力设备: sector not found",
       "通信设备: sector not found",
-      "半导体材料: sector not found",
       "半导体: sector not found",
-      "银行: sector not found",
       "有色金属/贵金属: sector not found",
+      "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
@@ -47,16 +47,16 @@
       "风险政策与人工确认"
     ],
     "freshness": {
-      "cached_sector_count": 11,
-      "current_sector_count": 0,
+      "cached_sector_count": 9,
+      "current_sector_count": 2,
       "error_count": 15,
-      "history_live_count": 0
+      "history_live_count": 2
     },
     "index_flows": [
       {
         "change_pct": -1.22,
         "code": "000001",
-        "main_net_flow_billion_cny": -327.765,
+        "main_net_flow_billion_cny": null,
         "name": "上证指数",
         "price": 3888.37,
         "secid": "1.000001",
@@ -359,10 +359,10 @@
       },
       {
         "code": "BK1325",
-        "continuity": "UNKNOWN",
+        "continuity": "CONTINUOUS_GREEN",
         "five_day_billion_cny": 4.348,
         "five_day_to_cap_pct": 0.041,
-        "flow_data_status": "CACHED",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": 3.11,
@@ -395,7 +395,7 @@
             "main_net_flow_billion_cny": 0.922
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "连续流入",
         "market_cap_trillion_cny": 1.061,
         "name": "半导体材料",
         "today_billion_cny": 0.922,
@@ -447,10 +447,10 @@
       },
       {
         "code": "BK1283",
-        "continuity": "UNKNOWN",
+        "continuity": "ONE_DAY_SPIKE",
         "five_day_billion_cny": -3.581,
         "five_day_to_cap_pct": -0.002,
-        "flow_data_status": "CACHED",
+        "flow_data_status": "LIVE",
         "history": [
           {
             "change_pct": -0.48,
@@ -483,7 +483,7 @@
             "main_net_flow_billion_cny": 1.51
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
+        "label": "单日流入，5日未确认",
         "market_cap_trillion_cny": 16.147,
         "name": "银行",
         "today_billion_cny": 1.51,
@@ -505,7 +505,7 @@
     ],
     "snapshot_date": "2026-09-26",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 2/11，完整5日历史 2/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -558,7 +558,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-09-26T05:00:25Z",
+    "checked_at": "2026-09-26T09:52:48Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5213,10 +5213,10 @@
             "weight": 0.14
           },
           {
-            "direction": "中性",
-            "fact": "纳斯达克较前值 +0.01%",
+            "direction": "支持",
+            "fact": "纳斯达克较前值 +0.48%",
             "name": "纳斯达克风险偏好",
-            "raw": 0.0,
+            "raw": 1.0,
             "weight": 0.14
           },
           {
@@ -5241,9 +5241,9 @@
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +14，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +28，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 14,
+        "score": 28,
         "stance": "温和支持"
       },
       "yen": {
@@ -5328,11 +5328,11 @@
       "value": 5.6436
     },
     "NASDAQ_DAILY": {
-      "date": "2026-09-24",
+      "date": "2026-09-25",
       "label": "纳斯达克日变动",
       "source": "FRED",
       "unit": "%",
-      "value": 0.0124
+      "value": 0.4802
     },
     "PAYROLL_CHANGE": {
       "date": "2026-08-01",
@@ -5349,11 +5349,11 @@
       "value": 3.7012
     },
     "SP500_DAILY": {
-      "date": "2026-09-24",
+      "date": "2026-09-25",
       "label": "标普 500 日变动",
       "source": "FRED",
       "unit": "%",
-      "value": -0.0247
+      "value": 0.5099
     },
     "USDJPY_DAILY": {
       "date": "2026-09-25",
@@ -5414,7 +5414,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-09-26T00:01:54Z",
+      "checked_at": "2026-09-26T09:52:38Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5757,9 +5757,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-09-26T05:00:22Z"
+    "updated_at": "2026-09-26T09:52:38Z"
   },
-  "generated_at": "2026-09-26T05:00:22Z",
+  "generated_at": "2026-09-26T09:52:38Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5791,7 +5791,7 @@
     "L4": {
       "automated": true,
       "metrics": {
-        "SPX / NDX": "-0.02% / 0.01%",
+        "SPX / NDX": "0.51% / 0.48%",
         "USD/JPY": "157.59",
         "美债 10Y": "5.180%",
         "美债 30Y": "5.470%"
@@ -5813,16 +5813,21 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-09-26T05:00:25Z",
+    "a_share_checked_at": "2026-09-26T09:52:49Z",
     "ai_tokens_used": 0,
-    "cached_count": 30,
-    "calendar_checked_at": "2026-09-26T05:00:22Z",
-    "cftc_checked_at": "2026-09-25T21:16:14Z",
+    "cached_count": 1,
+    "calendar_checked_at": "2026-09-26T09:52:38Z",
+    "cftc_checked_at": "2026-09-26T09:52:38Z",
     "cross_asset_checked_at": "2026-09-26T00:01:54Z",
     "error_count": 15,
     "errors": [
       {
-        "error": "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+        "error": "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -5862,22 +5867,17 @@
         "source": "Eastmoney A-share"
       },
       {
-        "error": "半导体材料: sector not found",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
         "error": "半导体: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "银行: sector not found",
+        "error": "有色金属/贵金属: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "有色金属/贵金属: sector not found",
+        "error": "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -5898,142 +5898,152 @@
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-09-26T00:01:54Z",
-    "macro_checked_at": "2026-09-26T00:01:54Z",
+    "inventory_checked_at": "2026-09-26T09:52:38Z",
+    "macro_checked_at": "2026-09-26T09:52:38Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-09-26T05:15:00Z",
+    "next_scheduled_at": "2026-09-26T10:00:00Z",
     "run_interval_minutes": 15,
-    "source_count": 35,
+    "source_count": 37,
     "statuses": [
       {
         "date": "2026-09-23",
         "source": "FRED WALCL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-25",
         "source": "FRED RRPONTSYD",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-23",
         "source": "FRED WDTGAL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED TOTRESNS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-31",
         "source": "FRED WM2NS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED DGS2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED DGS10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED DGS30",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED DFII10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-25",
         "source": "FRED T10YIE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED DFF",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-22",
         "source": "FRED VIXCLS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-24",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-24",
+        "date": "2026-09-25",
         "source": "FRED SP500",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-24",
+        "date": "2026-09-25",
         "source": "FRED NASDAQCOM",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-18",
         "source": "FRED DTWEXBGS",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-24",
+        "date": "2026-09-22",
         "source": "FRED DCOILBRENTEU",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-24",
+        "date": "2026-09-22",
         "source": "FRED DCOILWTICO",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PAYEMS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED UNRATE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED JTSJOL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED CPIAUCSL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPI",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-07-01",
         "source": "FRED PCEPILFE",
-        "status": "cached"
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-24",
+        "source": "Gate CFD XBRUSD",
+        "status": "ok"
+      },
+      {
+        "date": "2026-09-24",
+        "source": "Gate CFD XTIUSD",
+        "status": "ok"
       },
       {
         "date": "2026-09-25",
         "source": "ECB FX",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-25T20:45:00Z",
@@ -6048,25 +6058,25 @@
       {
         "date": "2026-09-22",
         "source": "CFTC",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-26T05:00:25Z",
+        "date": "2026-09-26T09:52:48Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-09-25",
         "source": "CME gold warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-25",
         "source": "CME silver warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-09-26T05:00:25Z",
+        "date": "2026-09-26T09:52:49Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6081,8 +6091,8 @@
         "status": "cached"
       }
     ],
-    "success_count": 35,
-    "updated_count": 4
+    "success_count": 37,
+    "updated_count": 35
   },
   "post_close_analysis": {
     "as_of": "2026-09-24",
@@ -10507,12 +10517,8 @@
     },
     "NASDAQCOM": {
       "category": "资产",
-      "date": "2026-09-24",
+      "date": "2026-09-25",
       "history": [
-        [
-          "2026-05-18",
-          26090.73
-        ],
         [
           "2026-05-19",
           25870.71
@@ -10868,16 +10874,20 @@
         [
           "2026-09-24",
           26939.37
+        ],
+        [
+          "2026-09-25",
+          27068.72
         ]
       ],
       "id": "NASDAQCOM",
       "label": "纳斯达克综合",
-      "previous": 26936.04,
-      "previous_date": "2026-09-23",
+      "previous": 26939.37,
+      "previous_date": "2026-09-24",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/NASDAQCOM",
       "unit": "指数",
-      "value": 26939.37
+      "value": 27068.72
     },
     "PAYEMS": {
       "category": "周期",
@@ -11817,12 +11827,8 @@
     },
     "SP500": {
       "category": "资产",
-      "date": "2026-09-24",
+      "date": "2026-09-25",
       "history": [
-        [
-          "2026-05-18",
-          7403.05
-        ],
         [
           "2026-05-19",
           7353.61
@@ -12178,16 +12184,20 @@
         [
           "2026-09-24",
           7704.13
+        ],
+        [
+          "2026-09-25",
+          7743.41
         ]
       ],
       "id": "SP500",
       "label": "标普 500",
-      "previous": 7706.03,
-      "previous_date": "2026-09-23",
+      "previous": 7704.13,
+      "previous_date": "2026-09-24",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/SP500",
       "unit": "指数",
-      "value": 7704.13
+      "value": 7743.41
     },
     "SPOT_XAGUSD": {
       "category": "贵金属",
@@ -18156,5 +18166,5 @@
       "value": 23305.5
     }
   },
-  "snapshot_id": "49466f4f30dc392e"
+  "snapshot_id": "18e82974bef0e39f"
 }
