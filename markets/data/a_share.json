@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-27T23:48:31Z",
+  "checked_at": "2026-09-28T04:28:35Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -22.1 亿（5日/市值 -0.12%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -20,8 +20,7 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
-    "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "铜: sector not found",
     "工业金属: sector not found",
     "证券: sector not found",
@@ -29,9 +28,9 @@
     "酿酒: sector not found",
     "电力设备: sector not found",
     "通信设备: sector not found",
-    "半导体材料 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+    "半导体材料: sector not found",
     "半导体: sector not found",
-    "银行 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+    "银行: sector not found",
     "有色金属/贵金属: sector not found",
     "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
@@ -48,53 +47,53 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 9,
-    "current_sector_count": 2,
-    "error_count": 17,
+    "cached_sector_count": 11,
+    "current_sector_count": 0,
+    "error_count": 16,
     "history_live_count": 0
   },
   "index_flows": [
     {
-      "change_pct": -1.22,
+      "change_pct": -1.74,
       "code": "000001",
       "main_net_flow_billion_cny": null,
       "name": "上证指数",
-      "price": 3888.37,
+      "price": 3820.82,
       "secid": "1.000001",
-      "turnover_billion_cny": 7836.13
+      "turnover_billion_cny": 5482.49
     },
     {
-      "change_pct": -2.35,
+      "change_pct": -4.0,
       "code": "000688",
       "main_net_flow_billion_cny": null,
       "name": "科创50",
-      "price": 1621.87,
+      "price": 1557.07,
       "secid": "1.000688",
-      "turnover_billion_cny": 699.88
+      "turnover_billion_cny": 538.157
     },
     {
-      "change_pct": -2.34,
+      "change_pct": -3.37,
       "code": "399001",
       "main_net_flow_billion_cny": null,
       "name": "深证成指",
-      "price": 13316.97,
+      "price": 12868.28,
       "secid": "0.399001",
-      "turnover_billion_cny": 8697.444
+      "turnover_billion_cny": 6127.83
     },
     {
-      "change_pct": -2.68,
+      "change_pct": -4.32,
       "code": "399006",
       "main_net_flow_billion_cny": null,
       "name": "创业板指",
-      "price": 3288.95,
+      "price": 3146.9,
       "secid": "0.399006",
-      "turnover_billion_cny": 4142.176
+      "turnover_billion_cny": 2944.604
     }
   ],
   "market": {
     "main_net_flow_billion_cny": null,
     "structure_label": "指数主力流向偏弱或部分缺失",
-    "turnover_trillion_cny": 1.653
+    "turnover_trillion_cny": 1.161
   },
   "next_data_needed": [
     "A股个股日内 OHLCV",
@@ -363,7 +362,7 @@
       "continuity": "UNKNOWN",
       "five_day_billion_cny": 4.348,
       "five_day_to_cap_pct": 0.041,
-      "flow_data_status": "PARTIAL",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": 3.11,
@@ -451,7 +450,7 @@
       "continuity": "UNKNOWN",
       "five_day_billion_cny": -3.581,
       "five_day_to_cap_pct": -0.002,
-      "flow_data_status": "PARTIAL",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -0.48,
@@ -506,7 +505,7 @@
   ],
   "snapshot_date": "2026-09-28",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 2/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
