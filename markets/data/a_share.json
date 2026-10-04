@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-04T00:04:19Z",
+  "checked_at": "2026-10-04T05:55:59Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -45.8 亿（5日/市值 -0.26%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -20,15 +20,13 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
-    "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "铜: sector not found",
     "工业金属: sector not found",
     "证券: sector not found",
     "印制电路板: sector not found",
     "酿酒: sector not found",
+    "电力设备: sector not found",
     "通信设备: sector not found",
     "半导体材料: sector not found",
     "半导体: sector not found",
@@ -45,10 +43,10 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 10,
-    "current_sector_count": 1,
-    "error_count": 14,
-    "history_live_count": 1
+    "cached_sector_count": 11,
+    "current_sector_count": 0,
+    "error_count": 12,
+    "history_live_count": 0
   },
   "index_flows": [
     {
@@ -269,10 +267,10 @@
     },
     {
       "code": "BK1200",
-      "continuity": "ONE_DAY_SPIKE",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": -72.644,
       "five_day_to_cap_pct": -0.105,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -0.44,
@@ -305,7 +303,7 @@
           "main_net_flow_billion_cny": 9.578
         }
       ],
-      "label": "单日流入，5日未确认",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 6.94,
       "name": "电力设备",
       "today_billion_cny": 9.578,
@@ -503,7 +501,7 @@
   ],
   "snapshot_date": "2026-10-04",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 1/11，完整5日历史 1/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
