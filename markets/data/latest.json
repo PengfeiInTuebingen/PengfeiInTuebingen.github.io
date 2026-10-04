@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-10-04T05:55:59Z",
+    "checked_at": "2026-10-04T12:04:47Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -45.8 亿（5日/市值 -0.26%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -32,7 +32,8 @@
       "半导体材料: sector not found",
       "半导体: sector not found",
       "银行: sector not found",
-      "有色金属/贵金属: sector not found"
+      "有色金属/贵金属: sector not found",
+      "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
     ],
     "evaluation_status": "PARTIAL",
     "framework": [
@@ -46,7 +47,7 @@
     "freshness": {
       "cached_sector_count": 11,
       "current_sector_count": 0,
-      "error_count": 12,
+      "error_count": 13,
       "history_live_count": 0
     },
     "index_flows": [
@@ -80,7 +81,7 @@
       {
         "change_pct": -0.23,
         "code": "399006",
-        "main_net_flow_billion_cny": -30.175,
+        "main_net_flow_billion_cny": null,
         "name": "创业板指",
         "price": 3135.28,
         "secid": "0.399006",
@@ -88,7 +89,7 @@
       }
     ],
     "market": {
-      "main_net_flow_billion_cny": -193.976,
+      "main_net_flow_billion_cny": null,
       "structure_label": "指数主力流向偏弱或部分缺失",
       "turnover_trillion_cny": 1.438
     },
@@ -555,22 +556,9 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-04T05:55:58Z",
+    "checked_at": "2026-10-04T12:04:46Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
-      {
-        "country": "All",
-        "forecast": "",
-        "id": "bb95186f3167",
-        "impact": "Medium",
-        "official": false,
-        "original_title": "OPEC-JMMC Meetings",
-        "previous": "",
-        "source": "Forex Factory public calendar feed",
-        "source_url": "https://www.forexfactory.com/calendar",
-        "timestamp": "2026-10-04T09:15:00Z",
-        "title": "全球 · OPEC-JMMC Meetings"
-      },
       {
         "country": "USD",
         "forecast": "55.1",
@@ -859,21 +847,21 @@
       }
     ],
     "next_event": {
-      "country": "All",
-      "forecast": "",
-      "id": "bb95186f3167",
+      "country": "USD",
+      "forecast": "55.1",
+      "id": "63e7d703f66b",
       "impact": "Medium",
       "official": false,
-      "original_title": "OPEC-JMMC Meetings",
-      "previous": "",
+      "original_title": "ISM Services PMI",
+      "previous": "55.4",
       "source": "Forex Factory public calendar feed",
       "source_url": "https://www.forexfactory.com/calendar",
-      "timestamp": "2026-10-04T09:15:00Z",
-      "title": "全球 · OPEC-JMMC Meetings"
+      "timestamp": "2026-10-05T14:00:00Z",
+      "title": "美国 · ISM Services PMI"
     },
     "source_statuses": [
       {
-        "events": 7,
+        "events": 6,
         "source": "Broad weekly feed",
         "status": "ok"
       },
@@ -5327,9 +5315,9 @@
     "headline": "黄金温和支持；白银明显支持；日元明显支持。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
-    "next_event_text": "下一事件：10-04 11:15 全球 · OPEC-JMMC Meetings",
+    "next_event_text": "下一事件：10-05 16:00 美国 · ISM Services PMI",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金温和支持；白银明显支持；日元明显支持。下一事件：10-04 11:15 全球 · OPEC-JMMC Meetings。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和支持；白银明显支持；日元明显支持。下一事件：10-05 16:00 美国 · ISM Services PMI。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5454,7 +5442,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-10-04T05:55:46Z",
+      "checked_at": "2026-10-04T12:04:34Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5857,9 +5845,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-04T05:55:46Z"
+    "updated_at": "2026-10-04T12:04:34Z"
   },
-  "generated_at": "2026-10-04T05:55:46Z",
+  "generated_at": "2026-10-04T12:04:34Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5913,13 +5901,13 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-04T05:55:59Z",
+    "a_share_checked_at": "2026-10-04T12:04:47Z",
     "ai_tokens_used": 0,
-    "cached_count": 1,
-    "calendar_checked_at": "2026-10-04T05:55:46Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-10-04T12:04:34Z",
     "cftc_checked_at": "2026-10-04T05:55:46Z",
     "cross_asset_checked_at": "2026-10-03T18:19:05Z",
-    "error_count": 12,
+    "error_count": 13,
     "errors": [
       {
         "error": "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
@@ -5980,13 +5968,18 @@
         "error": "有色金属/贵金属: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
+      },
+      {
+        "error": "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-10-04T05:55:46Z",
-    "macro_checked_at": "2026-10-04T05:55:46Z",
+    "inventory_checked_at": "2026-10-04T12:04:34Z",
+    "macro_checked_at": "2026-10-04T12:04:34Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-04T06:00:00Z",
+    "next_scheduled_at": "2026-10-04T12:15:00Z",
     "run_interval_minutes": 15,
     "source_count": 37,
     "statuses": [
@@ -6143,10 +6136,10 @@
       {
         "date": "2026-09-29",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-10-04T05:55:58Z",
+        "date": "2026-10-04T12:04:46Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6161,7 +6154,7 @@
         "status": "ok"
       },
       {
-        "date": "2026-10-04T05:55:59Z",
+        "date": "2026-10-04T12:04:47Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6177,7 +6170,7 @@
       }
     ],
     "success_count": 37,
-    "updated_count": 35
+    "updated_count": 34
   },
   "post_close_analysis": {
     "as_of": "2026-10-01",
