@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-08T19:29:47Z",
+  "checked_at": "2026-10-08T23:54:34Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -41.4 亿（5日/市值 -0.24%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -20,6 +20,7 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
+    "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "铜: sector not found",
@@ -31,7 +32,9 @@
     "半导体材料: sector not found",
     "半导体: sector not found",
     "银行: sector not found",
-    "有色金属/贵金属: sector not found"
+    "有色金属/贵金属: sector not found",
+    "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+    "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
   ],
   "evaluation_status": "PARTIAL",
   "framework": [
@@ -45,7 +48,7 @@
   "freshness": {
     "cached_sector_count": 10,
     "current_sector_count": 1,
-    "error_count": 12,
+    "error_count": 15,
     "history_live_count": 1
   },
   "index_flows": [
@@ -70,7 +73,7 @@
     {
       "change_pct": -2.07,
       "code": "399001",
-      "main_net_flow_billion_cny": -260.59,
+      "main_net_flow_billion_cny": null,
       "name": "深证成指",
       "price": 12620.9,
       "secid": "0.399001",
@@ -79,7 +82,7 @@
     {
       "change_pct": -3.15,
       "code": "399006",
-      "main_net_flow_billion_cny": -153.088,
+      "main_net_flow_billion_cny": null,
       "name": "创业板指",
       "price": 3036.66,
       "secid": "0.399006",
@@ -87,7 +90,7 @@
     }
   ],
   "market": {
-    "main_net_flow_billion_cny": -671.249,
+    "main_net_flow_billion_cny": null,
     "structure_label": "指数主力流向偏弱或部分缺失",
     "turnover_trillion_cny": 1.682
   },
