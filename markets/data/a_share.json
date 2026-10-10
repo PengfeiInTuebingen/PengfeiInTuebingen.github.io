@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-10-10T14:46:34Z",
+  "checked_at": "2026-10-10T19:09:57Z",
   "conclusions": [
     {
-      "body": "铜今日/市值 0.09%、5日/市值 0.04%，5日累计 +6.6 亿。工业金属若同向，才构成趋势级而非一日异动。",
+      "body": "铜当前记录值为 +6.6 亿（5日/市值 0.04%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
       "title": "资源流入连续性",
-      "tone": "positive"
+      "tone": "neutral"
     },
     {
       "body": "半导体记录值为 -383.5 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
@@ -20,17 +20,19 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
-    "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-    "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "铜: sector not found",
+    "工业金属: sector not found",
     "证券: sector not found",
     "印制电路板: sector not found",
     "酿酒: sector not found",
+    "电力设备: sector not found",
     "通信设备: sector not found",
     "半导体材料: sector not found",
     "半导体: sector not found",
     "银行: sector not found",
     "有色金属/贵金属: sector not found",
+    "index quotes: Eastmoney request failed: ulist.np/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A',",
     "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
@@ -46,10 +48,10 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 8,
-    "current_sector_count": 3,
-    "error_count": 15,
-    "history_live_count": 3
+    "cached_sector_count": 11,
+    "current_sector_count": 0,
+    "error_count": 17,
+    "history_live_count": 0
   },
   "index_flows": [
     {
@@ -112,10 +114,10 @@
   "sectors": [
     {
       "code": "BK1615",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 6.598,
       "five_day_to_cap_pct": 0.037,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -3.76,
@@ -148,7 +150,7 @@
           "main_net_flow_billion_cny": 16.166
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 1.785,
       "name": "铜",
       "today_billion_cny": 16.166,
@@ -156,10 +158,10 @@
     },
     {
       "code": "BK1287",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 7.459,
       "five_day_to_cap_pct": 0.027,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -3.03,
@@ -192,7 +194,7 @@
           "main_net_flow_billion_cny": 16.283
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 2.8,
       "name": "工业金属",
       "today_billion_cny": 16.283,
@@ -270,10 +272,10 @@
     },
     {
       "code": "BK1200",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 21.289,
       "five_day_to_cap_pct": 0.031,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -2.53,
@@ -306,7 +308,7 @@
           "main_net_flow_billion_cny": 25.313
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 6.977,
       "name": "电力设备",
       "today_billion_cny": 25.313,
@@ -502,9 +504,9 @@
       "today_to_cap_pct": null
     }
   ],
-  "snapshot_date": "2026-10-10",
+  "snapshot_date": "2026-10-11",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 3/11，完整5日历史 3/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
@@ -528,30 +530,30 @@
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "紫金",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "兴业",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "中铝",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     }
   ]
