@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-10-14T05:18:42Z",
+  "checked_at": "2026-10-14T10:28:58Z",
   "conclusions": [
     {
-      "body": "铜今日/市值 0.00%、5日/市值 0.04%，5日累计 +7.7 亿。工业金属若同向，才构成趋势级而非一日异动。",
+      "body": "铜当前记录值为 +7.7 亿（5日/市值 0.04%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
       "title": "资源流入连续性",
-      "tone": "positive"
+      "tone": "neutral"
     },
     {
       "body": "半导体记录值为 -323.8 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
@@ -20,7 +20,11 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
+    "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "铜: sector not found",
+    "工业金属: sector not found",
     "证券: sector not found",
     "酿酒: sector not found",
     "电力设备: sector not found",
@@ -29,6 +33,7 @@
     "半导体: sector not found",
     "银行: sector not found",
     "有色金属/贵金属: sector not found",
+    "index quotes: Eastmoney request failed: ulist.np/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A',",
     "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
@@ -44,10 +49,10 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 8,
-    "current_sector_count": 3,
-    "error_count": 13,
-    "history_live_count": 3
+    "cached_sector_count": 10,
+    "current_sector_count": 1,
+    "error_count": 18,
+    "history_live_count": 1
   },
   "index_flows": [
     {
@@ -110,10 +115,10 @@
   "sectors": [
     {
       "code": "BK1615",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 7.674,
       "five_day_to_cap_pct": 0.044,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": 0.33,
@@ -146,7 +151,7 @@
           "main_net_flow_billion_cny": 0.655
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 1.739,
       "name": "铜",
       "today_billion_cny": 0.655,
@@ -154,10 +159,10 @@
     },
     {
       "code": "BK1287",
-      "continuity": "CONTINUOUS_GREEN",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": 3.279,
       "five_day_to_cap_pct": 0.012,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": -0.11,
@@ -190,7 +195,7 @@
           "main_net_flow_billion_cny": 2.261
         }
       ],
-      "label": "连续流入",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 2.734,
       "name": "工业金属",
       "today_billion_cny": 2.261,
@@ -212,16 +217,10 @@
     {
       "code": "BK1340",
       "continuity": "ONE_DAY_SPIKE",
-      "five_day_billion_cny": -91.14,
-      "five_day_to_cap_pct": -0.365,
+      "five_day_billion_cny": -42.287,
+      "five_day_to_cap_pct": -0.173,
       "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": -4.56,
-          "close": 13790.1,
-          "date": "2026-09-30",
-          "main_net_flow_billion_cny": -31.618
-        },
         {
           "change_pct": -2.64,
           "close": 13426.07,
@@ -245,13 +244,19 @@
           "close": 13150.46,
           "date": "2026-10-13",
           "main_net_flow_billion_cny": 20.878
+        },
+        {
+          "change_pct": 0.63,
+          "close": 13233.16,
+          "date": "2026-10-14",
+          "main_net_flow_billion_cny": 17.235
         }
       ],
       "label": "单日流入，5日未确认",
-      "market_cap_trillion_cny": 2.498,
+      "market_cap_trillion_cny": 2.444,
       "name": "印制电路板",
-      "today_billion_cny": 20.878,
-      "today_to_cap_pct": 0.084
+      "today_billion_cny": 17.235,
+      "today_to_cap_pct": 0.071
     },
     {
       "code": null,
@@ -502,7 +507,7 @@
   ],
   "snapshot_date": "2026-10-14",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 3/11，完整5日历史 3/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 1/11，完整5日历史 1/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
@@ -526,30 +531,30 @@
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "紫金",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "兴业",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     },
     {
-      "actionability": "MANUAL_REVIEW",
+      "actionability": "NON_ACTIONABLE",
       "missing": "确切证券代码、个股确认/证伪位与目标仓位",
       "name": "中铝",
-      "reason": "所属工业金属板块状态为 PROVISIONAL_GREEN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+      "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
       "sector": "工业金属",
-      "status": "PROVISIONAL_GREEN",
+      "status": "UNKNOWN",
       "symbol": null
     }
   ]
