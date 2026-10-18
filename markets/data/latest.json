@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-10-18T17:09:31Z",
+    "checked_at": "2026-10-18T19:25:51Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -32.0 亿（5日/市值 -0.19%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -31,10 +31,7 @@
       "电力设备: sector not found",
       "半导体材料: sector not found",
       "银行: sector not found",
-      "有色金属/贵金属: sector not found",
-      "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-      "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-      "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
+      "有色金属/贵金属: sector not found"
     ],
     "evaluation_status": "PARTIAL",
     "framework": [
@@ -48,7 +45,7 @@
     "freshness": {
       "cached_sector_count": 9,
       "current_sector_count": 2,
-      "error_count": 14,
+      "error_count": 11,
       "history_live_count": 2
     },
     "index_flows": [
@@ -64,7 +61,7 @@
       {
         "change_pct": -0.06,
         "code": "000688",
-        "main_net_flow_billion_cny": null,
+        "main_net_flow_billion_cny": 17.485,
         "name": "科创50",
         "price": 1358.65,
         "secid": "1.000688",
@@ -73,7 +70,7 @@
       {
         "change_pct": -0.12,
         "code": "399001",
-        "main_net_flow_billion_cny": null,
+        "main_net_flow_billion_cny": -43.75,
         "name": "深证成指",
         "price": 11802.46,
         "secid": "0.399001",
@@ -82,7 +79,7 @@
       {
         "change_pct": -0.39,
         "code": "399006",
-        "main_net_flow_billion_cny": null,
+        "main_net_flow_billion_cny": -24.405,
         "name": "创业板指",
         "price": 2772.38,
         "secid": "0.399006",
@@ -90,7 +87,7 @@
       }
     ],
     "market": {
-      "main_net_flow_billion_cny": null,
+      "main_net_flow_billion_cny": -56.283,
       "structure_label": "指数主力流向偏弱或部分缺失",
       "turnover_trillion_cny": 1.555
     },
@@ -557,7 +554,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-18T17:09:31Z",
+    "checked_at": "2026-10-18T19:25:51Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5992,9 +5989,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-18T17:09:26Z"
+    "updated_at": "2026-10-18T19:25:48Z"
   },
-  "generated_at": "2026-10-18T17:09:26Z",
+  "generated_at": "2026-10-18T19:25:48Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6048,13 +6045,13 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-18T17:09:31Z",
+    "a_share_checked_at": "2026-10-18T19:25:51Z",
     "ai_tokens_used": 0,
     "cached_count": 30,
-    "calendar_checked_at": "2026-10-18T17:09:26Z",
+    "calendar_checked_at": "2026-10-18T19:25:48Z",
     "cftc_checked_at": "2026-10-18T09:54:20Z",
     "cross_asset_checked_at": "2026-10-18T05:32:25Z",
-    "error_count": 14,
+    "error_count": 11,
     "errors": [
       {
         "error": "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
@@ -6110,28 +6107,13 @@
         "error": "有色金属/贵金属: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
-      },
-      {
-        "error": "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
-        "error": "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
-        "error": "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
       }
     ],
     "fallback_count": 1,
     "inventory_checked_at": "2026-10-18T13:49:50Z",
     "macro_checked_at": "2026-10-18T13:49:50Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-18T17:15:00Z",
+    "next_scheduled_at": "2026-10-18T19:30:00Z",
     "run_interval_minutes": 15,
     "source_count": 35,
     "statuses": [
@@ -6281,7 +6263,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-10-18T17:09:31Z",
+        "date": "2026-10-18T19:25:51Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6296,7 +6278,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-10-18T17:09:31Z",
+        "date": "2026-10-18T19:25:51Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
