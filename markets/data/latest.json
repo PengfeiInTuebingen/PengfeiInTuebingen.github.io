@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-10-17T22:56:38Z",
+    "checked_at": "2026-10-18T00:48:40Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -32.0 亿（5日/市值 -0.19%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -21,7 +21,6 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
-      "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
@@ -34,6 +33,7 @@
       "半导体材料: sector not found",
       "银行: sector not found",
       "有色金属/贵金属: sector not found",
+      "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
     ],
     "evaluation_status": "PARTIAL",
@@ -73,7 +73,7 @@
       {
         "change_pct": -0.12,
         "code": "399001",
-        "main_net_flow_billion_cny": -43.75,
+        "main_net_flow_billion_cny": null,
         "name": "深证成指",
         "price": 11802.46,
         "secid": "0.399001",
@@ -91,7 +91,7 @@
     ],
     "market": {
       "main_net_flow_billion_cny": null,
-      "structure_label": "指数主力流向偏弱或部分缺失",
+      "structure_label": "指数主力流向净流入，结构仍需结合行业连续性",
       "turnover_trillion_cny": 1.555
     },
     "next_data_needed": [
@@ -557,7 +557,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-17T22:56:38Z",
+    "checked_at": "2026-10-18T00:48:40Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5897,9 +5897,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-17T22:56:35Z"
+    "updated_at": "2026-10-18T00:48:37Z"
   },
-  "generated_at": "2026-10-17T22:56:35Z",
+  "generated_at": "2026-10-18T00:48:37Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -5953,19 +5953,14 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-17T22:56:38Z",
+    "a_share_checked_at": "2026-10-18T00:48:40Z",
     "ai_tokens_used": 0,
     "cached_count": 30,
-    "calendar_checked_at": "2026-10-17T22:56:35Z",
+    "calendar_checked_at": "2026-10-18T00:48:37Z",
     "cftc_checked_at": "2026-10-17T18:16:50Z",
     "cross_asset_checked_at": "2026-10-17T04:03:16Z",
     "error_count": 14,
     "errors": [
-      {
-        "error": "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
       {
         "error": "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
         "series": "sector/index",
@@ -6027,6 +6022,11 @@
         "source": "Eastmoney A-share"
       },
       {
+        "error": "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
         "error": "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
@@ -6036,7 +6036,7 @@
     "inventory_checked_at": "2026-10-17T20:50:21Z",
     "macro_checked_at": "2026-10-17T20:50:21Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-17T23:00:00Z",
+    "next_scheduled_at": "2026-10-18T01:00:00Z",
     "run_interval_minutes": 15,
     "source_count": 35,
     "statuses": [
@@ -6186,7 +6186,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-10-17T22:56:38Z",
+        "date": "2026-10-18T00:48:40Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6201,7 +6201,7 @@
         "status": "cached"
       },
       {
-        "date": "2026-10-17T22:56:38Z",
+        "date": "2026-10-18T00:48:40Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
