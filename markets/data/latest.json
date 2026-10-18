@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-10-18T05:32:37Z",
+    "checked_at": "2026-10-18T09:54:24Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -32.0 亿（5日/市值 -0.19%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -21,7 +21,6 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
-      "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
@@ -34,7 +33,6 @@
       "半导体材料: sector not found",
       "银行: sector not found",
       "有色金属/贵金属: sector not found",
-      "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
     ],
     "evaluation_status": "PARTIAL",
@@ -49,7 +47,7 @@
     "freshness": {
       "cached_sector_count": 9,
       "current_sector_count": 2,
-      "error_count": 15,
+      "error_count": 13,
       "history_live_count": 2
     },
     "index_flows": [
@@ -74,7 +72,7 @@
       {
         "change_pct": -0.12,
         "code": "399001",
-        "main_net_flow_billion_cny": null,
+        "main_net_flow_billion_cny": -43.75,
         "name": "深证成指",
         "price": 11802.46,
         "secid": "0.399001",
@@ -92,7 +90,7 @@
     ],
     "market": {
       "main_net_flow_billion_cny": null,
-      "structure_label": "指数主力流向净流入，结构仍需结合行业连续性",
+      "structure_label": "指数主力流向偏弱或部分缺失",
       "turnover_trillion_cny": 1.555
     },
     "next_data_needed": [
@@ -558,7 +556,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-18T05:32:36Z",
+    "checked_at": "2026-10-18T09:54:24Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -917,17 +915,6 @@
       "白银": [
         {
           "categories": {
-            "其他报告商": 11645,
-            "掉期商": -22889,
-            "生产商/贸易商": -16912,
-            "管理资金": 9794,
-            "非报告商": 18361
-          },
-          "date": "2026-06-09",
-          "open_interest": 126230.0
-        },
-        {
-          "categories": {
             "其他报告商": 11492,
             "掉期商": -25282,
             "生产商/贸易商": -16654,
@@ -1126,17 +1113,6 @@
         }
       ],
       "黄金": [
-        {
-          "categories": {
-            "其他报告商": 62244,
-            "掉期商": -171552,
-            "生产商/贸易商": -22138,
-            "管理资金": 103660,
-            "非报告商": 27786
-          },
-          "date": "2026-06-09",
-          "open_interest": 459311.0
-        },
         {
           "categories": {
             "其他报告商": 61467,
@@ -6015,9 +5991,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-18T05:32:25Z"
+    "updated_at": "2026-10-18T09:54:20Z"
   },
-  "generated_at": "2026-10-18T05:32:25Z",
+  "generated_at": "2026-10-18T09:54:20Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6071,19 +6047,14 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-18T05:32:37Z",
+    "a_share_checked_at": "2026-10-18T09:54:24Z",
     "ai_tokens_used": 0,
-    "cached_count": 1,
-    "calendar_checked_at": "2026-10-18T05:32:25Z",
-    "cftc_checked_at": "2026-10-17T18:16:50Z",
+    "cached_count": 29,
+    "calendar_checked_at": "2026-10-18T09:54:20Z",
+    "cftc_checked_at": "2026-10-18T09:54:20Z",
     "cross_asset_checked_at": "2026-10-18T05:32:25Z",
-    "error_count": 15,
+    "error_count": 13,
     "errors": [
-      {
-        "error": "sector page 2: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
       {
         "error": "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
         "series": "sector/index",
@@ -6145,11 +6116,6 @@
         "source": "Eastmoney A-share"
       },
       {
-        "error": "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
         "error": "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
@@ -6159,149 +6125,139 @@
     "inventory_checked_at": "2026-10-18T05:32:25Z",
     "macro_checked_at": "2026-10-18T05:32:25Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-18T05:45:00Z",
+    "next_scheduled_at": "2026-10-18T10:00:00Z",
     "run_interval_minutes": 15,
-    "source_count": 37,
+    "source_count": 35,
     "statuses": [
       {
         "date": "2026-10-14",
         "source": "FRED WALCL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16",
         "source": "FRED RRPONTSYD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-14",
         "source": "FRED WDTGAL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED TOTRESNS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-31",
         "source": "FRED WM2NS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED DGS2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED DGS10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED DGS30",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED DFII10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16",
         "source": "FRED T10YIE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED DFF",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED VIXCLS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16",
         "source": "FRED SP500",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-15",
         "source": "FRED NASDAQCOM",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-09",
         "source": "FRED DTWEXBGS",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-10-14",
+        "date": "2026-10-15",
         "source": "FRED DCOILBRENTEU",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-10-14",
+        "date": "2026-10-15",
         "source": "FRED DCOILWTICO",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED PAYEMS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED UNRATE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED JTSJOL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED CPIAUCSL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PCEPI",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PCEPILFE",
-        "status": "ok"
-      },
-      {
-        "date": "2026-10-15",
-        "source": "Gate CFD XBRUSD",
-        "status": "ok"
-      },
-      {
-        "date": "2026-10-15",
-        "source": "Gate CFD XTIUSD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16",
         "source": "ECB FX",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16T20:45:00Z",
@@ -6316,25 +6272,25 @@
       {
         "date": "2026-10-13",
         "source": "CFTC",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-10-18T05:32:36Z",
+        "date": "2026-10-18T09:54:24Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-10-16",
         "source": "CME gold warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-16",
         "source": "CME silver warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-10-18T05:32:37Z",
+        "date": "2026-10-18T09:54:24Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6346,11 +6302,11 @@
       {
         "date": "2026-10-16",
         "source": "Cross-asset correlation",
-        "status": "ok"
+        "status": "cached"
       }
     ],
-    "success_count": 37,
-    "updated_count": 35
+    "success_count": 35,
+    "updated_count": 5
   },
   "post_close_analysis": {
     "as_of": "2026-10-15",
