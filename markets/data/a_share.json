@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-19T20:27:15Z",
+  "checked_at": "2026-10-19T23:53:57Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -32.0 亿（5日/市值 -0.19%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -20,6 +20,8 @@
   "data_status": "PARTIAL",
   "data_type": "a_share_snapshot",
   "errors": [
+    "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+    "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
     "铜: sector not found",
     "工业金属: sector not found",
@@ -27,9 +29,12 @@
     "印制电路板: sector not found",
     "酿酒: sector not found",
     "电力设备: sector not found",
+    "半导体材料: sector not found",
     "有色金属/贵金属: sector not found",
     "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
-    "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
+    "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+    "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+    "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
   ],
   "evaluation_status": "PARTIAL",
   "framework": [
@@ -41,9 +46,9 @@
     "风险政策与人工确认"
   ],
   "freshness": {
-    "cached_sector_count": 7,
-    "current_sector_count": 4,
-    "error_count": 10,
+    "cached_sector_count": 8,
+    "current_sector_count": 3,
+    "error_count": 15,
     "history_live_count": 3
   },
   "index_flows": [
@@ -68,7 +73,7 @@
     {
       "change_pct": 0.13,
       "code": "399001",
-      "main_net_flow_billion_cny": -85.301,
+      "main_net_flow_billion_cny": null,
       "name": "深证成指",
       "price": 11817.42,
       "secid": "0.399001",
@@ -77,7 +82,7 @@
     {
       "change_pct": -0.94,
       "code": "399006",
-      "main_net_flow_billion_cny": -50.553,
+      "main_net_flow_billion_cny": null,
       "name": "创业板指",
       "price": 2746.29,
       "secid": "0.399006",
@@ -353,10 +358,10 @@
     },
     {
       "code": "BK1325",
-      "continuity": "RED_STRONG",
+      "continuity": "UNKNOWN",
       "five_day_billion_cny": -32.46,
       "five_day_to_cap_pct": -0.398,
-      "flow_data_status": "LIVE",
+      "flow_data_status": "CACHED",
       "history": [
         {
           "change_pct": 0.04,
@@ -389,7 +394,7 @@
           "main_net_flow_billion_cny": -1.586
         }
       ],
-      "label": "持续流出，强度偏高",
+      "label": "5日历史未完整返回，连续性不判定",
       "market_cap_trillion_cny": 0.816,
       "name": "半导体材料",
       "today_billion_cny": -1.586,
@@ -441,10 +446,10 @@
     },
     {
       "code": "BK1283",
-      "continuity": "UNKNOWN",
+      "continuity": "ONE_DAY_SPIKE",
       "five_day_billion_cny": -14.388,
       "five_day_to_cap_pct": -0.008,
-      "flow_data_status": "PARTIAL",
+      "flow_data_status": "LIVE",
       "history": [
         {
           "change_pct": -1.01,
@@ -477,7 +482,7 @@
           "main_net_flow_billion_cny": 3.299
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
+      "label": "单日流入，5日未确认",
       "market_cap_trillion_cny": 17.109,
       "name": "银行",
       "today_billion_cny": 3.299,
@@ -499,7 +504,7 @@
   ],
   "snapshot_date": "2026-10-20",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 4/11，完整5日历史 3/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 3/11，完整5日历史 3/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
