@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-10-25T01:27:32Z",
+    "checked_at": "2026-10-25T06:42:05Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -45.9 亿（5日/市值 -0.29%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -21,6 +21,7 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
+      "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "铜: sector not found",
@@ -31,6 +32,7 @@
       "半导体材料: sector not found",
       "银行: sector not found",
       "有色金属/贵金属: sector not found",
+      "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "深证成指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
@@ -47,14 +49,14 @@
     "freshness": {
       "cached_sector_count": 8,
       "current_sector_count": 3,
-      "error_count": 13,
+      "error_count": 15,
       "history_live_count": 3
     },
     "index_flows": [
       {
         "change_pct": 0.89,
         "code": "000001",
-        "main_net_flow_billion_cny": -74.926,
+        "main_net_flow_billion_cny": null,
         "name": "上证指数",
         "price": 3690.48,
         "secid": "1.000001",
@@ -556,9 +558,22 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-25T01:27:32Z",
+    "checked_at": "2026-10-25T06:42:04Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
+      {
+        "country": "USD",
+        "forecast": "80.5",
+        "id": "c65710ed3691",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "CB Consumer Confidence",
+        "previous": "81.9",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-27T14:00:00Z",
+        "title": "美国 · CB Consumer Confidence"
+      },
       {
         "country": "USD",
         "forecast": "",
@@ -570,6 +585,32 @@
         "source": "Federal Reserve",
         "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
         "timestamp": "2026-10-28T18:00:00Z",
+        "title": "美联储 FOMC 事件"
+      },
+      {
+        "country": "USD",
+        "forecast": "4.00%",
+        "id": "ff3d9692ab48",
+        "impact": "High",
+        "official": false,
+        "original_title": "Federal Funds Rate",
+        "previous": "4.00%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-28T18:00:00Z",
+        "title": "美国 · Federal Funds Rate"
+      },
+      {
+        "country": "USD",
+        "forecast": "",
+        "id": "73186e6bb93f",
+        "impact": "High",
+        "official": false,
+        "original_title": "FOMC Press Conference",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-28T18:30:00Z",
         "title": "美联储 FOMC 事件"
       },
       {
@@ -599,6 +640,58 @@
         "title": "美国个人收入与支出（含 PCE）"
       },
       {
+        "country": "USD",
+        "forecast": "3.2%",
+        "id": "6edca97f5d24",
+        "impact": "High",
+        "official": false,
+        "original_title": "Advance GDP q/q",
+        "previous": "1.5%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T12:30:00Z",
+        "title": "美国 · Advance GDP q/q"
+      },
+      {
+        "country": "USD",
+        "forecast": "0.3%",
+        "id": "1229cd8890a0",
+        "impact": "High",
+        "official": false,
+        "original_title": "Core PCE Price Index m/m",
+        "previous": "0.2%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T12:30:00Z",
+        "title": "美国核心 PCE"
+      },
+      {
+        "country": "USD",
+        "forecast": "3.5%",
+        "id": "7679240496ce",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Advance GDP Price Index q/q",
+        "previous": "6.2%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T12:30:00Z",
+        "title": "美国 GDP 价格指数"
+      },
+      {
+        "country": "USD",
+        "forecast": "198K",
+        "id": "a5a49f53edca",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Unemployment Claims",
+        "previous": "194K",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T12:30:00Z",
+        "title": "美国初请失业金"
+      },
+      {
         "country": "EUR",
         "forecast": "",
         "id": "93a832be7109",
@@ -610,6 +703,149 @@
         "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
         "timestamp": "2026-10-29T13:15:00Z",
         "title": "欧元区 · ECB monetary-policy decision"
+      },
+      {
+        "country": "EUR",
+        "forecast": "2.65%",
+        "id": "cd1a1189356f",
+        "impact": "High",
+        "official": false,
+        "original_title": "Main Refinancing Rate",
+        "previous": "2.65%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T13:15:00Z",
+        "title": "欧元区 · Main Refinancing Rate"
+      },
+      {
+        "country": "EUR",
+        "forecast": "",
+        "id": "8f93f6d76ffd",
+        "impact": "High",
+        "official": false,
+        "original_title": "Monetary Policy Statement",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T13:15:00Z",
+        "title": "欧元区 · Monetary Policy Statement"
+      },
+      {
+        "country": "EUR",
+        "forecast": "",
+        "id": "b8f35e7dd140",
+        "impact": "High",
+        "official": false,
+        "original_title": "ECB Press Conference",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T13:45:00Z",
+        "title": "欧元区 · ECB Press Conference"
+      },
+      {
+        "country": "JPY",
+        "forecast": "2.6%",
+        "id": "df6ce80e1bf9",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Tokyo Core CPI y/y",
+        "previous": "2.7%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-29T23:30:00Z",
+        "title": "日本东京核心 CPI"
+      },
+      {
+        "country": "JPY",
+        "forecast": "<1.25%",
+        "id": "451bda49020b",
+        "impact": "High",
+        "official": false,
+        "original_title": "BOJ Policy Rate",
+        "previous": "<1.25%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T02:30:00Z",
+        "title": "日本央行事件"
+      },
+      {
+        "country": "JPY",
+        "forecast": "",
+        "id": "49a5937cd695",
+        "impact": "High",
+        "official": false,
+        "original_title": "Monetary Policy Statement",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T02:30:00Z",
+        "title": "日本 · Monetary Policy Statement"
+      },
+      {
+        "country": "JPY",
+        "forecast": "",
+        "id": "59ebcc1af90d",
+        "impact": "High",
+        "official": false,
+        "original_title": "BOJ Outlook Report",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T02:31:00Z",
+        "title": "日本央行事件"
+      },
+      {
+        "country": "JPY",
+        "forecast": "",
+        "id": "a182c47c40df",
+        "impact": "High",
+        "official": false,
+        "original_title": "BOJ Press Conference",
+        "previous": "",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T05:30:00Z",
+        "title": "日本央行事件"
+      },
+      {
+        "country": "EUR",
+        "forecast": "0.1%",
+        "id": "330ba17eec10",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "German Prelim CPI m/m",
+        "previous": "0.6%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T06:29:00Z",
+        "title": "CPI 环比"
+      },
+      {
+        "country": "EUR",
+        "forecast": "0.1%",
+        "id": "57bfea513bcc",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "German Prelim GDP q/q",
+        "previous": "0.2%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T09:00:00Z",
+        "title": "美国 GDP 修正值"
+      },
+      {
+        "country": "USD",
+        "forecast": "0.8%",
+        "id": "1477ed29f9b8",
+        "impact": "Medium",
+        "official": false,
+        "original_title": "Employment Cost Index q/q",
+        "previous": "0.9%",
+        "source": "Forex Factory public calendar feed",
+        "source_url": "https://www.forexfactory.com/calendar",
+        "timestamp": "2026-10-30T12:30:00Z",
+        "title": "美国 · Employment Cost Index q/q"
       },
       {
         "country": "USD",
@@ -636,141 +872,24 @@
         "source_url": "https://www.bea.gov/news/schedule",
         "timestamp": "2026-11-25T13:30:00Z",
         "title": "美国 GDP 第二次估值"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "53fa07815483",
-        "impact": "High",
-        "official": true,
-        "original_title": "Personal Income and Outlays, October 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-11-25T13:30:00Z",
-        "title": "美国个人收入与支出（含 PCE）"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "1412a70f2895",
-        "impact": "High",
-        "official": true,
-        "original_title": "GDP by County and Personal Income by County, 2025",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-02T13:30:00Z",
-        "title": "美国 · GDP by County and Personal Income by County, 2025"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "6ab112beeb05",
-        "impact": "Medium",
-        "official": true,
-        "original_title": "U.S. International Trade in Goods and Services, October 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-08T13:30:00Z",
-        "title": "美国国际贸易"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "b53425080c0f",
-        "impact": "High",
-        "official": true,
-        "original_title": "FOMC interest-rate decision and statement",
-        "previous": "",
-        "source": "Federal Reserve",
-        "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-        "timestamp": "2026-12-09T19:00:00Z",
-        "title": "美联储 FOMC 事件"
-      },
-      {
-        "country": "EUR",
-        "forecast": "",
-        "id": "97563ebbd853",
-        "impact": "High",
-        "official": true,
-        "original_title": "ECB monetary-policy decision",
-        "previous": "",
-        "source": "European Central Bank",
-        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-        "timestamp": "2026-12-17T13:15:00Z",
-        "title": "欧元区 · ECB monetary-policy decision"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "5b96ea30fcf9",
-        "impact": "High",
-        "official": true,
-        "original_title": "GDP (Third Estimate), Industries, Corporate Profits, State GDP, and State Personal Income, 3rd Quarter 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-23T13:30:00Z",
-        "title": "美国 GDP 第三次估值"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "36424af3a9fa",
-        "impact": "High",
-        "official": true,
-        "original_title": "Personal Income and Outlays, November 2026",
-        "previous": "",
-        "source": "U.S. BEA",
-        "source_url": "https://www.bea.gov/news/schedule",
-        "timestamp": "2026-12-23T13:30:00Z",
-        "title": "美国个人收入与支出（含 PCE）"
-      },
-      {
-        "country": "EUR",
-        "forecast": "",
-        "id": "d04b9f463bdd",
-        "impact": "High",
-        "official": true,
-        "original_title": "ECB monetary-policy decision",
-        "previous": "",
-        "source": "European Central Bank",
-        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-        "timestamp": "2027-02-04T13:15:00Z",
-        "title": "欧元区 · ECB monetary-policy decision"
-      },
-      {
-        "country": "EUR",
-        "forecast": "",
-        "id": "ed48ca3c6c85",
-        "impact": "High",
-        "official": true,
-        "original_title": "ECB monetary-policy decision",
-        "previous": "",
-        "source": "European Central Bank",
-        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-        "timestamp": "2027-03-18T13:15:00Z",
-        "title": "欧元区 · ECB monetary-policy decision"
       }
     ],
     "next_event": {
       "country": "USD",
-      "forecast": "",
-      "id": "e1771f86ce6c",
-      "impact": "High",
-      "official": true,
-      "original_title": "FOMC interest-rate decision and statement",
-      "previous": "",
-      "source": "Federal Reserve",
-      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "timestamp": "2026-10-28T18:00:00Z",
-      "title": "美联储 FOMC 事件"
+      "forecast": "80.5",
+      "id": "c65710ed3691",
+      "impact": "Medium",
+      "official": false,
+      "original_title": "CB Consumer Confidence",
+      "previous": "81.9",
+      "source": "Forex Factory public calendar feed",
+      "source_url": "https://www.forexfactory.com/calendar",
+      "timestamp": "2026-10-27T14:00:00Z",
+      "title": "美国 · CB Consumer Confidence"
     },
     "source_statuses": [
       {
-        "events": 0,
+        "events": 19,
         "source": "Broad weekly feed",
         "status": "ok"
       },
@@ -5246,9 +5365,9 @@
     "headline": "黄金明显支持；白银温和支持；日元明显支持。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
-    "next_event_text": "下一事件：10-28 19:00 美联储 FOMC 事件",
+    "next_event_text": "下一事件：10-27 15:00 美国 · CB Consumer Confidence",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金明显支持；白银温和支持；日元明显支持。下一事件：10-28 19:00 美联储 FOMC 事件。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金明显支持；白银温和支持；日元明显支持。下一事件：10-27 15:00 美国 · CB Consumer Confidence。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5373,7 +5492,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-10-24T23:20:04Z",
+      "checked_at": "2026-10-25T06:41:53Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5956,9 +6075,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-25T01:27:30Z"
+    "updated_at": "2026-10-25T06:41:53Z"
   },
-  "generated_at": "2026-10-25T01:27:30Z",
+  "generated_at": "2026-10-25T06:41:53Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6012,14 +6131,19 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-25T01:27:32Z",
+    "a_share_checked_at": "2026-10-25T06:42:05Z",
     "ai_tokens_used": 0,
-    "cached_count": 30,
-    "calendar_checked_at": "2026-10-25T01:27:30Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-10-25T06:41:53Z",
     "cftc_checked_at": "2026-10-24T21:12:26Z",
     "cross_asset_checked_at": "2026-10-24T15:48:42Z",
-    "error_count": 13,
+    "error_count": 15,
     "errors": [
+      {
+        "error": "sector page 3: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
       {
         "error": "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
         "series": "sector/index",
@@ -6071,6 +6195,11 @@
         "source": "Eastmoney A-share"
       },
       {
+        "error": "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
         "error": "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
@@ -6087,142 +6216,152 @@
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-10-24T23:20:04Z",
-    "macro_checked_at": "2026-10-24T23:20:04Z",
+    "inventory_checked_at": "2026-10-25T06:41:53Z",
+    "macro_checked_at": "2026-10-25T06:41:53Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-25T01:30:00Z",
+    "next_scheduled_at": "2026-10-25T06:45:00Z",
     "run_interval_minutes": 15,
-    "source_count": 35,
+    "source_count": 37,
     "statuses": [
       {
         "date": "2026-10-21",
         "source": "FRED WALCL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "FRED RRPONTSYD",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-21",
         "source": "FRED WDTGAL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED TOTRESNS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-31",
         "source": "FRED WM2NS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED DGS2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED DGS10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED DGS30",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED DFII10",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "FRED T10YIE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED DFF",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED VIXCLS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-22",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-21",
         "source": "FRED SP500",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "FRED NASDAQCOM",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-16",
         "source": "FRED DTWEXBGS",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-10-22",
+        "date": "2026-10-20",
         "source": "FRED DCOILBRENTEU",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-10-22",
+        "date": "2026-10-20",
         "source": "FRED DCOILWTICO",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-04-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-01",
         "source": "FRED PAYEMS",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-01",
         "source": "FRED UNRATE",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED JTSJOL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-09-01",
         "source": "FRED CPIAUCSL",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PCEPI",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-08-01",
         "source": "FRED PCEPILFE",
-        "status": "cached"
+        "status": "ok"
+      },
+      {
+        "date": "2026-10-22",
+        "source": "Gate CFD XBRUSD",
+        "status": "ok"
+      },
+      {
+        "date": "2026-10-22",
+        "source": "Gate CFD XTIUSD",
+        "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "ECB FX",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-23T20:45:00Z",
@@ -6240,22 +6379,22 @@
         "status": "cached"
       },
       {
-        "date": "2026-10-25T01:27:32Z",
+        "date": "2026-10-25T06:42:04Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "CME gold warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
         "date": "2026-10-23",
         "source": "CME silver warehouse",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-10-25T01:27:32Z",
+        "date": "2026-10-25T06:42:05Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6270,8 +6409,8 @@
         "status": "cached"
       }
     ],
-    "success_count": 35,
-    "updated_count": 4
+    "success_count": 37,
+    "updated_count": 34
   },
   "post_close_analysis": {
     "as_of": "2026-10-22",
