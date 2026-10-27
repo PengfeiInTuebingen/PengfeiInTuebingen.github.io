@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-27T11:03:16Z",
+  "checked_at": "2026-10-27T16:41:44Z",
   "conclusions": [
     {
       "body": "铜当前记录值为 -35.2 亿（5日/市值 -0.23%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -30,7 +30,6 @@
     "通信设备: sector not found",
     "半导体材料: sector not found",
     "半导体: sector not found",
-    "银行 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "有色金属/贵金属: sector not found",
     "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
     "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
@@ -49,8 +48,8 @@
   "freshness": {
     "cached_sector_count": 8,
     "current_sector_count": 3,
-    "error_count": 16,
-    "history_live_count": 2
+    "error_count": 15,
+    "history_live_count": 3
   },
   "index_flows": [
     {
@@ -447,17 +446,11 @@
     },
     {
       "code": "BK1283",
-      "continuity": "UNKNOWN",
-      "five_day_billion_cny": -35.711,
-      "five_day_to_cap_pct": -0.021,
-      "flow_data_status": "PARTIAL",
+      "continuity": "ONE_DAY_SPIKE",
+      "five_day_billion_cny": -26.806,
+      "five_day_to_cap_pct": -0.016,
+      "flow_data_status": "LIVE",
       "history": [
-        {
-          "change_pct": -1.12,
-          "close": 4397.11,
-          "date": "2026-10-20",
-          "main_net_flow_billion_cny": -1.209
-        },
         {
           "change_pct": -0.58,
           "close": 4371.49,
@@ -481,9 +474,15 @@
           "close": 4375.36,
           "date": "2026-10-26",
           "main_net_flow_billion_cny": 0.767
+        },
+        {
+          "change_pct": 1.34,
+          "close": 4433.97,
+          "date": "2026-10-27",
+          "main_net_flow_billion_cny": 7.696
         }
       ],
-      "label": "5日历史未完整返回，连续性不判定",
+      "label": "单日流入，5日未确认",
       "market_cap_trillion_cny": 17.091,
       "name": "银行",
       "today_billion_cny": 7.696,
@@ -503,9 +502,9 @@
       "today_to_cap_pct": null
     }
   ],
-  "snapshot_date": "2026-10-27",
+  "snapshot_date": "2026-10-28",
   "source": "东方财富公开行情与资金流接口",
-  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 3/11，完整5日历史 2/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+  "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 3/11，完整5日历史 3/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
   "source_url": "https://data.eastmoney.com/zjlx/",
   "timezone": "Asia/Shanghai",
   "update_interval_minutes": 15,
