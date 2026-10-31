@@ -1,9 +1,9 @@
 {
   "a_share": {
-    "checked_at": "2026-10-31T08:31:20Z",
+    "checked_at": "2026-10-31T14:47:22Z",
     "conclusions": [
       {
-        "body": "铜当前记录值为 -24.2 亿（5日/市值 -0.16%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
+        "body": "铜当前记录值为 -24.8 亿（5日/市值 -0.17%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
         "title": "资源流入连续性",
         "tone": "neutral"
       },
@@ -21,17 +21,15 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
-      "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-      "铜: sector not found",
-      "工业金属: sector not found",
+      "工业金属 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "证券: sector not found",
-      "印制电路板: sector not found",
+      "印制电路板 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "酿酒: sector not found",
-      "电力设备: sector not found",
-      "通信设备: sector not found",
-      "半导体材料: sector not found",
-      "半导体: sector not found",
-      "银行: sector not found",
+      "电力设备 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+      "通信设备 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+      "半导体材料 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+      "半导体 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+      "银行 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "有色金属/贵金属: sector not found",
       "上证指数 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
       "科创50 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
@@ -48,10 +46,10 @@
       "风险政策与人工确认"
     ],
     "freshness": {
-      "cached_sector_count": 11,
-      "current_sector_count": 0,
-      "error_count": 16,
-      "history_live_count": 0
+      "cached_sector_count": 3,
+      "current_sector_count": 8,
+      "error_count": 14,
+      "history_live_count": 1
     },
     "index_flows": [
       {
@@ -114,17 +112,11 @@
     "sectors": [
       {
         "code": "BK1615",
-        "continuity": "UNKNOWN",
-        "five_day_billion_cny": -24.169,
-        "five_day_to_cap_pct": -0.158,
-        "flow_data_status": "CACHED",
+        "continuity": "RED",
+        "five_day_billion_cny": -24.832,
+        "five_day_to_cap_pct": -0.165,
+        "flow_data_status": "LIVE",
         "history": [
-          {
-            "change_pct": 1.42,
-            "close": 3210.56,
-            "date": "2026-10-23",
-            "main_net_flow_billion_cny": -6.154
-          },
           {
             "change_pct": -2.55,
             "close": 3128.79,
@@ -148,20 +140,26 @@
             "close": 3035.19,
             "date": "2026-10-29",
             "main_net_flow_billion_cny": -6.841
+          },
+          {
+            "change_pct": -2.98,
+            "close": 2944.64,
+            "date": "2026-10-30",
+            "main_net_flow_billion_cny": -6.817
           }
         ],
-        "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 1.534,
+        "label": "连续流出",
+        "market_cap_trillion_cny": 1.502,
         "name": "铜",
-        "today_billion_cny": -6.841,
+        "today_billion_cny": -6.817,
         "today_to_cap_pct": -0.045
       },
       {
         "code": "BK1287",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -34.902,
-        "five_day_to_cap_pct": -0.143,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.145,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -2.65,
@@ -195,10 +193,10 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 2.44,
+        "market_cap_trillion_cny": 2.41,
         "name": "工业金属",
-        "today_billion_cny": -0.979,
-        "today_to_cap_pct": -0.004
+        "today_billion_cny": -5.232,
+        "today_to_cap_pct": -0.022
       },
       {
         "code": null,
@@ -217,8 +215,8 @@
         "code": "BK1340",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -120.136,
-        "five_day_to_cap_pct": -0.61,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.668,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -6.01,
@@ -252,10 +250,10 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 1.97,
+        "market_cap_trillion_cny": 1.798,
         "name": "印制电路板",
-        "today_billion_cny": 47.023,
-        "today_to_cap_pct": 0.239
+        "today_billion_cny": -8.353,
+        "today_to_cap_pct": -0.046
       },
       {
         "code": null,
@@ -274,8 +272,8 @@
         "code": "BK1200",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -119.313,
-        "five_day_to_cap_pct": -0.198,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.203,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -1.88,
@@ -309,17 +307,17 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 6.026,
+        "market_cap_trillion_cny": 5.888,
         "name": "电力设备",
-        "today_billion_cny": -18.885,
-        "today_to_cap_pct": -0.031
+        "today_billion_cny": -23.541,
+        "today_to_cap_pct": -0.04
       },
       {
         "code": "BK0448",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -72.187,
-        "five_day_to_cap_pct": -0.24,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.264,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -3.87,
@@ -353,17 +351,17 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 3.002,
+        "market_cap_trillion_cny": 2.73,
         "name": "通信设备",
-        "today_billion_cny": 78.528,
-        "today_to_cap_pct": 0.262
+        "today_billion_cny": -52.193,
+        "today_to_cap_pct": -0.191
       },
       {
         "code": "BK1325",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -27.287,
-        "five_day_to_cap_pct": -0.385,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.416,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -4.16,
@@ -397,17 +395,17 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 0.709,
+        "market_cap_trillion_cny": 0.655,
         "name": "半导体材料",
-        "today_billion_cny": -1.66,
-        "today_to_cap_pct": -0.023
+        "today_billion_cny": -5.427,
+        "today_to_cap_pct": -0.083
       },
       {
         "code": "BK1036",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -42.244,
-        "five_day_to_cap_pct": -0.038,
-        "flow_data_status": "CACHED",
+        "five_day_to_cap_pct": -0.04,
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -3.11,
@@ -441,17 +439,17 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 11.101,
+        "market_cap_trillion_cny": 10.494,
         "name": "半导体",
-        "today_billion_cny": 68.908,
-        "today_to_cap_pct": 0.062
+        "today_billion_cny": -56.139,
+        "today_to_cap_pct": -0.053
       },
       {
         "code": "BK1283",
         "continuity": "UNKNOWN",
         "five_day_billion_cny": -12.518,
         "five_day_to_cap_pct": -0.007,
-        "flow_data_status": "CACHED",
+        "flow_data_status": "PARTIAL",
         "history": [
           {
             "change_pct": -0.54,
@@ -485,10 +483,10 @@
           }
         ],
         "label": "5日历史未完整返回，连续性不判定",
-        "market_cap_trillion_cny": 17.402,
+        "market_cap_trillion_cny": 17.375,
         "name": "银行",
-        "today_billion_cny": 1.115,
-        "today_to_cap_pct": 0.001
+        "today_billion_cny": -1.04,
+        "today_to_cap_pct": -0.001
       },
       {
         "code": null,
@@ -506,7 +504,7 @@
     ],
     "snapshot_date": "2026-10-31",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 1/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
@@ -559,7 +557,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-10-31T08:31:20Z",
+    "checked_at": "2026-10-31T14:47:21Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -704,6 +702,19 @@
         "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
         "timestamp": "2027-03-18T13:15:00Z",
         "title": "欧元区 · ECB monetary-policy decision"
+      },
+      {
+        "country": "EUR",
+        "forecast": "",
+        "id": "592eba40a858",
+        "impact": "High",
+        "official": true,
+        "original_title": "ECB monetary-policy decision",
+        "previous": "",
+        "source": "European Central Bank",
+        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
+        "timestamp": "2027-04-29T12:15:00Z",
+        "title": "欧元区 · ECB monetary-policy decision"
       }
     ],
     "next_event": {
@@ -736,7 +747,7 @@
         "status": "ok"
       },
       {
-        "events": 3,
+        "events": 4,
         "source": "ECB",
         "status": "ok"
       }
@@ -5324,7 +5335,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-10-31T08:31:07Z",
+      "checked_at": "2026-10-31T14:47:08Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -5967,9 +5978,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-10-31T08:31:07Z"
+    "updated_at": "2026-10-31T14:47:08Z"
   },
-  "generated_at": "2026-10-31T08:31:07Z",
+  "generated_at": "2026-10-31T14:47:08Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6023,26 +6034,16 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-10-31T08:31:20Z",
+    "a_share_checked_at": "2026-10-31T14:47:22Z",
     "ai_tokens_used": 0,
-    "cached_count": 1,
-    "calendar_checked_at": "2026-10-31T08:31:07Z",
+    "cached_count": 2,
+    "calendar_checked_at": "2026-10-31T14:47:08Z",
     "cftc_checked_at": "2026-10-31T08:31:07Z",
     "cross_asset_checked_at": "2026-10-31T02:14:27Z",
-    "error_count": 16,
+    "error_count": 14,
     "errors": [
       {
-        "error": "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
-        "error": "铜: sector not found",
-        "series": "sector/index",
-        "source": "Eastmoney A-share"
-      },
-      {
-        "error": "工业金属: sector not found",
+        "error": "工业金属 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -6052,7 +6053,7 @@
         "source": "Eastmoney A-share"
       },
       {
-        "error": "印制电路板: sector not found",
+        "error": "印制电路板 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -6062,27 +6063,27 @@
         "source": "Eastmoney A-share"
       },
       {
-        "error": "电力设备: sector not found",
+        "error": "电力设备 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "通信设备: sector not found",
+        "error": "通信设备 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "半导体材料: sector not found",
+        "error": "半导体材料 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "半导体: sector not found",
+        "error": "半导体 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
       {
-        "error": "银行: sector not found",
+        "error": "银行 history: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -6113,10 +6114,10 @@
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-10-31T08:31:07Z",
-    "macro_checked_at": "2026-10-31T08:31:07Z",
+    "inventory_checked_at": "2026-10-31T14:47:08Z",
+    "macro_checked_at": "2026-10-31T14:47:08Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-10-31T08:45:00Z",
+    "next_scheduled_at": "2026-10-31T15:00:00Z",
     "run_interval_minutes": 15,
     "source_count": 37,
     "statuses": [
@@ -6273,10 +6274,10 @@
       {
         "date": "2026-10-27",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-10-31T08:31:20Z",
+        "date": "2026-10-31T14:47:21Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6291,7 +6292,7 @@
         "status": "ok"
       },
       {
-        "date": "2026-10-31T08:31:20Z",
+        "date": "2026-10-31T14:47:22Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6307,7 +6308,7 @@
       }
     ],
     "success_count": 37,
-    "updated_count": 35
+    "updated_count": 34
   },
   "post_close_analysis": {
     "as_of": "2026-10-29",
