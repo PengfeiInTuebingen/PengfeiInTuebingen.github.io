@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-11-03T09:54:19Z",
+    "checked_at": "2026-11-03T17:37:58Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -15.0 亿（5日/市值 -0.10%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -8,9 +8,9 @@
         "tone": "neutral"
       },
       {
-        "body": "半导体 5日净额 -209.0 亿；半导体材料 5日/市值 -0.33%。资金流只修正结构可信度，不能替代个股价格与广度确认。",
+        "body": "半导体记录值为 -209.0 亿，但5日历史未完整返回，撤退判断保持 UNKNOWN。资金流只修正结构可信度，不能替代个股价格与广度确认。",
         "title": "科技资金状态",
-        "tone": "negative"
+        "tone": "neutral"
       },
       {
         "body": "板块绿灯不等于个股买点；个股代码、复权口径、OHLCV 和正式证伪位齐备后，才可进入人工评估。",
@@ -18,12 +18,22 @@
         "tone": "neutral"
       }
     ],
-    "data_status": "LIVE",
+    "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
+      "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+      "铜: sector not found",
+      "工业金属: sector not found",
       "证券: sector not found",
+      "印制电路板: sector not found",
       "酿酒: sector not found",
-      "有色金属/贵金属: sector not found"
+      "电力设备: sector not found",
+      "通信设备: sector not found",
+      "半导体材料: sector not found",
+      "半导体: sector not found",
+      "银行: sector not found",
+      "有色金属/贵金属: sector not found",
+      "index quotes: Eastmoney request failed: ulist.np/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A',"
     ],
     "evaluation_status": "PARTIAL",
     "framework": [
@@ -35,10 +45,10 @@
       "风险政策与人工确认"
     ],
     "freshness": {
-      "cached_sector_count": 3,
-      "current_sector_count": 8,
-      "error_count": 3,
-      "history_live_count": 8
+      "cached_sector_count": 11,
+      "current_sector_count": 0,
+      "error_count": 13,
+      "history_live_count": 0
     },
     "index_flows": [
       {
@@ -101,10 +111,10 @@
     "sectors": [
       {
         "code": "BK1615",
-        "continuity": "ONE_DAY_SPIKE",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -14.954,
         "five_day_to_cap_pct": -0.101,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 0.98,
@@ -137,7 +147,7 @@
             "main_net_flow_billion_cny": 0.436
           }
         ],
-        "label": "单日流入，5日未确认",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 1.487,
         "name": "铜",
         "today_billion_cny": 0.436,
@@ -145,10 +155,10 @@
       },
       {
         "code": "BK1287",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -23.586,
         "five_day_to_cap_pct": -0.098,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 0.66,
@@ -181,7 +191,7 @@
             "main_net_flow_billion_cny": -1.723
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 2.401,
         "name": "工业金属",
         "today_billion_cny": -1.723,
@@ -202,10 +212,10 @@
       },
       {
         "code": "BK1340",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -86.27,
         "five_day_to_cap_pct": -0.522,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 4.29,
@@ -238,7 +248,7 @@
             "main_net_flow_billion_cny": -52.167
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 1.654,
         "name": "印制电路板",
         "today_billion_cny": -52.167,
@@ -259,10 +269,10 @@
       },
       {
         "code": "BK1200",
-        "continuity": "ONE_DAY_SPIKE",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -34.339,
         "five_day_to_cap_pct": -0.056,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 1.65,
@@ -295,7 +305,7 @@
             "main_net_flow_billion_cny": 34.32
           }
         ],
-        "label": "单日流入，5日未确认",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 6.116,
         "name": "电力设备",
         "today_billion_cny": 34.32,
@@ -303,10 +313,10 @@
       },
       {
         "code": "BK0448",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -174.555,
         "five_day_to_cap_pct": -0.69,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 2.97,
@@ -339,7 +349,7 @@
             "main_net_flow_billion_cny": -100.906
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 2.531,
         "name": "通信设备",
         "today_billion_cny": -100.906,
@@ -347,10 +357,10 @@
       },
       {
         "code": "BK1325",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -21.48,
         "five_day_to_cap_pct": -0.332,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 4.17,
@@ -383,7 +393,7 @@
             "main_net_flow_billion_cny": -9.913
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 0.646,
         "name": "半导体材料",
         "today_billion_cny": -9.913,
@@ -391,10 +401,10 @@
       },
       {
         "code": "BK1036",
-        "continuity": "RED_STRONG",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -208.984,
         "five_day_to_cap_pct": -0.207,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": 4.88,
@@ -427,7 +437,7 @@
             "main_net_flow_billion_cny": -131.431
           }
         ],
-        "label": "持续流出，强度偏高",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 10.117,
         "name": "半导体",
         "today_billion_cny": -131.431,
@@ -435,10 +445,10 @@
       },
       {
         "code": "BK1283",
-        "continuity": "RED",
+        "continuity": "UNKNOWN",
         "five_day_billion_cny": -37.879,
         "five_day_to_cap_pct": -0.022,
-        "flow_data_status": "LIVE",
+        "flow_data_status": "CACHED",
         "history": [
           {
             "change_pct": -0.35,
@@ -471,7 +481,7 @@
             "main_net_flow_billion_cny": -26.27
           }
         ],
-        "label": "连续流出",
+        "label": "5日历史未完整返回，连续性不判定",
         "market_cap_trillion_cny": 17.148,
         "name": "银行",
         "today_billion_cny": -26.27,
@@ -491,20 +501,20 @@
         "today_to_cap_pct": null
       }
     ],
-    "snapshot_date": "2026-11-03",
+    "snapshot_date": "2026-11-04",
     "source": "东方财富公开行情与资金流接口",
-    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 8/11，完整5日历史 8/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
+    "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 0/11，完整5日历史 0/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
     "timezone": "Asia/Shanghai",
     "update_interval_minutes": 15,
     "watchlist": [
       {
-        "actionability": "FREEZE_BUY",
+        "actionability": "NON_ACTIONABLE",
         "missing": "股票代码、复权口径、收盘价、个股成交额/RVOL、正式证伪位",
         "name": "太极实业",
         "reason": "所属半导体板块5日净额 -209.0 亿；接回资金绿灯不满足，不能仅凭价格反弹接回。",
         "sector": "半导体",
-        "status": "RED_STRONG",
+        "status": "UNKNOWN",
         "symbol": null
       },
       {
@@ -517,64 +527,38 @@
         "symbol": null
       },
       {
-        "actionability": "FREEZE_BUY",
+        "actionability": "NON_ACTIONABLE",
         "missing": "确切证券代码、个股确认/证伪位与目标仓位",
         "name": "紫金",
-        "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+        "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
         "sector": "工业金属",
-        "status": "RED",
+        "status": "UNKNOWN",
         "symbol": null
       },
       {
-        "actionability": "FREEZE_BUY",
+        "actionability": "NON_ACTIONABLE",
         "missing": "确切证券代码、个股确认/证伪位与目标仓位",
         "name": "兴业",
-        "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+        "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
         "sector": "工业金属",
-        "status": "RED",
+        "status": "UNKNOWN",
         "symbol": null
       },
       {
-        "actionability": "FREEZE_BUY",
+        "actionability": "NON_ACTIONABLE",
         "missing": "确切证券代码、个股确认/证伪位与目标仓位",
         "name": "中铝",
-        "reason": "所属工业金属板块状态为 RED；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
+        "reason": "所属工业金属板块状态为 UNKNOWN；板块支持不等于个股绿灯，仍需个股 OHLCV、广度和证伪位。",
         "sector": "工业金属",
-        "status": "RED",
+        "status": "UNKNOWN",
         "symbol": null
       }
     ]
   },
   "calendar": {
-    "checked_at": "2026-11-03T09:54:18Z",
+    "checked_at": "2026-11-03T17:37:57Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
-      {
-        "country": "USD",
-        "forecast": "7.15M",
-        "id": "1aa6f2beaa20",
-        "impact": "Medium",
-        "official": false,
-        "original_title": "JOLTS Job Openings",
-        "previous": "7.08M",
-        "source": "Forex Factory public calendar feed",
-        "source_url": "https://www.forexfactory.com/calendar",
-        "timestamp": "2026-11-03T15:00:00Z",
-        "title": "美国 JOLTS 职位空缺"
-      },
-      {
-        "country": "USD",
-        "forecast": "",
-        "id": "259ab85612d2",
-        "impact": "High",
-        "official": false,
-        "original_title": "Congressional Elections",
-        "previous": "",
-        "source": "Forex Factory public calendar feed",
-        "source_url": "https://www.forexfactory.com/calendar",
-        "timestamp": "2026-11-03T15:16:00Z",
-        "title": "美国 · Congressional Elections"
-      },
       {
         "country": "EUR",
         "forecast": "2.5%",
@@ -860,24 +844,37 @@
         "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
         "timestamp": "2027-03-18T13:15:00Z",
         "title": "欧元区 · ECB monetary-policy decision"
+      },
+      {
+        "country": "EUR",
+        "forecast": "",
+        "id": "592eba40a858",
+        "impact": "High",
+        "official": true,
+        "original_title": "ECB monetary-policy decision",
+        "previous": "",
+        "source": "European Central Bank",
+        "source_url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
+        "timestamp": "2027-04-29T12:15:00Z",
+        "title": "欧元区 · ECB monetary-policy decision"
       }
     ],
     "next_event": {
-      "country": "USD",
-      "forecast": "7.15M",
-      "id": "1aa6f2beaa20",
+      "country": "EUR",
+      "forecast": "2.5%",
+      "id": "8882efc4814f",
       "impact": "Medium",
       "official": false,
-      "original_title": "JOLTS Job Openings",
-      "previous": "7.08M",
+      "original_title": "Core CPI Flash Estimate y/y",
+      "previous": "2.5%",
       "source": "Forex Factory public calendar feed",
       "source_url": "https://www.forexfactory.com/calendar",
-      "timestamp": "2026-11-03T15:00:00Z",
-      "title": "美国 JOLTS 职位空缺"
+      "timestamp": "2026-11-04T10:00:00Z",
+      "title": "欧元区 · Core CPI Flash Estimate y/y"
     },
     "source_statuses": [
       {
-        "events": 13,
+        "events": 11,
         "source": "Broad weekly feed",
         "status": "ok"
       },
@@ -5177,13 +5174,13 @@
   },
   "daily_conclusion": {
     "ai_tokens_used": 0,
-    "as_of": "2026-11-03T09:45:00Z",
+    "as_of": "2026-11-03T17:30:00Z",
     "assets": {
       "gold": {
         "drivers": [
           {
             "direction": "压制",
-            "fact": "黄金 UTC 日内 -1.04%",
+            "fact": "黄金 UTC 日内 -0.58%",
             "name": "黄金日内动量",
             "raw": -1.0,
             "weight": 0.23
@@ -5211,29 +5208,29 @@
           },
           {
             "direction": "中性",
-            "fact": "VIX 19.42",
+            "fact": "VIX 21.15",
             "name": "避险波动",
             "raw": 0.0,
             "weight": 0.12
           },
           {
-            "direction": "支持",
-            "fact": "Brent +1.26%；WTI +1.10%",
+            "direction": "压制",
+            "fact": "Brent -0.81%；WTI -0.32%",
             "name": "能源/通胀背景",
-            "raw": 1.0,
+            "raw": -1.0,
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +42，对黄金明显支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 +26，对黄金温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "黄金",
-        "score": 42,
-        "stance": "明显支持"
+        "score": 26,
+        "stance": "温和支持"
       },
       "silver": {
         "drivers": [
           {
             "direction": "压制",
-            "fact": "白银 UTC 日内 -3.54%",
+            "fact": "白银 UTC 日内 -2.13%",
             "name": "白银日内动量",
             "raw": -1.0,
             "weight": 0.23
@@ -5274,23 +5271,23 @@
             "weight": 0.14
           },
           {
-            "direction": "支持",
-            "fact": "Brent +1.26%；WTI +1.10%",
+            "direction": "压制",
+            "fact": "Brent -0.81%；WTI -0.32%",
             "name": "能源/通胀背景",
-            "raw": 1.0,
+            "raw": -1.0,
             "weight": 0.08
           }
         ],
-        "interpretation": "当前规则得分 +12，对白银温和支持。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
+        "interpretation": "当前规则得分 -4，对白银中性等待。只有价格与跨资产信号继续同向，才视为确认；出现反向组合时应降低结论强度。",
         "label": "白银",
-        "score": 12,
-        "stance": "温和支持"
+        "score": -4,
+        "stance": "中性等待"
       },
       "yen": {
         "drivers": [
           {
             "direction": "压制",
-            "fact": "USD/JPY 较前值 +0.41%",
+            "fact": "USD/JPY 较前值 +0.25%",
             "name": "USD/JPY 方向",
             "raw": -1.0,
             "weight": 0.35
@@ -5304,7 +5301,7 @@
           },
           {
             "direction": "中性",
-            "fact": "VIX 19.42",
+            "fact": "VIX 21.15",
             "name": "风险规避",
             "raw": 0.0,
             "weight": 0.15
@@ -5324,12 +5321,12 @@
       }
     },
     "date": "2026-11-03",
-    "headline": "黄金明显支持；白银温和支持；日元温和压制。",
+    "headline": "黄金温和支持；白银中性等待；日元温和压制。",
     "method": "transparent-rules-v1",
     "method_note": "仅使用已标注时点的价格、FRED/ECB 宏观数据、Brent/WTI 与 CFTC 持仓；CME 库存作为官方背景展示，价格/K线/成交量图由 TradingView 负责；自动规则只使用标注日期的可审计数值源，不把嵌入图当作未经授权的数值接口；缺失因子不参与加权，不用 AI 补写。",
-    "next_event_text": "下一事件：11-03 16:00 美国 JOLTS 职位空缺",
+    "next_event_text": "下一事件：11-04 11:00 欧元区 · Core CPI Flash Estimate y/y",
     "risk_note": "若实际利率、美元与价格动量发生同步反转，当前结论应立即降级；事件公布前后需防范跳空和点差扩大。",
-    "summary": "黄金明显支持；白银温和支持；日元温和压制。下一事件：11-03 16:00 美国 JOLTS 职位空缺。这是指标规则的条件判断，不是收益保证或自动交易指令。"
+    "summary": "黄金温和支持；白银中性等待；日元温和压制。下一事件：11-04 11:00 欧元区 · Core CPI Flash Estimate y/y。这是指标规则的条件判断，不是收益保证或自动交易指令。"
   },
   "derived": {
     "BRENT_DAILY": {
@@ -5337,7 +5334,7 @@
       "label": "Brent 原油日变动",
       "source": "Gate CFD XBRUSD daily OHLC",
       "unit": "%",
-      "value": 1.2575
+      "value": -0.8137
     },
     "CORE_PCE_YOY": {
       "date": "2026-09-01",
@@ -5358,7 +5355,7 @@
       "label": "金银比",
       "source": "Gold-API",
       "unit": "倍",
-      "value": 79.9564
+      "value": 79.1769
     },
     "M2_YOY": {
       "date": "2026-10-05",
@@ -5396,11 +5393,11 @@
       "value": -1.8175
     },
     "USDJPY_DAILY": {
-      "date": "2026-11-02",
+      "date": "2026-11-03",
       "label": "USD/JPY 日变动",
       "source": "ECB",
       "unit": "%",
-      "value": 0.4128
+      "value": 0.246
     },
     "WALCL_WEEKLY_B": {
       "date": "2026-10-28",
@@ -5414,35 +5411,35 @@
       "label": "WTI 原油日变动",
       "source": "Gate CFD XTIUSD daily OHLC",
       "unit": "%",
-      "value": 1.1045
+      "value": -0.32
     },
     "XAG_15M": {
       "date": "2026-11-03",
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -2.6094
+      "value": 1.4542
     },
     "XAG_SESSION": {
       "date": "2026-11-03",
       "label": "白银 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -3.5374
+      "value": -2.1347
     },
     "XAU_15M": {
       "date": "2026-11-03",
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.8833
+      "value": 0.465
     },
     "XAU_SESSION": {
       "date": "2026-11-03",
       "label": "黄金 UTC 日内变动",
       "source": "Gold-API",
       "unit": "%",
-      "value": -1.0404
+      "value": -0.5802
     },
     "YIELD_10Y2Y": {
       "date": "2026-10-30",
@@ -5454,7 +5451,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-11-03T09:54:07Z",
+      "checked_at": "2026-11-03T17:37:45Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -6109,9 +6106,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-11-03T09:54:07Z"
+    "updated_at": "2026-11-03T17:37:45Z"
   },
-  "generated_at": "2026-11-03T09:54:07Z",
+  "generated_at": "2026-11-03T17:37:45Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6125,7 +6122,7 @@
     "L2": {
       "automated": true,
       "metrics": {
-        "JOLTS 职位空缺": "7 百万",
+        "JOLTS 职位空缺": "8 百万",
         "美国 Q2 GDP": "3.4% 年化",
         "美国失业率": "4.2%",
         "美国非农月变动": "29 千人"
@@ -6144,7 +6141,7 @@
       "automated": true,
       "metrics": {
         "SPX / NDX": "-1.82% / -1.07%",
-        "USD/JPY": "157.90",
+        "USD/JPY": "158.29",
         "美债 10Y": "4.940%",
         "美债 30Y": "5.310%"
       }
@@ -6152,10 +6149,10 @@
     "L5": {
       "automated": true,
       "metrics": {
-        "VIX": "19.42",
+        "VIX": "21.15",
         "动态 CFTC": "10 类资产",
         "白银管理资金净多": "+2,902 张",
-        "美国 HY OAS": "3.44%"
+        "美国 HY OAS": "3.43%"
       }
     },
     "L6": {
@@ -6165,16 +6162,36 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-11-03T09:54:19Z",
+    "a_share_checked_at": "2026-11-03T17:37:58Z",
     "ai_tokens_used": 0,
     "cached_count": 1,
-    "calendar_checked_at": "2026-11-03T09:54:07Z",
-    "cftc_checked_at": "2026-11-03T02:21:11Z",
+    "calendar_checked_at": "2026-11-03T17:37:45Z",
+    "cftc_checked_at": "2026-11-03T17:37:45Z",
     "cross_asset_checked_at": "2026-11-03T09:54:07Z",
-    "error_count": 3,
+    "error_count": 13,
     "errors": [
       {
+        "error": "sector quotes: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "铜: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "工业金属: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
         "error": "证券: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "印制电路板: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       },
@@ -6184,16 +6201,46 @@
         "source": "Eastmoney A-share"
       },
       {
+        "error": "电力设备: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "通信设备: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "半导体材料: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "半导体: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "银行: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
         "error": "有色金属/贵金属: sector not found",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
+      {
+        "error": "index quotes: Eastmoney request failed: ulist.np/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A',",
         "series": "sector/index",
         "source": "Eastmoney A-share"
       }
     ],
-    "fallback_count": 0,
-    "inventory_checked_at": "2026-11-03T09:54:07Z",
-    "macro_checked_at": "2026-11-03T09:54:07Z",
+    "fallback_count": 1,
+    "inventory_checked_at": "2026-11-03T17:37:45Z",
+    "macro_checked_at": "2026-11-03T17:37:45Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-11-03T10:00:00Z",
+    "next_scheduled_at": "2026-11-03T17:45:00Z",
     "run_interval_minutes": 15,
     "source_count": 37,
     "statuses": [
@@ -6253,12 +6300,12 @@
         "status": "ok"
       },
       {
-        "date": "2026-10-30",
+        "date": "2026-11-02",
         "source": "FRED VIXCLS",
         "status": "ok"
       },
       {
-        "date": "2026-10-30",
+        "date": "2026-11-02",
         "source": "FRED BAMLH0A0HYM2",
         "status": "ok"
       },
@@ -6303,7 +6350,7 @@
         "status": "ok"
       },
       {
-        "date": "2026-08-01",
+        "date": "2026-09-01",
         "source": "FRED JTSJOL",
         "status": "ok"
       },
@@ -6333,27 +6380,27 @@
         "status": "ok"
       },
       {
-        "date": "2026-11-02",
+        "date": "2026-11-03",
         "source": "ECB FX",
         "status": "ok"
       },
       {
-        "date": "2026-11-03T09:45:00Z",
+        "date": "2026-11-03T17:30:00Z",
         "source": "XAU/USD spot",
         "status": "ok"
       },
       {
-        "date": "2026-11-03T09:45:00Z",
+        "date": "2026-11-03T17:30:00Z",
         "source": "XAG/USD spot",
         "status": "ok"
       },
       {
         "date": "2026-10-27",
         "source": "CFTC",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-11-03T09:54:18Z",
+        "date": "2026-11-03T17:37:57Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6368,9 +6415,9 @@
         "status": "ok"
       },
       {
-        "date": "2026-11-03T09:54:19Z",
+        "date": "2026-11-03T17:37:58Z",
         "source": "A股指数/板块资金流",
-        "status": "ok"
+        "status": "fallback"
       },
       {
         "date": "2026-11-02",
@@ -6380,19 +6427,19 @@
       {
         "date": "2026-11-02",
         "source": "Cross-asset correlation",
-        "status": "ok"
+        "status": "cached"
       }
     ],
     "success_count": 37,
-    "updated_count": 36
+    "updated_count": 35
   },
   "post_close_analysis": {
     "as_of": "2026-11-02",
     "basis": "优先 Gate XAUUSD CFD 日线；接口不可用时使用公开 XAU/USD 或 COMEX GC=F 日线代理；成交量由源端提供时才展示",
     "daily_bar": {
-      "close": 3909.45,
+      "close": 3928.03,
       "date": "2026-11-02",
-      "high": 3964.49,
+      "high": 3971.15,
       "low": 3895.48,
       "open": 3947.74,
       "volume": null
@@ -6400,36 +6447,36 @@
     "data_quality": "使用公开 XAU/USD 日线；若源端尚未发布新完整收盘日线，则保留最近已验证日线。",
     "levels": {
       "deep_support": 4200,
-      "midpoint": 3929.98,
+      "midpoint": 3933.32,
       "prior_high": 4697,
       "resistance_1": 3947.74,
-      "resistance_2": 3964.49,
+      "resistance_2": 3971.15,
       "support_1": 3895.48,
-      "support_2": 4076.84
+      "support_2": 4077.77
     },
     "metrics": {
-      "body": 38.29,
-      "body_pct": 55.5,
-      "close_location_pct": 20.2,
-      "lower_wick": 13.97,
+      "body": 19.71,
+      "body_pct": 26.0,
+      "close_location_pct": 43.0,
+      "lower_wick": 32.55,
       "previous_close": 3946.53,
-      "range": 69.01,
-      "sma20": 4076.84,
-      "upper_wick": 16.75
+      "range": 75.67,
+      "sma20": 4077.77,
+      "upper_wick": 23.41
     },
     "oil": {
       "as_of": "2026-11-02",
-      "brent": 109.51,
-      "brent_change": 1.2575,
+      "brent": 107.27,
+      "brent_change": -0.8137,
       "label": "Brent / WTI",
       "stance": "油价下跌，通胀降温但工业需求偏弱",
-      "wti": 97.95,
-      "wti_change": 1.1045
+      "wti": 96.57,
+      "wti_change": -0.32
     },
     "pattern": {
-      "bias": "短线偏弱",
+      "bias": "方向待确认",
       "confirmation": "连续日收盘跌破支撑，或反弹重新站回开盘区后再定方向",
-      "label": "中长阴线"
+      "label": "小实体 / 混合 K 线"
     },
     "scenarios": [
       {
@@ -6460,9 +6507,9 @@
     "silver": {
       "label": "白银 XAG/USD",
       "note": "白银既受贵金属联动支持，也对实际利率和工业周期更敏感；跌破自身支撑时不与黄金强行合并。",
-      "session_change": -3.5374,
+      "session_change": -2.1347,
       "stance": "高波动，等待跟随确认",
-      "value": 48.894
+      "value": 49.605
     },
     "source": "Gate CFD XAUUSD daily OHLC",
     "source_url": [
@@ -6557,12 +6604,8 @@
     },
     "BAMLH0A0HYM2": {
       "category": "情绪",
-      "date": "2026-10-30",
+      "date": "2026-11-02",
       "history": [
-        [
-          "2026-06-29",
-          2.8
-        ],
         [
           "2026-06-30",
           2.75
@@ -6918,16 +6961,20 @@
         [
           "2026-10-30",
           3.44
+        ],
+        [
+          "2026-11-02",
+          3.43
         ]
       ],
       "id": "BAMLH0A0HYM2",
       "label": "美国高收益债 OAS",
-      "previous": 3.26,
-      "previous_date": "2026-10-29",
+      "previous": 3.44,
+      "previous_date": "2026-10-30",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
       "unit": "%",
-      "value": 3.44
+      "value": 3.43
     },
     "CPIAUCSL": {
       "category": "通胀",
@@ -7121,7 +7168,7 @@
     },
     "DCOILBRENTEU": {
       "category": "能源",
-      "change": 1.2575,
+      "change": -0.8137,
       "date": "2026-11-02",
       "history": [
         [
@@ -7602,7 +7649,7 @@
         ],
         [
           "2026-11-02",
-          109.51
+          107.27
         ]
       ],
       "id": "DCOILBRENTEU",
@@ -7613,11 +7660,11 @@
       "source": "Gate CFD XBRUSD daily OHLC",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XBRUSD/klines?kline_type=1d&limit=120",
       "unit": "美元/桶",
-      "value": 109.51
+      "value": 107.27
     },
     "DCOILWTICO": {
       "category": "能源",
-      "change": 1.1045,
+      "change": -0.32,
       "date": "2026-11-02",
       "history": [
         [
@@ -8098,7 +8145,7 @@
         ],
         [
           "2026-11-02",
-          97.95
+          96.57
         ]
       ],
       "id": "DCOILWTICO",
@@ -8109,7 +8156,7 @@
       "source": "Gate CFD XTIUSD daily OHLC",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XTIUSD/klines?kline_type=1d&limit=120",
       "unit": "美元/桶",
-      "value": 97.95
+      "value": 96.57
     },
     "DFF": {
       "category": "政策",
@@ -10357,12 +10404,8 @@
     },
     "FX_USDJPY": {
       "category": "资产",
-      "date": "2026-11-02",
+      "date": "2026-11-03",
       "history": [
-        [
-          "2026-08-05",
-          157.59044
-        ],
         [
           "2026-08-06",
           157.83226
@@ -10614,20 +10657,24 @@
         [
           "2026-11-02",
           157.89943
+        ],
+        [
+          "2026-11-03",
+          158.28786
         ]
       ],
       "id": "FX_USDJPY",
       "label": "USD/JPY ECB 参考汇率",
-      "previous": 157.25027,
-      "previous_date": "2026-10-30",
+      "previous": 157.89943,
+      "previous_date": "2026-11-02",
       "source": "ECB",
       "source_url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
       "unit": "JPY/USD",
-      "value": 157.89943
+      "value": 158.28786
     },
     "JTSJOL": {
       "category": "周期",
-      "date": "2026-08-01",
+      "date": "2026-09-01",
       "history": [
         [
           "2023-01-01",
@@ -10803,17 +10850,21 @@
         ],
         [
           "2026-08-01",
-          7079.0
+          7190.0
+        ],
+        [
+          "2026-09-01",
+          7523.0
         ]
       ],
       "id": "JTSJOL",
       "label": "JOLTS 职位空缺",
-      "previous": 7335.0,
-      "previous_date": "2026-07-01",
+      "previous": 7190.0,
+      "previous_date": "2026-08-01",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/JTSJOL",
       "unit": "千人",
-      "value": 7079.0
+      "value": 7523.0
     },
     "NASDAQCOM": {
       "category": "资产",
@@ -12524,130 +12575,6 @@
       "date": "2026-11-03",
       "history": [
         [
-          "2026-10-27T10:00:00Z",
-          53.13
-        ],
-        [
-          "2026-10-27T10:15:00Z",
-          53.15
-        ],
-        [
-          "2026-10-27T10:30:00Z",
-          53.382
-        ],
-        [
-          "2026-10-27T10:45:00Z",
-          53.362
-        ],
-        [
-          "2026-10-27T11:00:00Z",
-          53.384
-        ],
-        [
-          "2026-10-27T11:15:00Z",
-          53.339
-        ],
-        [
-          "2026-10-27T11:30:00Z",
-          53.283
-        ],
-        [
-          "2026-10-27T11:45:00Z",
-          53.259
-        ],
-        [
-          "2026-10-27T12:00:00Z",
-          53.333
-        ],
-        [
-          "2026-10-27T12:15:00Z",
-          53.524
-        ],
-        [
-          "2026-10-27T12:30:00Z",
-          53.593
-        ],
-        [
-          "2026-10-27T12:45:00Z",
-          53.634
-        ],
-        [
-          "2026-10-27T13:00:00Z",
-          53.719
-        ],
-        [
-          "2026-10-27T13:15:00Z",
-          53.719
-        ],
-        [
-          "2026-10-27T13:30:00Z",
-          53.984
-        ],
-        [
-          "2026-10-27T13:45:00Z",
-          53.873
-        ],
-        [
-          "2026-10-27T14:00:00Z",
-          54.013
-        ],
-        [
-          "2026-10-27T14:15:00Z",
-          54.215
-        ],
-        [
-          "2026-10-27T14:30:00Z",
-          54.142
-        ],
-        [
-          "2026-10-27T14:45:00Z",
-          54.398
-        ],
-        [
-          "2026-10-27T15:00:00Z",
-          54.436
-        ],
-        [
-          "2026-10-27T15:15:00Z",
-          54.507
-        ],
-        [
-          "2026-10-27T15:30:00Z",
-          54.467
-        ],
-        [
-          "2026-10-27T15:45:00Z",
-          54.501
-        ],
-        [
-          "2026-10-27T16:00:00Z",
-          54.383
-        ],
-        [
-          "2026-10-27T16:15:00Z",
-          54.367
-        ],
-        [
-          "2026-10-27T16:30:00Z",
-          54.379
-        ],
-        [
-          "2026-10-27T16:45:00Z",
-          54.382
-        ],
-        [
-          "2026-10-27T17:00:00Z",
-          54.394
-        ],
-        [
-          "2026-10-27T17:15:00Z",
-          54.435
-        ],
-        [
-          "2026-10-27T17:30:00Z",
-          54.428
-        ],
-        [
           "2026-10-27T17:45:00Z",
           54.261
         ],
@@ -14345,152 +14272,152 @@
         ],
         [
           "2026-11-03T09:45:00Z",
-          48.894
+          48.992
+        ],
+        [
+          "2026-11-03T10:00:00Z",
+          48.882
+        ],
+        [
+          "2026-11-03T10:15:00Z",
+          48.91
+        ],
+        [
+          "2026-11-03T10:30:00Z",
+          48.924
+        ],
+        [
+          "2026-11-03T10:45:00Z",
+          48.951
+        ],
+        [
+          "2026-11-03T11:00:00Z",
+          49.054
+        ],
+        [
+          "2026-11-03T11:15:00Z",
+          48.958
+        ],
+        [
+          "2026-11-03T11:30:00Z",
+          49.03
+        ],
+        [
+          "2026-11-03T11:45:00Z",
+          48.961
+        ],
+        [
+          "2026-11-03T12:00:00Z",
+          48.948
+        ],
+        [
+          "2026-11-03T12:15:00Z",
+          49.165
+        ],
+        [
+          "2026-11-03T12:30:00Z",
+          49.3
+        ],
+        [
+          "2026-11-03T12:45:00Z",
+          49.643
+        ],
+        [
+          "2026-11-03T13:00:00Z",
+          49.695
+        ],
+        [
+          "2026-11-03T13:15:00Z",
+          50.115
+        ],
+        [
+          "2026-11-03T13:30:00Z",
+          50.333
+        ],
+        [
+          "2026-11-03T13:45:00Z",
+          50.412
+        ],
+        [
+          "2026-11-03T14:00:00Z",
+          50.096
+        ],
+        [
+          "2026-11-03T14:15:00Z",
+          49.92
+        ],
+        [
+          "2026-11-03T14:30:00Z",
+          49.987
+        ],
+        [
+          "2026-11-03T14:45:00Z",
+          50.047
+        ],
+        [
+          "2026-11-03T15:00:00Z",
+          49.933
+        ],
+        [
+          "2026-11-03T15:15:00Z",
+          49.662
+        ],
+        [
+          "2026-11-03T15:30:00Z",
+          49.906
+        ],
+        [
+          "2026-11-03T15:45:00Z",
+          49.851
+        ],
+        [
+          "2026-11-03T16:00:00Z",
+          49.816
+        ],
+        [
+          "2026-11-03T16:15:00Z",
+          49.826
+        ],
+        [
+          "2026-11-03T16:30:00Z",
+          49.718
+        ],
+        [
+          "2026-11-03T16:45:00Z",
+          49.719
+        ],
+        [
+          "2026-11-03T17:00:00Z",
+          49.747
+        ],
+        [
+          "2026-11-03T17:15:00Z",
+          49.668
+        ],
+        [
+          "2026-11-03T17:30:00Z",
+          49.605
         ]
       ],
       "id": "SPOT_XAGUSD",
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
-      "observed_at": "2026-11-03T09:45:00Z",
-      "previous": 50.204,
-      "previous_date": "2026-11-03T09:30:00Z",
+      "observed_at": "2026-11-03T17:30:00Z",
+      "previous": 48.894,
+      "previous_date": "2026-11-03T17:15:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAGUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 48.894,
+      "value": 49.605,
       "venue": "Gate TradFi CFD"
     },
     "SPOT_XAUUSD": {
       "category": "贵金属",
       "date": "2026-11-03",
       "history": [
-        [
-          "2026-10-27T10:00:00Z",
-          3996.21
-        ],
-        [
-          "2026-10-27T10:15:00Z",
-          3994.66
-        ],
-        [
-          "2026-10-27T10:30:00Z",
-          4007.51
-        ],
-        [
-          "2026-10-27T10:45:00Z",
-          4008.74
-        ],
-        [
-          "2026-10-27T11:00:00Z",
-          4009.08
-        ],
-        [
-          "2026-10-27T11:15:00Z",
-          4010.96
-        ],
-        [
-          "2026-10-27T11:30:00Z",
-          4009.79
-        ],
-        [
-          "2026-10-27T11:45:00Z",
-          4012.45
-        ],
-        [
-          "2026-10-27T12:00:00Z",
-          4013.24
-        ],
-        [
-          "2026-10-27T12:15:00Z",
-          4021.6
-        ],
-        [
-          "2026-10-27T12:30:00Z",
-          4021.1
-        ],
-        [
-          "2026-10-27T12:45:00Z",
-          4023.28
-        ],
-        [
-          "2026-10-27T13:00:00Z",
-          4023.01
-        ],
-        [
-          "2026-10-27T13:15:00Z",
-          4021.29
-        ],
-        [
-          "2026-10-27T13:30:00Z",
-          4028.91
-        ],
-        [
-          "2026-10-27T13:45:00Z",
-          4029.76
-        ],
-        [
-          "2026-10-27T14:00:00Z",
-          4035.8
-        ],
-        [
-          "2026-10-27T14:15:00Z",
-          4043.89
-        ],
-        [
-          "2026-10-27T14:30:00Z",
-          4047.87
-        ],
-        [
-          "2026-10-27T14:45:00Z",
-          4052.29
-        ],
-        [
-          "2026-10-27T15:00:00Z",
-          4057.69
-        ],
-        [
-          "2026-10-27T15:15:00Z",
-          4058.93
-        ],
-        [
-          "2026-10-27T15:30:00Z",
-          4061.4
-        ],
-        [
-          "2026-10-27T15:45:00Z",
-          4063.61
-        ],
-        [
-          "2026-10-27T16:00:00Z",
-          4060.93
-        ],
-        [
-          "2026-10-27T16:15:00Z",
-          4057.33
-        ],
-        [
-          "2026-10-27T16:30:00Z",
-          4059.77
-        ],
-        [
-          "2026-10-27T16:45:00Z",
-          4059.15
-        ],
-        [
-          "2026-10-27T17:00:00Z",
-          4059.17
-        ],
-        [
-          "2026-10-27T17:15:00Z",
-          4061.63
-        ],
-        [
-          "2026-10-27T17:30:00Z",
-          4063.05
-        ],
         [
           "2026-10-27T17:45:00Z",
           4056.75
@@ -16189,22 +16116,146 @@
         ],
         [
           "2026-11-03T09:45:00Z",
-          3909.39
+          3909.47
+        ],
+        [
+          "2026-11-03T10:00:00Z",
+          3906.4
+        ],
+        [
+          "2026-11-03T10:15:00Z",
+          3902.67
+        ],
+        [
+          "2026-11-03T10:30:00Z",
+          3903.62
+        ],
+        [
+          "2026-11-03T10:45:00Z",
+          3905.35
+        ],
+        [
+          "2026-11-03T11:00:00Z",
+          3908.4
+        ],
+        [
+          "2026-11-03T11:15:00Z",
+          3905.04
+        ],
+        [
+          "2026-11-03T11:30:00Z",
+          3906.85
+        ],
+        [
+          "2026-11-03T11:45:00Z",
+          3906.04
+        ],
+        [
+          "2026-11-03T12:00:00Z",
+          3905.36
+        ],
+        [
+          "2026-11-03T12:15:00Z",
+          3913.43
+        ],
+        [
+          "2026-11-03T12:30:00Z",
+          3914.97
+        ],
+        [
+          "2026-11-03T12:45:00Z",
+          3932.68
+        ],
+        [
+          "2026-11-03T13:00:00Z",
+          3937.27
+        ],
+        [
+          "2026-11-03T13:15:00Z",
+          3953.99
+        ],
+        [
+          "2026-11-03T13:30:00Z",
+          3964.15
+        ],
+        [
+          "2026-11-03T13:45:00Z",
+          3960.89
+        ],
+        [
+          "2026-11-03T14:00:00Z",
+          3949.32
+        ],
+        [
+          "2026-11-03T14:15:00Z",
+          3942.07
+        ],
+        [
+          "2026-11-03T14:30:00Z",
+          3945.02
+        ],
+        [
+          "2026-11-03T14:45:00Z",
+          3944.65
+        ],
+        [
+          "2026-11-03T15:00:00Z",
+          3935.61
+        ],
+        [
+          "2026-11-03T15:15:00Z",
+          3925.58
+        ],
+        [
+          "2026-11-03T15:30:00Z",
+          3935.78
+        ],
+        [
+          "2026-11-03T15:45:00Z",
+          3936.42
+        ],
+        [
+          "2026-11-03T16:00:00Z",
+          3935.86
+        ],
+        [
+          "2026-11-03T16:15:00Z",
+          3934.04
+        ],
+        [
+          "2026-11-03T16:30:00Z",
+          3930.61
+        ],
+        [
+          "2026-11-03T16:45:00Z",
+          3927.85
+        ],
+        [
+          "2026-11-03T17:00:00Z",
+          3929.96
+        ],
+        [
+          "2026-11-03T17:15:00Z",
+          3928.66
+        ],
+        [
+          "2026-11-03T17:30:00Z",
+          3927.57
         ]
       ],
       "id": "SPOT_XAUUSD",
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
-      "observed_at": "2026-11-03T09:45:00Z",
-      "previous": 3944.23,
-      "previous_date": "2026-11-03T09:30:00Z",
+      "observed_at": "2026-11-03T17:30:00Z",
+      "previous": 3909.39,
+      "previous_date": "2026-11-03T17:15:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
       "source_url": "https://api.gateio.ws/api/v4/tradfi/symbols/XAUUSD/klines?kline_type=15m&limit=97",
       "stale": false,
       "tradable": false,
       "unit": "USD/金衡盎司",
-      "value": 3909.39,
+      "value": 3927.57,
       "venue": "Gate TradFi CFD"
     },
     "T10YIE": {
@@ -16967,12 +17018,8 @@
     },
     "VIXCLS": {
       "category": "情绪",
-      "date": "2026-10-30",
+      "date": "2026-11-02",
       "history": [
-        [
-          "2026-06-29",
-          17.65
-        ],
         [
           "2026-06-30",
           16.45
@@ -17328,16 +17375,20 @@
         [
           "2026-10-30",
           19.42
+        ],
+        [
+          "2026-11-02",
+          21.15
         ]
       ],
       "id": "VIXCLS",
       "label": "VIX",
-      "previous": 17.2,
-      "previous_date": "2026-10-29",
+      "previous": 19.42,
+      "previous_date": "2026-10-30",
       "source": "FRED",
       "source_url": "https://fred.stlouisfed.org/series/VIXCLS",
       "unit": "指数",
-      "value": 19.42
+      "value": 21.15
     },
     "WALCL": {
       "category": "流动性",
@@ -18462,5 +18513,5 @@
       "value": 23508.0
     }
   },
-  "snapshot_id": "dd67e974724f6953"
+  "snapshot_id": "21529d65a1fe49af"
 }
