@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-11-20T22:59:36Z",
+    "checked_at": "2026-11-21T03:53:38Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -28.9 亿（5日/市值 -0.22%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -31,7 +31,8 @@
       "半导体材料: sector not found",
       "半导体: sector not found",
       "银行: sector not found",
-      "有色金属/贵金属: sector not found"
+      "有色金属/贵金属: sector not found",
+      "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',"
     ],
     "evaluation_status": "PARTIAL",
     "framework": [
@@ -45,7 +46,7 @@
     "freshness": {
       "cached_sector_count": 9,
       "current_sector_count": 2,
-      "error_count": 11,
+      "error_count": 12,
       "history_live_count": 2
     },
     "index_flows": [
@@ -79,7 +80,7 @@
       {
         "change_pct": -3.54,
         "code": "399006",
-        "main_net_flow_billion_cny": -112.701,
+        "main_net_flow_billion_cny": null,
         "name": "创业板指",
         "price": 2212.13,
         "secid": "0.399006",
@@ -87,7 +88,7 @@
       }
     ],
     "market": {
-      "main_net_flow_billion_cny": -658.175,
+      "main_net_flow_billion_cny": null,
       "structure_label": "指数主力流向偏弱或部分缺失",
       "turnover_trillion_cny": 1.422
     },
@@ -554,7 +555,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-11-20T22:59:35Z",
+    "checked_at": "2026-11-21T03:53:38Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5282,7 +5283,7 @@
       "label": "白银较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.2878
+      "value": 0.0
     },
     "XAG_SESSION": {
       "date": "2026-11-20",
@@ -5296,7 +5297,7 @@
       "label": "黄金较上次快照",
       "source": "Gold-API",
       "unit": "%",
-      "value": -0.1839
+      "value": 0.0
     },
     "XAU_SESSION": {
       "date": "2026-11-20",
@@ -6138,9 +6139,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-11-20T22:59:23Z"
+    "updated_at": "2026-11-21T03:53:35Z"
   },
-  "generated_at": "2026-11-20T22:59:23Z",
+  "generated_at": "2026-11-21T03:53:35Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6194,13 +6195,13 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-11-20T22:59:36Z",
+    "a_share_checked_at": "2026-11-21T03:53:38Z",
     "ai_tokens_used": 0,
-    "cached_count": 1,
-    "calendar_checked_at": "2026-11-20T22:59:23Z",
+    "cached_count": 30,
+    "calendar_checked_at": "2026-11-21T03:53:35Z",
     "cftc_checked_at": "2026-11-20T22:59:23Z",
     "cross_asset_checked_at": "2026-11-20T07:47:18Z",
-    "error_count": 11,
+    "error_count": 12,
     "errors": [
       {
         "error": "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
@@ -6256,155 +6257,150 @@
         "error": "有色金属/贵金属: sector not found",
         "series": "sector/index",
         "source": "Eastmoney A-share"
+      },
+      {
+        "error": "创业板指 flow: Eastmoney request failed: stock/fflow/daykline/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error',",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
       }
     ],
     "fallback_count": 1,
     "inventory_checked_at": "2026-11-20T22:59:23Z",
     "macro_checked_at": "2026-11-20T22:59:23Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-11-20T23:00:00Z",
+    "next_scheduled_at": "2026-11-21T04:00:00Z",
     "run_interval_minutes": 15,
-    "source_count": 37,
+    "source_count": 35,
     "statuses": [
       {
         "date": "2026-11-18",
         "source": "FRED WALCL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-20",
         "source": "FRED RRPONTSYD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-18",
         "source": "FRED WDTGAL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED TOTRESNS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-05",
         "source": "FRED WM2NS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED DGS2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED DGS10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED DGS30",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED DFII10",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-20",
         "source": "FRED T10YIE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED DFF",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED VIXCLS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED BAMLH0A0HYM2",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED SP500",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-19",
         "source": "FRED NASDAQCOM",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-13",
         "source": "FRED DTWEXBGS",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-11-17",
+        "date": "2026-11-19",
         "source": "FRED DCOILBRENTEU",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-11-17",
+        "date": "2026-11-19",
         "source": "FRED DCOILWTICO",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-07-01",
         "source": "FRED A191RL1Q225SBEA",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-01",
         "source": "FRED PAYEMS",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-01",
         "source": "FRED UNRATE",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED JTSJOL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-10-01",
         "source": "FRED CPIAUCSL",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED PCEPI",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-09-01",
         "source": "FRED PCEPILFE",
-        "status": "ok"
-      },
-      {
-        "date": "2026-11-19",
-        "source": "Gate CFD XBRUSD",
-        "status": "ok"
-      },
-      {
-        "date": "2026-11-19",
-        "source": "Gate CFD XTIUSD",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-20",
         "source": "ECB FX",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-20T21:45:00Z",
@@ -6419,25 +6415,25 @@
       {
         "date": "2026-11-17",
         "source": "CFTC",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-11-20T22:59:35Z",
+        "date": "2026-11-21T03:53:38Z",
         "source": "Economic calendar",
         "status": "ok"
       },
       {
         "date": "2026-11-20",
         "source": "CME gold warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
         "date": "2026-11-20",
         "source": "CME silver warehouse",
-        "status": "ok"
+        "status": "cached"
       },
       {
-        "date": "2026-11-20T22:59:36Z",
+        "date": "2026-11-21T03:53:38Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6452,8 +6448,8 @@
         "status": "cached"
       }
     ],
-    "success_count": 37,
-    "updated_count": 35
+    "success_count": 35,
+    "updated_count": 4
   },
   "post_close_analysis": {
     "as_of": "2026-11-19",
@@ -14453,7 +14449,7 @@
       "instrument": "XAG/USD spot",
       "label": "白银现货 XAG/USD",
       "observed_at": "2026-11-20T21:45:00Z",
-      "previous": 41.348,
+      "previous": 41.229,
       "previous_date": "2026-11-20T21:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
@@ -16313,7 +16309,7 @@
       "instrument": "XAU/USD spot",
       "label": "黄金现货 XAU/USD",
       "observed_at": "2026-11-20T21:45:00Z",
-      "previous": 3544.57,
+      "previous": 3538.05,
       "previous_date": "2026-11-20T21:30:00Z",
       "quote_basis": "Gate TradFi CFD 15分钟参考价（非可成交现货报价）",
       "source": "Gate CFD public API",
