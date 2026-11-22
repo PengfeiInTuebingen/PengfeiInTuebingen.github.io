@@ -1,6 +1,6 @@
 {
   "a_share": {
-    "checked_at": "2026-11-22T14:43:19Z",
+    "checked_at": "2026-11-22T20:51:08Z",
     "conclusions": [
       {
         "body": "铜当前记录值为 -28.9 亿（5日/市值 -0.22%），但历史未完整返回，连续性保持 UNKNOWN。工业金属若同向，才构成趋势级而非一日异动。",
@@ -21,6 +21,7 @@
     "data_status": "PARTIAL",
     "data_type": "a_share_snapshot",
     "errors": [
+      "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
       "工业金属: sector not found",
       "证券: sector not found",
@@ -44,7 +45,7 @@
     "freshness": {
       "cached_sector_count": 9,
       "current_sector_count": 2,
-      "error_count": 10,
+      "error_count": 11,
       "history_live_count": 2
     },
     "index_flows": [
@@ -498,7 +499,7 @@
         "today_to_cap_pct": null
       }
     ],
-    "snapshot_date": "2026-11-22",
+    "snapshot_date": "2026-11-23",
     "source": "东方财富公开行情与资金流接口",
     "source_note": "自动抓取指数行情、成交额与行业资金流；板块当前行情 2/11，完整5日历史 2/11。主力净额为数据商依据成交方向推断的主动买卖差额，算法版本与大小单分档未公开。",
     "source_url": "https://data.eastmoney.com/zjlx/",
@@ -553,7 +554,7 @@
     ]
   },
   "calendar": {
-    "checked_at": "2026-11-22T14:43:18Z",
+    "checked_at": "2026-11-22T20:51:07Z",
     "coverage_note": "美联储、BEA、ECB 官方日程优先；公开周历补足 CPI、非农、日本与中国事件。",
     "events": [
       {
@@ -5439,7 +5440,7 @@
   },
   "flow_positioning": {
     "cme_inventory": {
-      "checked_at": "2026-11-22T14:42:48Z",
+      "checked_at": "2026-11-22T20:50:55Z",
       "definition_note": "Registered = 已签发仓单、可交割库存；Eligible = 符合规格但未签发仓单；Pledged = 已质押库存。",
       "fallback_note": "CME 当前自动报表下载受站点反爬策略限制；页面保留最近一次官方快照，并在下一个 6 小时周期重试。",
       "metals": {
@@ -6262,9 +6263,9 @@
       "source_url": "https://www.cmegroup.com/solutions/clearing/operations-and-deliveries/nymex-delivery-notices.html"
     },
     "scope_note": "价格、K线与成交量统一由 TradingView 图表展示；CFTC 持仓与 CME 库存作为官方背景数据，不再生成独立的加密货币持仓量、成交量或资金费率指标。",
-    "updated_at": "2026-11-22T14:42:48Z"
+    "updated_at": "2026-11-22T20:50:55Z"
   },
-  "generated_at": "2026-11-22T14:42:48Z",
+  "generated_at": "2026-11-22T20:50:55Z",
   "layers": {
     "L1": {
       "automated": true,
@@ -6318,14 +6319,19 @@
     }
   },
   "pipeline": {
-    "a_share_checked_at": "2026-11-22T14:43:19Z",
+    "a_share_checked_at": "2026-11-22T20:51:08Z",
     "ai_tokens_used": 0,
     "cached_count": 1,
-    "calendar_checked_at": "2026-11-22T14:42:48Z",
-    "cftc_checked_at": "2026-11-22T06:14:38Z",
+    "calendar_checked_at": "2026-11-22T20:50:55Z",
+    "cftc_checked_at": "2026-11-22T20:50:55Z",
     "cross_asset_checked_at": "2026-11-22T14:42:48Z",
-    "error_count": 10,
+    "error_count": 11,
     "errors": [
+      {
+        "error": "sector page 4: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
+        "series": "sector/index",
+        "source": "Eastmoney A-share"
+      },
       {
         "error": "sector page 5: Eastmoney request failed: clist/get: Command '['curl', '--http1.1', '--fail', '--silent', '--show-error', '-L', '-A', 'M",
         "series": "sector/index",
@@ -6378,10 +6384,10 @@
       }
     ],
     "fallback_count": 1,
-    "inventory_checked_at": "2026-11-22T14:42:48Z",
-    "macro_checked_at": "2026-11-22T14:42:48Z",
+    "inventory_checked_at": "2026-11-22T20:50:55Z",
+    "macro_checked_at": "2026-11-22T20:50:55Z",
     "mode": "15-minute-zero-token",
-    "next_scheduled_at": "2026-11-22T14:45:00Z",
+    "next_scheduled_at": "2026-11-22T21:00:00Z",
     "run_interval_minutes": 15,
     "source_count": 37,
     "statuses": [
@@ -6538,10 +6544,10 @@
       {
         "date": "2026-11-17",
         "source": "CFTC",
-        "status": "cached"
+        "status": "ok"
       },
       {
-        "date": "2026-11-22T14:43:18Z",
+        "date": "2026-11-22T20:51:07Z",
         "source": "Economic calendar",
         "status": "ok"
       },
@@ -6556,7 +6562,7 @@
         "status": "ok"
       },
       {
-        "date": "2026-11-22T14:43:19Z",
+        "date": "2026-11-22T20:51:08Z",
         "source": "A股指数/板块资金流",
         "status": "fallback"
       },
@@ -6568,7 +6574,7 @@
       {
         "date": "2026-11-20",
         "source": "Cross-asset correlation",
-        "status": "ok"
+        "status": "cached"
       }
     ],
     "success_count": 37,
